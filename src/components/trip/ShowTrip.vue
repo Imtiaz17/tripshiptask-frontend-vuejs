@@ -2,396 +2,333 @@
     <div>
         <div class="content vld-parent">
             <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true"></loading>
-            <div id="main-dashboard" class="conbox">
-                <div id="social-layout" class="dashboard-columns" style="min-height:500px;">
-                    <div class="columns">
-                        <div class="column is-8">
-                            <div v-if="trip">
-                                <edit-trip :info="data"></edit-trip>
-                            </div>
-                            <div v-else>
-                                <div class="flex-card featured-feed-post light-bordered light-raised" style="min-height:100px; max-height:380px">
-                                    <div class="c-body">
-                                        <div class="columns is-mobile" style="margin-top:30px">
-                                            <div class="column is-8" style="margin-top:-27px">
-                                                <span class="tripid">
-                                                    Trip Id: {{info.trip_id}}
+            <div id="main-dashboard">
+                <div class="columns">
+                    <div class="column is-8">
+                        <div v-if="trip">
+                            <edit-trip :info="data"></edit-trip>
+                        </div>
+                        <div v-else>
+                            <div class="flex-card featured-feed-post light-bordered light-raised" style="min-height:100px; max-height:380px">
+                                <div class="body">
+                                    <div class="columns is-mobile">
+                                        <div class="column is-8">
+                                            <span class="tripid">
+                                                Trip Id: {{info.trip_id}}
+                                            </span>
+                                            <h4 class="triptitle">
+                                                {{info.title}}
+                                            </h4>
+                                        </div>
+                                        <div class="column is-4">
+                                            <div class="posting-time">
+                                                <span>Posted {{moment(info.created_at).fromNow()}}
                                                 </span>
-                                                <h4 class="triptitle">
-                                                    {{info.title}}
-                                                </h4>
-                                            </div>
-                                            <div class="column is-4">
-                                                <!--  <button @click="" class="button btn-align info-btn raised" v-if="post_type=='offer'">Back</button> -->
-                                                <!--  <a @click="$router.go(-1)">back</a>
-                                                 -->
-                                                <div class="author-meta" style="margin-top: -26px;float:right;padding:0px 17px">
-                                                    <div style="color:gray">Published by
-                                                        <span style="color: black;font-weight:600">{{info.user}}</span>
-                                                    </div>
-                                                    <div style="color:gray">
-                                                        Posted
-                                                        <span>
-                                                            {{moment(info.created_at).fromNow()}}
-                                                        </span>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
-                                        <hr style="margin:0;margin-top:-11px">
-                                        <div class="post-detail-section">
-                                            <div class="post-body">
-                                                <h5>Ride Details</h5>
-                                                <div class="divider"></div>
-                                                <p style="font-size: 15px;line-height: 23px;">
-                                                    {{info.details}}
-                                                </p>
-                                            </div>
+                                    </div>
+                                    <hr style="margin: -7px 0px 0px;">
+                                    <div class="post-detail-section">
+                                        <div class="post-body">
+                                            <h5>Notes</h5>
+                                            <div class="divider"></div>
+                                            <p style="font-size: 15px;line-height: 23px;">
+                                                {{info.details}}
+                                            </p>
                                         </div>
-                                        <div class="post-activity">
-                                            <div class="columns tactivity  is-mobile">
-                                                <div class="left column is-9">
-                                                    <h5>Trip Activity</h5>
-                                                    <div class="divider"></div>
-                                                    <div class="field" style="display:inline-flex">
-                                                        <label class="label">Total Bids:</label>
-                                                        <div class="control" style="margin-left:5px;margin-top:-2px;">
-                                                            <label>{{info.bids_count}}</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="right column is-3" v-if="trip_owner">
-                                                    <vs-button type="filled" @click="editTrip">Edit</vs-button>
-                                                    <vs-button type="filled" color="danger" @click="deleteTrip(info.slug)">Delete</vs-button>
-                                                </div>
-                                                <div class="column is-3" v-else v-show="canBid">
-                                                    <a @click="bidtrip" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade right"><span class="material-icons">
-                                                            add_alert
-                                                        </span> Bid</a>
-                                                </div>
+                                    </div>
+                                    <div class="post-activity">
+                                        <div class="columns tactivity  is-mobile">
+                                            <div class="left column">
+                                            </div>
+                                            <div class="right column is-3" v-if="trip_owner">
+                                                <vs-button v-if="showDeleteTrip" type="filled" color="danger" @click="deleteTrip(info.slug)">Delete</vs-button>
+                                                <vs-button type="filled" @click="editTrip">Edit</vs-button>
+                                                <vs-button v-if="showCancelTrip" @click="cancelTrip" color="rgb(11, 189, 135)" type="filled">Cancel Trip</vs-button>
+                                            </div>
+                                            <div class="column is-3" v-else v-show="canBid">
+                                                <a v-if="verified" @click="bidtrip" class="button btn-dash info-btn is-raised rounded btn-fade right"><span class="material-icons">
+                                                        add_alert
+                                                    </span>Offer</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div style="margin-top:-12px">
-                                    <google-map :data="data"></google-map>
-                                </div>
+                            </div>
+                            <div style="margin-top:-12px">
+                                <google-map :data="data"></google-map>
                             </div>
                         </div>
-                        <div class="column is-4">
-                            <div class="flex-card light-bordered light-raised trip-info">
-                                <h3 class="card-heading is-bordered">Trip information</h3>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span v-if="info.vehicle_type=='Car'" class="material-icons">directions_car</span>
-                                            <span v-else-if="info.vehicle_type=='Motorcycle'" class="material-icons">two_wheeler</span>
-                                            <span v-else-if="info.vehicle_type=='Mini van'" class="material-icons">local_shipping</span>
-                                            <span v-else><span class="material-icons">local_taxi</span></span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Vehicle Type:</p>
-                                        <p class="post-info">{{info.vehicle_type}}</p>
-                                    </div>
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">airline_seat_legroom_normal</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Seats Available:</p>
-                                        <p class="post-info">
-                                            {{info.seat}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32" style="padding-top: 5px;">
+                    </div>
+                    <div class="column is-4">
+                        <div class="flex-card light-bordered light-raised trip-info">
+                            <h3 class="card-heading is-bordered">Trip information</h3>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span v-if="info.vehicle_type=='Car'" class="material-icons">directions_car</span>
+                                        <span v-else-if="info.vehicle_type=='Motorcycle'" class="material-icons">two_wheeler</span>
+                                        <span v-else-if="info.vehicle_type=='Mini van'" class="material-icons">local_shipping</span>
+                                        <span v-else><span class="material-icons">local_taxi</span></span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Vehicle Type:</p>
+                                    <p class="post-info">{{info.vehicle_type}}</p>
+                                    <p class="post-title">Vehicle:</p>
+                                    <p class="post-info">{{info.vehicle_name}}</p>
+                                </div>
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">airline_seat_legroom_normal</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Total Seats:</p>
+                                    <p class="post-info">
+                                        {{info.vehicle_seat}}
+                                    </p>
+                                    <p class="post-title">Seats Available:</p>
+                                    <p class="post-info">
+                                        {{info.seats_available}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">
+                                            near_me
+                                        </span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Start Point:</p>
+                                    <p class="post-info">
+                                        {{info.start_point}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post" v-if="info.via">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">room</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Mid Point</p>
+                                    <p class="post-info"> {{info.via}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons" style="margin-top: 3px;">beenhere</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Destination:</p>
+                                    <p class="post-info">
+                                        {{info.destination}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">trending_up</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Trip distance:</p>
+                                    <p class="post-info">
+                                        {{info.distance}}
+                                    </p>
+                                </div>
+                                <div class="media-left is-hidden-mobile" style="    margin-left: -46px;">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">schedule</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Trip duration:</p>
+                                    <p class="post-info">
+                                        {{info.duration}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">
+                                            calendar_today
+                                        </span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Date:</p>
+                                    <p class="post-info">
+                                        {{moment(info.date).format("ll")}}
+                                    </p>
+                                </div>
+                                <div class="media-left is-hidden-mobile" style="margin-left: -73px;">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">access_time</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Time:</p>
+                                    <p class="post-info">
+                                        {{moment(info.time, "HH:mm::ss").format("hh:mm A")}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">how_to_reg</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Prefer to give ride:</p>
+                                    <p class="post-info"> {{info.preferred_passenger}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">
+                                            money
+                                        </span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Offered Amount:</p>
+                                    <p class="post-info">
+                                        <span class="amountpayble">
+                                            {{info.pay}} {{info.currency}}
+                                        </span>
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="flex-card light-bordered light-raised trip-giver-info">
+                            <h3 class="card-heading is-bordered">Trip poster’s information</h3>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <i class="material-icons">local_offer</i>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Posted:</p>
+                                    <div class="post-info">
+                                        <div class="verified">
+                                            <span class="username">
+                                                {{data.user.split(' ')[0]}}</span>
                                             <span class="material-icons">
-                                                near_me
+                                                verified
                                             </span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Start Point:</p>
-                                        <p class="post-info">
-                                            {{info.start_point}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post" v-if="info.via">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">room</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Mid Point</p>
-                                        <p class="post-info"> {{info.via}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons" style="margin-top: 3px;">beenhere</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Destination:</p>
-                                        <p class="post-info">
-                                            {{info.destination}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">trending_up</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Trip distance:</p>
-                                        <p class="post-info">
-                                            {{info.distance}}
-                                        </p>
-                                    </div>
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">schedule</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Trip duration:</p>
-                                        <p class="post-info">
-                                            {{info.duration}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">
-                                                calendar_today
-                                            </span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Date:</p>
-                                        <p class="post-info">
-                                            {{moment(info.date).format("ll")}}
-                                        </p>
-                                    </div>
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">access_time</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Time:</p>
-                                        <p class="post-info">
-                                            {{moment(info.time, "HH:mm::ss").format("hh:mm A")}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">
-                                                money
-                                            </span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Offered Amount:</p>
-                                        <p class="post-info">
-                                            <span class="amountpayble">
-                                                {{info.pay}} BDT
-                                            </span>
-                                        </p>
-                                    </div>
-                                </article>
-                            </div>
-                            <div class="flex-card light-bordered light-raised trip-giver-info">
-                                <h3 class="card-heading is-bordered">Trip poster’s information</h3>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <span class="material-icons">star_border</span>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-info">
-                                            <span class="rating" @click="tripOwnerRating">
-                                                <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="info.trip_poster_rating" style="float:left"> </star-rating>
-                                                <!--  <el-rate v-model="data.trip_poster_rating" disabled></el-rate> -->
-                                                <!--  <small class="rate">{{data.trip_poster_rating}}</small> -->
-                                            </span>
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <i class="material-icons">local_offer</i>
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Trips posted:</p>
-                                        <p class="post-info">
-                                            {{info.total_trip}}
-                                        </p>
-                                    </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <img src="https://img.icons8.com/material/48/000000/facebook-new.png" />
-                                        </figure>
-                                    </div>
-                                    <div class="media-content">
-                                        <div class="post-share">
-                                            <p class="post-title">Facebook id:</p>
-                                            <a :href="info.facebook" target="_blank">
-                                                {{info.facebook}}
-                                            </a>
+                                            <span class="text">Govt Id Verified</span>
                                         </div>
                                     </div>
-                                </article>
-                                <article class="media recent-post">
-                                    <div class="media-left is-hidden-mobile">
-                                        <figure class="image is-32x32">
-                                            <i class="material-icons">history</i>
-                                        </figure>
+                                </div>
+                            </article>
+                            <article class="media recent-post" style="margin: auto;">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">star_border</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <div class="rating" @click="feedbackShow=true">
+                                        <a-rate :default-value="info.trip_poster_rating" disabled allow-half />
                                     </div>
-                                    <div class="media-content">
-                                        <p class="post-title">Member since:</p>
-                                        <p class="post-info">
-                                            {{info.user_created}}
-                                        </p>
-                                    </div>
-                                </article>
-                            </div>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <i class="material-icons">local_offer</i>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Trips posted:</p>
+                                    <p class="post-info">
+                                        {{info.total_trip}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <i class="material-icons">history</i>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Member since:</p>
+                                    <p class="post-info">
+                                        {{info.user_created}}
+                                    </p>
+                                </div>
+                            </article>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <offer-bids :data="content" v-if="content.post_type=='offer'" v-show="offering"></offer-bids>
-        <seeking-bids :data="content" v-else-if="content.post_type=='seek'"></seeking-bids>
-        <vs-popup class="holamundo" title="Bid for this ride" :active.sync="bid">
-            <div class="columns" v-if="content.post_type=='seek'">
-                <div class="column is-4">
-                    <div class="field mt-5">
-                        <div class="control">
-                            <float-label :dispatch="false" label="Vehicle type" fixed>
-                            <div class="select">
-                                <select name="vehicle_type" v-on:change="loadV" v-model="form.vehicle_type" v-validate="'required'">
-                                    <option v-for="(item,index) in voptions" :key="index" :value="item">{{item}}</option>
-                                </select>
-                            </div>
-                        </float-label>
-                            <span v-show="errors.has('vehicle_type')" class="help is-danger">Vehicle type is required</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="column is-4" v-if="own">
-                    <label class="label">Do you own this vehicle?</label>
-                    <div class="control">
-                        <ul class="leftx" style="display: inline-flex;">
-                            <li style="margin-left:10px;">
-                                <vs-radio vs-name="radios1" vs-value="yes" @change="yes">Yes</vs-radio>
-                            </li>
-                            <li style="margin-left:10px;">
-                                <vs-radio vs-name="radios1" vs-value="no" @change="no">No</vs-radio>
-                            </li>
-                        </ul>
-                    </div>
-                    <input type="" v-model="radio" type="hidden" v-validate="'required'" name="vehicle">
-                    <span v-show="errors.has('vehicle')" class="help is-danger">Please select an option</span>
-                </div>
-                <div class="column is-4" v-if="ownCar">
-                    <div class="control" v-if="myVehicles.length>0">
-                        <select v-on:change="loadV" v-model="form.vehicle">
-                            <option :value="null" disabled selected>Select vehicle</option>
-                            <option v-for="(item,index) in myVehicles" :key="index" :value="item">{{item}}</option>
-                        </select>
-                    </div>
-                    <div class="control" v-else-if="myVehicles.length==0">
-                        <span style="color:red">No vehicles found</span>
-                    </div>
-                </div>
-            </div>
-            <div class="columns is-vcentered">
-                <div class="column is-4">
-                    <div class="control">
-                        <float-label label="Bid amount" fixed>
-                            <input type="number" v-model="form.amount" name="amount" class="input is-primary-focus">
-                        </float-label>
-                    </div>
-                </div>
-                <span class="infotext">Put in the amount only if you want to negotiate</span>
-            </div>
-            <div class="columns">
-                <div class="column is-three-quarters">
-                    <div class="field">
-                        <div class="control">
-                            <float-label label="Short Message" fixed>
-                                <textarea class="textarea is-primary-focus" v-model="form.message" rows="4" placeholder="Optional"></textarea>
-                            </float-label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="has-text-center">
-                <button @click="submit" class="button btn-align info-btn raised">Submit</button>
-            </div>
-        </vs-popup>
-        <vs-sidebar position-right parent="body" default-index="1" color="primary" class="sidebarx" spacer v-model="feedbackShow">
-            <div class="header-sidebar" slot="header">
+        <offer-bids :data="info" v-if="info.post_type=='offer'" v-show="offering"></offer-bids>
+        <seeking-bids :data="info" v-else-if="info.post_type=='seek'"></seeking-bids>
+        <post-bid :content="info" v-if="bid"></post-bid>
+        <a-drawer :width="720" :visible="feedbackShow" :body-style="{ paddingBottom: '80px' }" @close="onClose">
+            <div class="header">
                 <vs-avatar size="70px" :src="'/images/' + data.trip_owner_photo" style="float:left" />
                 <div class="con-colors" style="overflow:hidden">
                     <ul style="padding-left:10px">
-                        <li style="font-size: 21px;color: rgb(36, 33, 69);font-weight:700">
+                        <li>
                             <h4>
                                 {{data.user}}
                             </h4>
-                            <span @click="removeModal" class="material-icons" style="float:right;margin-top:-28px;    cursor: pointer;">clear</span>
                         </li>
                         <li>
                             <span class="address">
-                                <i class="material-icons" style="font-size:21px">room</i>
-                                <p style="margin-top: -2px;">{{data.user_lcoation}}</p>
+                                <i class="material-icons">room</i>
+                                <p>{{data.user_location}}</p>
                             </span>
                         </li>
                         <li>
-                            <span class="rating">
-                                <!-- <el-rate v-model="data.trip_poster_rating" disabled></el-rate> -->
-                                <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="data.trip_poster_rating" style="float:left"> </star-rating>
-                                <small class="rate">{{data.trip_poster_rating}}</small>
-                            </span>
+                            <div class="rating">
+                                <a-rate :default-value="data.trip_poster_rating" disabled allow-half />
+                            </div>
+                            <!-- <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="data.trip_poster_rating" style="float:left"> </star-rating>
+                                <small class="rate">{{data.trip_poster_rating}}</small> -->
                         </li>
                         <li>
                         </li>
                     </ul>
                 </div>
             </div>
-            <posted-trip-feedback :data="postedfeedbacks"></posted-trip-feedback>
-        </vs-sidebar>
+            <vs-divider />
+            <posted-trip-feedback v-if="feedbackShow" :data="postedfeedbacks"></posted-trip-feedback>
+        </a-drawer>
     </div>
 </template>
 <script>
 import Vue from 'vue';
-import StarRating from 'vue-star-rating';
-import 'moment-duration-format';
+import googleMap from '@/components/global/googleMap'
 import moment from 'moment-timezone';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate);
-
+import { Rate } from 'ant-design-vue';
+import { Drawer } from 'ant-design-vue';
+import 'ant-design-vue/lib/rate/style/index.css'
+import 'ant-design-vue/lib/drawer/style/index.css'
+Vue.use(Rate);
+Vue.use(Drawer);
 import VueSweetalert2 from 'vue-sweetalert2';
 import Swal from 'sweetalert2';
 Vue.use(VueSweetalert2);
@@ -410,12 +347,12 @@ export default {
     components: {
         postedTripFeedback: () => import('@/components/trip/postedTripFeedback'),
         completedTripFeedback: () => import('@/components/trip/completedTripFeedback'),
-        googleMap: () => import('@/components/global/googleMap'),
         offerBids: () => import('@/components/trip/OfferingBids'),
         seekingBids: () => import('@/components/trip/SeekingBids'),
         editTrip: () => import('@/components/trip/EditTrip'),
-        StarRating,
-        Loading
+        postBid: () => import('@/components/trip/PostaBid'),
+        Loading,
+        googleMap
     },
     props: ['data'],
     data() {
@@ -428,9 +365,8 @@ export default {
             trip: false,
             id: '',
             rt: 4,
+            status: 'cancel',
             offering: true,
-            ownCar: false,
-            rentCar: false,
             own: false,
             text: false,
             bid: false,
@@ -440,37 +376,24 @@ export default {
             mapLoaded: false,
             content: this.data,
             moment: moment,
-            form: {
-                vehicle_type: '',
-                vehicle: '',
-                message: '',
-                amount: '',
-                trip_id: this.data.id,
-            },
-            myVehicles: [],
-            voptions: [
-                'Car',
-                'Mini van',
-                'Motorcycle',
-                'Electric Scooter',
-                'CNG',
-                'Rickshaw',
-                'Bicycle'
-            ]
-
+            showCancelTrip: false,
+            showDeleteTrip: true,
         }
 
     },
     created() {
+        if (this.data.seats_available <= 0) {
+            this.canBid = false
+        }
         for (let i = 0; i < this.data.bids.length; i++) {
             if (this.data.bids[i].user_id == this.authId) {
                 this.canBid = false
             }
+            if (this.data.bids[i].passenger_accepted == 1) {
+                this.showCancelTrip = true
+                this.showDeleteTrip = false
+            }
         }
-        // axios.post('api/auth/me', this.data)
-        //     .then(res =>
-        //         this.id = res.data.id)
-        //     .catch(error => console.log(error.res.data))
     },
 
     computed: {
@@ -479,39 +402,41 @@ export default {
         },
         trip_owner() {
             return this.$store.getters.id == this.data.user_id
+        },
+        verified() {
+            return this.$store.getters.user.status == 'verified'
         }
 
     },
 
     mounted() {
-        // this.$refs.xyz.$mapPromise.then(() => {
-        //     this.directionsService = new google.maps.DirectionsService()
-        //     this.directionsDisplay = new google.maps.DirectionsRenderer()
-        //     this.directionsDisplay.setMap(this.$refs.xyz.$mapObject)
-        //     var vm = this
-        //     var waypts = []
-        //     var midpoint = this.data.via
-        //     if (midpoint) {
-        //         waypts.push({
-        //             location: midpoint,
-        //             stopover: true
-        //         })
-        //     };
 
-        //     vm.directionsService.route({
-        //         origin: this.data.start_point,
-        //         destination: this.data.destination,
-        //         travelMode: 'DRIVING',
-        //         waypoints: waypts
-        //     }, function(response, status) {
-        //         if (status === 'OK') {
-        //             vm.directionsDisplay.setDirections(response)
-        //         } else {
-        //             console.log('Directions request failed due to ' + status)
-        //         }
-        //     });
-        // }, 2000);
+        EventBus.$on('bidPosting', () => {
+            this.bid = false
+            this.isLoading = true
+        })
+        EventBus.$on('bidPosted', () => {
+            this.canBid = false
+            this.$axios.get('getTrip/' + this.data.id)
+                .then(res => {
+                    this.isLoading = false
+                    this.info = res.data.data
+                    EventBus.$emit('newBid', res.data)
+                    Toast.fire({
+                        type: 'success',
+                        title: 'Offer sent successfully'
+                    })
+                })
+        })
+        EventBus.$on('updatePost', (value) => {
+            this.info = value
+        })
 
+        EventBus.$on('bidFailed', () => {
+            this.bid = false
+            this.isLoading = false
+            alert('something gone wrong! try again later!!')
+        })
         EventBus.$on('tripupdated', (value) => {
             this.offering = true
             this.trip = false
@@ -535,13 +460,29 @@ export default {
 
     },
     methods: {
+        onClose() {
+            this.feedbackShow = false
+        },
         amountfield() {
             this.text = true;
         },
         removeModal() {
-            this.feedbackShow = !this.feedbackShow
+            this.feedbackShow = false
         },
+        cancelTrip() {
+            this.$vs.dialog({
+                type: 'confirm',
+                color: 'danger',
+                title: `Alert`,
+                text: 'Are you sure you want to cancel the trip?',
+                acceptText: 'Yes',
+                accept: this.acceptAlert
+            })
 
+        },
+        acceptAlert() {
+            this.$axios.patch(`canceltrip/${this.data.slug}`, this.status)
+        },
         calcRoute: function() {
             this.directionsService = new google.maps.DirectionsService()
             this.directionsDisplay = new google.maps.DirectionsRenderer()
@@ -560,26 +501,8 @@ export default {
                 }
             })
         },
-        loadV() {
-            this.$axios.post(`vehicles/${this.authId}`, {
-                    ve: this.form.vehicle_type,
-                    id: this.id
-                })
-                .then(res => {
-                    this.myVehicles = res.data;
 
-                })
-                .catch(error => console.log(error.res.data))
-        },
-        yes() {
-            this.radio = "true"
-            this.ownCar = true
-            this.rentCar = false
-        },
-        no() {
-            this.radio = "true"
-            this.ownCar = false
-        },
+
         editTrip() {
             this.offering = false
             this.trip = true
@@ -591,31 +514,6 @@ export default {
         tripOwnerRating() {
             this.feedbackShow = !this.feedbackShow;
         },
-        submit() {
-            this.$validator.validateAll().then((result) => {
-                if (result) {
-                    this.bid = false
-                    this.isLoading = true
-                    this.$axios.post('tripbids', this.form)
-                        .then((res) => {
-                            this.canBid = false
-                            this.bid = false
-                            setTimeout(() => {
-                                this.isLoading = false
-                                this.$axios.get('getTrip/' + this.data.id)
-                                    .then(res => {
-                                        EventBus.$emit('newTrip', res.data)
-                                    })
-                            }, 0)
-                        })
-                        .catch(error => {
-                            this.isLoading = false
-                            console.log(error.res.data)
-                        })
-                }
-            })
-        },
-
         deleteTrip(slug) {
             Swal.fire({
                 title: 'Are you sure you want to delete this post?',
@@ -626,13 +524,17 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.value) {
-                    this.axios.delete(`trip/${this.data.slug}`)
-                    Swal.fire(
-                        'Deleted!',
-                        'Your task has been deleted.',
-                        'success'
-                    )
-                    this.$router.push('/task')
+                    this.$axios.delete(`trip/${this.data.slug}`)
+                        .then(res => {
+                            Swal.fire(
+                                'Deleted!',
+                                'Your Trip has been deleted.',
+                                'success'
+                            )
+                            this.$router.push('/trip')
+
+                        })
+
                 } else(
 
                     result.dismiss === Swal.DismissReason.cancel
@@ -642,18 +544,12 @@ export default {
         },
     },
     watch: {
-        'form.vehicle_type': function(val) {
-            this.myVehicles = []
-            this.own = true
-            this.loadV()
-
-        },
-        feedbackShow: function(val) {
-            if (val == true) {
-                document.getElementsByTagName("html")[0].style.overflow = "hidden";
-            } else
-                document.getElementsByTagName("html")[0].style.overflow = "auto"
-        },
+        // feedbackShow: function(val) {
+        //     if (val == true) {
+        //         document.getElementsByTagName("html")[0].style.overflow = "hidden";
+        //     } else
+        //         document.getElementsByTagName("html")[0].style.overflow = "auto"
+        // },
 
     }
 }
@@ -670,11 +566,6 @@ export default {
     padding: 0px 0px;
 }
 
-.post-body {
-    padding: 0px 10px;
-}
-
-
 .recent-post figure img {
     width: 28px;
     border-radius: 0% !important;
@@ -686,7 +577,7 @@ export default {
 
 .trip-info {
     min-height: 200px;
-    margin-left: -15px
+    margin-left: -5px
 }
 
 .vs-sidebar--header {
@@ -696,25 +587,15 @@ export default {
 .trip-giver-info {
     min-height: 160px;
     margin-top: -20px;
-    margin-left: -15px;
+    margin-left: -5px;
 }
 
 .taskinfo {
     margin-left: 7px;
 }
 
-.header {
-    min-height: 65px;
-    border-bottom: 1px solid #e0e0e0;
-
-}
-
 a {
     color: #878787;
-}
-
-.featured-feed-post .post-body {
-    padding: 0em 1em !important;
 }
 
 .featured-feed-post .post-meta {
@@ -736,9 +617,18 @@ a:hover {
 
 
 .content {
-    padding: 20px 0px 0px;
+    padding: 20px 0px 0px 0px;
+    margin-bottom: 0rem;
 }
 
+.image.is-32x32 {
+    height: 20px;
+    width: 20px;
+}
+
+.material-icons {
+    font-size: 20px;
+}
 
 
 .card-heading {
@@ -752,17 +642,21 @@ a:hover {
 }
 
 .content h3 {
-    font-size: 1.5em;
+    font-size: 1.3em;
     margin-bottom: 0.2em;
 }
 
 .recent-post {
-    margin-top: 1px;
-    margin-bottom: 4px;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
 .media+.media {
     padding-top: 0.3rem;
+}
+
+.media-left {
+    margin-right: .2rem;
 }
 
 .recent-post a {
@@ -770,12 +664,32 @@ a:hover {
 }
 
 .recent-post .post-title {
-    margin-bottom: 0px !important;
     float: left;
     padding-right: 5px;
 }
 
+.content p:not(:last-child) {
+    margin-bottom: 0;
+}
 
+.media .media-content p {
+    font-size: 1em !important;
+}
+
+.image.is-32x32 {
+    height: 20px;
+    width: 20px;
+}
+
+.material-icons {
+    font-size: 20px;
+}
+
+.content figure {
+    margin-left: .5em;
+    margin-right: .2em;
+    text-align: left;
+}
 
 .content h2 {
     font-size: 1.55em;
@@ -793,20 +707,8 @@ a:hover {
     line-height: 1.125;
 }
 
-
-
-
 .section-wrapper {
     margin: -28px -22px
-}
-
-
-
-.rating {
-    margin-left: 2px;
-    width: 87%;
-    display: inline-flex;
-    cursor: pointer;
 }
 
 .swal2-icon.swal2-warning {
@@ -838,13 +740,6 @@ table th {
     right: 27px;
 }
 
-
-.address {
-    display: inline-flex;
-    font-size: 15px;
-    margin-left: -6px;
-}
-
 @media only screen and (max-width: 780px) {
     .dashboard-wrapper .section-wrapper {
         max-width: 1406px !important;
@@ -855,5 +750,31 @@ table th {
 .infotext {
     color: #717171;
     padding: 4px;
+}
+
+.verified {
+    font-size: 18px;
+    margin: px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.con-vs-dialog .vs-dialog .vs-dialog-text {
+    font-size: 1em;
+}
+
+.verified .username {
+    color: black;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.verified .material-icons {
+    font-size: 18px;
+}
+
+.verified .text {
+    font-size: 13px;
+    margin-top: 2px;
 }
 </style>

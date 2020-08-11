@@ -1,247 +1,119 @@
 <template>
     <main>
+        <vue-headful title="Sign Up | TripShipTask" description="Sign Up" />
+        <div class="modal" :class="openmodal?'is-active':''">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="box">
+                    <article class="media">
+                        <div class="media-content">
+                            <button class="delete" aria-label="close" @click="openmodal=false"></button>
+                            <div class="content">
+                                <p v-html="infomsg"></p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
         <div class="auth-outer">
             <article class="message is-danger" v-show="errormessage">
-                <div class="message-header">
-                    <p>Please fill up all the required fields</p>
-                    <button class="delete" aria-label="delete" @click="closeerrmsg"></button>
-                </div>
                 <div class="message-body">
+                    <button class="delete" aria-label="delete" @click="closeerrmsg"></button>
                     <p v-for="(err,index) in error[0]" :key="index">{{ err[0] }}</p>
                 </div>
             </article>
             <div class="auth-box">
+                <div class="side-box">
+                    <div class="headline">
+                        <p>TripShipTask helps you connect with others to</p>
+                        <ul>
+                            <li>give or get rides</li>
+                            <li>send or receive any goods</li>
+                            <li>give or get tasks</li>
+                        </ul>
+                        <p style="margin-left: 15px;">and make money while you are at it.</p>
+                    </div>
+                    <img class="featured-drawing" src="../../assets/images/tst/people.png" alt="" width="400px">
+                </div>
                 <div class="form-wrapper">
                     <div class="login">
                         <div class="item-list">
-                            <img class="featured-drawing" src="../../assets/images/tst/tst-logo.jpg" alt="" width="300px">
+                            <img class="featured-drawing" src="../../assets/images/tst/tstlogo.png" alt="" width="300px">
                         </div>
-                        <div class="field" v-show="secondlevel" style="text-align:center">
-                            <label class="label" style="color:#0095f6;">
-                                These won't be a part of your public profile except profession</label>
-                        </div>
-                        <section class="fstlevel" v-show="fstlevel">
+                        <section class="fstlevel">
                             <div class="body">
                                 <form @submit.prevent="signup">
                                     <div class="field">
                                         <div class="control">
-                                            <input type="text" class="input" placeholder="Full name" v-model="form.full_name" name="full_name" v-validate="'required'" />
+                                            <float-label label="Full name">
+                                                <input type="text" class="input is-primary-focus" v-model="form.full_name" v-validate="'required'" name="full_name">
+                                            </float-label>
                                             <span v-show="errors.has('full_name')" class="help is-danger">Full name is required</span>
                                         </div>
                                     </div>
                                     <div class="field">
-                                        <div class="control">
-                                            <vue-tel-input v-model="form.phone" v-bind="bindProps" class="input" v-on:country-changed="countryChanged" name="phone" v-validate="'required'"></vue-tel-input>
+                                        <div class="control phn">
+                                            <float-label :dispatch="false" label="Phone number" fixed>
+                                                <vue-tel-input v-model="form.mobile" class="input" v-bind="bindProps" v-on:country-changed="countryChanged" name="phone" v-validate="'required'"></vue-tel-input>
+                                            </float-label>
                                             <span style="margin-left:11px;" v-show="errors.has('phone')" class="help is-danger">Phone number is required</span>
                                         </div>
                                     </div>
                                     <div class="field">
                                         <div class="control">
-                                            <input type="text" class="input" placeholder="Email" name="email" v-model="form.email" data-vv-as="email" v-validate="'required|email'" />
+                                            <float-label label="Email">
+                                                <input type="text" class="input is-primary-focus" ref="email" v-model="form.email" v-validate="'required|email'" data-vv-validate-on="abc" @change="onChange" name="email">
+                                            </float-label>
                                             <span v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
                                         </div>
                                     </div>
-                                    <div class="field">
+                                    <div class="field gender">
                                         <div class="control">
-                                            <input type="password" class="input" placeholder="Password" v-model="form.password" name="password" v-validate="'required|min:6'" ref="password" />
-                                            <span v-show="errors.has('password')" class="help is-danger">{{ errors.first('password') }}</span>
+                                            <float-label :dispatch="false" label="Gender">
+                                                <div class="select" :class="errors.has('gender')?'mb-20':''">
+                                                    <select v-model="form.gender" name="gender" v-validate="'required'">
+                                                        <option v-for="gender in gender" :value="gender">{{gender}}</option>
+                                                    </select>
+                                                </div>
+                                            </float-label>
+                                            <span v-show="errors.has('gender')" class="help is-danger">Gender is required</span>
+                                        </div>
+                                    </div>
+                                    <div class="field gender" v-if="customgender">
+                                        <div class="control">
+                                            <float-label :dispatch="false" label="What is your gender?" v-show="customgender">
+                                                <input type="text" class="input is-primary-focus" v-model="custgender" name="gender" v-validate="'required'">
+                                            </float-label>
+                                        </div>
+                                    </div>
+                                    <div class="field" :style="errors.has('password')?'':'margin-bottom:0rem'">
+                                        <div class="control">
+                                            <float-label :dispatch="false" label="Password">
+                                                <input :type="pwdType" class="input is-primary-focus" v-model="form.password" name="password" v-validate="'required|min:8'" ref="password">
+                                            </float-label>
+                                            <span class="icon is-small is-right" @click="pwdcheck">
+                                                <img v-if="pwdType=='password'" src="../../assets/images/tst/close-eye.png">
+                                                <img v-else src="../../assets/images/tst/open-eye.png">
+                                            </span>
+                                            <span v-show="errors.has('password')" class="help is-danger">Make your password strong. Use 8 or more characters with a mix of letters, numbers & symbols</span>
                                         </div>
                                     </div>
                                     <div class="field">
                                         <div class="control">
-                                            <input class="input" name="password_confirmation" v-validate="'required|confirmed:password'" data-vv-as="password" placeholder="Retype password" type="password">
+                                            <float-label :dispatch="false" label="Retype password">
+                                                <input class="input is-primary-focus" name="password_confirmation" v-validate="'required|confirmed:password'" data-vv-as="password" :type="repwdType">
+                                            </float-label>
+                                            <span class="icon is-small is-right" @click="repwdcheck">
+                                                <img v-if="repwdType=='password'" src="../../assets/images/tst/close-eye.png">
+                                                <img v-else src="../../assets/images/tst/open-eye.png">
+                                            </span>
                                             <span v-show="errors.has('password_confirmation')" class="help is-danger">Password does not match</span>
                                         </div>
                                     </div>
-                                    <button v-bind:class="(isLoading)?'button is-info is-small':'button is-info is-small'" @click="signup">Sign Up</button>
-                                    <p class="tdpc">By signing up, you agree to our Terms , Data Policy and Cookies Policy.</p>
+                                    <button v-bind:class="(isLoading)?'button is-info is-small is-loading':'button is-info is-small'">Sign Up</button>
+                                    <p class="tdpc">By signing up, you agree to our Terms, Privacy Policy, Data Policy and Cookies Policy.</p>
                                 </form>
-                            </div>
-                        </section>
-                        <section class="secondlevel" v-show="secondlevel">
-                            
-                            <div class="columns">
-                                <div class="column is-7">
-                                    <div class="field">
-                                        <div class="control">
-                                            <input type="text" class="input" placeholder="National ID" name="identity" v-if="nidinfo" v-validate="'required'" v-model="form.identity_no" />
-                                            <input type="text" class="input" placeholder="Drivers licence ID" name="identity" v-else v-validate="'required'" v-model="form.identity_no" />
-                                            <span v-show="errors.has('identity')" v-if="nidinfo" class="help is-danger">
-                                                NID is required
-                                            </span>
-                                            <span v-show="errors.has('identity')" v-else class="help is-danger">
-                                                Driver's licence is required
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column is-5">
-                                    <div class="field">
-                                        <div class="control">
-                                            <label class="file-label">
-                                                <input class="file-input" :disabled="ndisabled==1" multiple type="file" accept="image/*" @change="onIdentityChnage">
-                                                <span class="file-cta" style="width: 96px;">
-                                                    <span class="file-icon">
-                                                        <span class="material-icons">publish</span>
-                                                    </span>
-                                                    <span class="file-label" v-if="form.countryname=='BD' || form.countryname=='IN' || form.countryname=='PK' || form.countryname=='KE'">
-                                                        Upload NID
-                                                    </span>
-                                                    <span class="file-label" v-else-if="form.countryname=='US' || form.countryname=='GB' || form.countryname=='CA' ">
-                                                        Upload DL ID
-                                                    </span>
-                                                </span>
-                                            </label>
-                                            <input type="hidden" name="nidpic" v-model="identityname" v-validate="'required'">
-                                            <span v-show="errors.has('nidpic')" v-if="nidinfo" class="help is-danger">NID photo is required</span>
-                                            <span v-show="errors.has('nidpic')" v-else class="help is-danger">Drivers licence photo is required</span>
-                                            <span v-if="ndisabled==1" class="help is-danger">Only two photos allowed</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="columns" v-if="identityname.length>0">
-                                <div class="column">
-                                    <vs-chip @click="remove(index,chip)" v-for="(chip,index) in identityname" :key="index" closable>
-                                        {{ chip }}
-                                    </vs-chip>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column is-7">
-                                    <div class="field">
-                                        <div class="control">
-                                            <div class="select">
-                                                <select v-model="form.profession" name="profession" v-validate="'required'">
-                                                    <option :value="null" disabled selected hidden>Profession</option>
-                                                    <option value="Job Holder">Job Holder</option>
-                                                    <option value="Business">Business</option>
-                                                    <option value="Freelancer">Freelancer</option>
-                                                    <option value="free">Dont have any job</option>
-                                                </select>
-                                                <span v-show="errors.has('profession')" class="help is-danger">Profession is required</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column is-5">
-                                    <div class="field">
-                                        <div class="control">
-                                            <label class="file-label">
-                                                <input class="file-input" multiple="" type="file" :disabled="jdisabled==1" accept="image/*" @change="onJobChnage">
-                                                <span class="file-cta">
-                                                    <span class="file-icon">
-                                                        <span class="material-icons">publish</span>
-                                                    </span>
-                                                    <span class="file-label">
-                                                        Upload Job ID
-                                                    </span>
-                                                </span>
-                                            </label>
-                                            <span v-if="jdisabled==1" class="help is-danger">Only two photos allowed</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="columns" v-if="jobname.length>0">
-                                <div class="column">
-                                    <vs-chip @click="removejobid(index,chip)" v-for="(chip,index) in jobname" :key="index" closable>
-                                        {{ chip }}
-                                    </vs-chip>
-                                </div>
-                            </div>
-                            <div class="columns" :class="errors.has('profession')?'select-error':''">
-                                <div class="column is-7">
-                                    <div class="field">
-                                        <div class="control">
-                                            <div class="select">
-                                                <select v-model="form.educational_qualification" name="education" v-validate="'required'">
-                                                    <option :value="null" disabled selected hidden>Educational Qualification</option>
-                                                    <option v-for="edu in education" :value="edu">{{edu}}</option>
-                                                </select>
-                                                <span v-show="errors.has('education')" class="help is-danger">Educational qualification is required</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    <div class="field">
-                                        <div class="control">
-                                            <div class="columns is-mobile is-gapless">
-                                                <div class="column is-4-desktop is-3-mobile">
-                                                    <label class="label">Security question: </label>
-                                                </div>
-                                                <div class="column">
-                                                    <input type="text" class="input" placeholder="ex: What is my pet's birthday?" v-validate="'required'"name="sq" />
-                                                    <span v-show="errors.has('sq')" class="help is-danger">Security question is required</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    <div class="field">
-                                        <div class="control">
-                                            <div class="columns is-mobile is-gapless">
-                                                <div class="column is-4-desktop is-3-mobile">
-                                                    <label class="label">Security answer: </label>
-                                                </div>
-                                                <div class="column">
-                                                    <input type="text" class="input" placeholder="ans: Jan 1, 2015" name="sa" v-validate="'required'" />
-                                                    <span v-show="errors.has('sa')" class="help is-danger">Security answer is required</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    <div class="field">
-                                        <div class="control">
-                                            <div class="columns is-mobile is-gapless">
-                                                <div class="column is-2-desktop is-3-mobile">
-                                                    <label class="label">Birthday: </label>
-                                                </div>
-                                                <div class="column">
-                                                    <div class="select">
-                                                        <select v-model="day">
-                                                            <option v-for="day in days" :value="day">{{day}}</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="column">
-                                                    <div class="select">
-                                                        <select v-model="month">
-                                                            <option v-for="month in months" :value="month.num">{{month.month}}</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="column">
-                                                    <div class="select">
-                                                        <select v-model="year">
-                                                            <option v-for="year in years" :value="year">{{year}}</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <input type="hidden" name="dob" v-model="form.dob" v-validate="'required'">
-                                            <span v-show="errors.has('dob')" class="help is-danger">Date of birth is required</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="columns is-vcentered is-mobile" :class="errors.has('education')?'edu-error':''">
-                                <div class="column is-8">
-                                    <button v-bind:class="(isLoading)?'button is-info is-small is-loading':'button is-info is-small'" style="width:100px;font-size:14px;float: right;" @click="submit">Submit</button>
-                                </div>
-                                <div class="column is-4">
-                                    <button class="goback" @click="back">Go Back</button>
-                                </div>
                             </div>
                         </section>
                     </div>
@@ -264,6 +136,7 @@
                 </div>
             </div>
         </div>
+        <app-footer></app-footer>
     </main>
 </template>
 <script>
@@ -273,12 +146,21 @@ Vue.component('vue-tel-input', VueTelInput.VueTelInput)
 Vue.use(VueTelInput)
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate)
+import appFooter from "../../components/global/AppFooter";
+VeeValidate.Validator.extend("verify_password", {
+    getMessage: field => "Make your password strong. Use 8 or more characters with a mix of letters, numbers & symbols",
+    validate: value => {
+
+        var strongRegex = new RegExp("^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+        return strongRegex.test(value);
+    }
+});
 import { Validator } from 'vee-validate';
 const dictionary = {
     custom: {
         email: {
             required: 'Email is required',
-            email: 'Email must be a valid email'
+            email: 'The field must contain a valid Email'
         },
         password: {
             required: 'Password is required',
@@ -294,143 +176,129 @@ Validator.localize('en', dictionary);
 import VueSweetalert2 from 'vue-sweetalert2';
 import Swal from 'sweetalert2';
 Vue.use(VueSweetalert2);
-export default {
 
+export default {
+        components: {appFooter },
     data() {
         return {
-        	errormessage:false,
-            ndisabled: 0,
-            jdisabled: 0,
+            pwdType: 'password',
+            repwdType: 'password',
+            isActive: false,
+            openmodal: false,
+            errormessage: false,
             isLoading: false,
             fstlevel: true,
             secondlevel: false,
             error: [],
             loading: false,
             sitekey: "6Le8TekUAAAAAO7Qf7rYfvIEoV2t8fmWYSD_AyfJ",
-            identityimg: [],
-            jobimg: [],
-            identityname: [],
-            jobname: [],
-            nidrequired: false,
-            dlrequired: false,
+            countryCode: 'CA',
             form: {
                 full_name: '',
                 email: "",
                 password: "",
-                phone: '',
-                dob: '',
-                identity_no: '',
+                mobile: '',
                 countryname: '',
-                profession: null,
-                educational_qualification: null,
+                gender: null,
+                referral: this.$route.query.referral_acc,
             },
-            education: [
-                'PHD',
-                'Masters',
-                'Bachelors',
-                'High School Graduate',
-                'High School Incomplete',
-                'Didnt attend school'
+            isActive: false,
+
+            gender: [
+                'Male',
+                'Female',
+                'Rather not say',
+                'Custom'
             ],
+            custgender: null,
+            customgender: false,
+            infomsg: '',
             bindProps: {
-                mode: "international",
-                defaultCountry: '',
-                disabledFetchingCountry: false,
-                disabled: false,
-                disabledFormatting: false,
-                placeholder: "Phone number",
-                required: false,
-                enabledCountryCode: false,
-                enabledFlags: true,
-                preferredCountries: [],
-                ignoredCountries: [],
-                autocomplete: "off",
-                name: "telephone",
-                maxLen: 25,
+                placeholder: "",
                 invalidMsg: 'Invalid Number',
-                wrapperClasses: "",
-                inputClasses: "",
-                dropdownOptions: {
-                    disabledDialCode: false
-                },
                 inputOptions: {
                     showDialCode: true
                 }
-            },
-            years: [],
-            days: [],
-            day: 25,
-            year: 1980,
-            month: '04',
-            months: [
-                { num: "01", month: "January" },
-                { num: "02", month: "February" },
-                { num: "03", month: "March" },
-                { num: "04", month: "April" },
-                { num: "05", month: "May" },
-                { num: "06", month: "June" },
-                { num: "07", month: "July" },
-                { num: "08", month: "August" },
-                { num: "09", month: "September" },
-                { num: "10", month: "October" },
-                { num: "11", month: "November" },
-                { num: "12", month: "December" }
-            ],
+            }
+            // bindProps: {
+            //     mode: "international",
+            //     defaultCountry: '',
+            //     disabledFetchingCountry: false,
+            //     disabled: false,
+            //     disabledFormatting: false,
+            //     placeholder: "Phone number",
+            //     required: false,
+            //     enabledCountryCode: false,
+            //     enabledFlags: true,
+            //     preferredCountries: [],
+            //     ignoredCountries: [],
+            //     autocomplete: "off",
+            //     name: "telephone",
+            //     maxLen: 25,
+            //     invalidMsg: 'Invalid Number',
+            //     wrapperClasses: "",
+            //     inputClasses: "",
+            //     dropdownOptions: {
+            //         disabledDialCode: false
+            //     },
+            //     inputOptions: {
+            //         showDialCode: true
+            //     }
+            // },
+
 
         };
     },
-    created() {
 
-        for (let i = 1900; i < 2021; i++) {
-            this.years.push(i);
-        }
-        for (let i = 1; i < 32; i++) {
-            if (i < 10) {
-                i = ('0' + i).slice(-2)
-            }
-            this.days.push(i);
-        }
-    },
-    computed: {
-        nidinfo() {
-            return this.form.countryname == 'BD' || this.form.countryname == 'IN' || this.form.countryname == 'PK' || this.form.countryname == 'KE'
-        },
-        id_type() {
-            if (this.form.countryname == 'BD' || this.form.countryname == 'IN' || this.form.countryname == 'PK' || this.form.countryname == 'KE') {
-                return "NID"
-            } else {
-                return "Driver_licence"
-            }
-        }
+    created() {
 
     },
 
     methods: {
-        closeerrmsg()
-        {
-            this.error=[]
-            this.errormessage=false
+        onChange() {
+            this.$emit('abc'); // vue events
+            this.$refs.email.dispatchEvent(
+                new Event('abc')
+            );
         },
-        remove(index, chip) {
-            this.nidname.splice(this.nidname.indexOf(chip), 1)
-            this.nidimg.splice(this.nidimg.indexOf(index), 1)
-            this.ndisabled = 0
-        },
-        removejobid(index, chip) {
-            this.jobname.splice(this.jobname.indexOf(chip), 1)
-            this.jobimg.splice(this.jobimg.indexOf(index), 1)
-            this.jdisabled = 0
 
+        pwdcheck() {
+            if (this.pwdType === 'password') {
+                this.pwdType = 'text';
+            } else {
+                this.pwdType = 'password';
+            }
         },
+        repwdcheck() {
+            if (this.repwdType === 'password') {
+                this.repwdType = 'text';
+            } else {
+                this.repwdType = 'password';
+            }
+        },
+        quesmodel() {
+            this.openmodal = true
+            this.infomsg = "Security question is to add an extra layer of certainty to identify you when you have forgotten your password, entered the wrong credentials too many times, or tried to log in from an unfamiliar device or location."
+        },
+        whyneed() {
+            this.openmodal = true
+            this.infomsg = "<p>The following information will not be visible to other users except profession.</p><p> We require you to provide this information for your own safety and security.</p><p>Each member of TripShipTask is therefore a verified user. We verify your government issued id, contact number, Bank account details  to prevent unauthorized access to your account and to prevent/avoid unpleasant experience while interacting with another user as each member is held responsible for his/her unwanted actions.</p><p>Security question is to add an extra layer of certainty to identify you when you have forgotten your password, entered the wrong credentials too many times, or tried to log in from an unfamiliar device or location.</p>"
+        },
+        closeerrmsg() {
+            this.error = []
+            this.errormessage = false
+        },
+
+
         countryChanged(country) {
             this.form.countryname = country.iso2
-            if (country.iso2 == "BD" || country.iso2 == "IN" || country.iso2 == "PK") {
-                this.nidrequired = true
-                this.dlrequired = false
-            } else {
-                this.nidrequired = false
-                this.dlrequired = true
-            }
+            // if (country.iso2 == "BD" || country.iso2 == "IN" || country.iso2 == "PK") {
+            //     this.nidrequired = true
+            //     this.dlrequired = false
+            // } else {
+            //     this.nidrequired = false
+            //     this.dlrequired = true
+            // }
         },
 
         async signup() {
@@ -438,53 +306,28 @@ export default {
                 this.$validator.validate('full_name'),
                 this.$validator.validate('email'),
                 this.$validator.validate('phone'),
+                this.$validator.validate('gender'),
                 this.$validator.validate('password'),
                 this.$validator.validate('password_confirmation'),
             ]);
             const areValid = (await results).every(isValid => isValid);
             if (areValid) {
-                this.fstlevel = false
-                this.secondlevel = true
-            }
-
-        },
-        async submit() {
-            const results = Promise.all([
-                this.$validator.validate('dob'),
-                this.$validator.validate('identity'),
-                this.$validator.validate('nidpic'),
-                this.$validator.validate('profession'),
-                this.$validator.validate('education'),
-                this.$validator.validate('sq'),
-                this.$validator.validate('sa'),
-            ]);
-            const areValid = (await results).every(isValid => isValid);
-            if (areValid) {
                 this.isLoading = true
-                this.$axios.post('auth/signup', {
-                        full_name: this.form.full_name,
-                        mobile: this.form.phone,
-                        email: this.form.email,
-                        countryname: this.form.countryname,
-                        dob: this.form.dob,
-                        profession: this.form.profession,
-                        educational_qualification: this.form.educational_qualification,
-                        password: this.form.password,
-                        jobimg: this.jobimg,
-                        identityimg: this.identityimg,
-                        identity_no: this.form.identity_no,
-                        identity_type: this.id_type
-                    })
+                this.$axios.post('auth/signup', this.form)
                     .then((result) => {
                         this.isLoading = false
                         if (result.response = 200) {
                             this.$router.push('/')
                             Swal.fire({
-                                position: 'center',
-                                type: 'success',
+                                position: 'top',
                                 title: 'Sign Up Successful!',
-                                text: 'Please check your email to verify.',
+                                html: '<p style="text-align:center;font-size: 22px;font-weight: 600;">Please check your email to verify.</p>',
                                 showConfirmButton: true,
+                                imageUrl: 'https://dev.tripshiptask.com/assets/images/success.png',
+                                imageWidth: 80,
+                                imageHeight: 80,
+                                imageAlt: 'success',
+                                animation: true
 
                             })
                         }
@@ -493,66 +336,33 @@ export default {
                     .catch(error => {
                         this.isLoading = false
                         this.error.push(error.response.data.errors)
-                        this.errormessage=true
+                        this.errormessage = true
                     })
-
-
             }
 
         },
-        back() {
-            this.fstlevel = true
-            this.secondlevel = false
-        },
-        onIdentityChnage(e) {
-            if (this.identityimg.length >= 2) {
-                this.ndisabled = 1
-            } else {
-                let file = e.target.files[0];
-                this.identityname.push(file.name)
-                let reader = new FileReader();
-                reader.onload = (file) => {
-                    this.identityimg.push(reader.result);
-                }
-                reader.readAsDataURL(file);
-            }
 
-        },
-        onJobChnage(e) {
-            if (this.jobimg.length >= 2) {
-                this.jdisabled = 1
-            } else {
-                let file = e.target.files[0];
-                this.jobname.push(file.name)
-                let reader = new FileReader();
-                reader.onload = (file) => {
-                    this.jobimg.push(reader.result);
-                }
-                reader.readAsDataURL(file);
-            }
-        },
+
     },
     watch: {
-        'nidname': function(val) {
-            this.nidname = val
+        'form.gender': function(val) {
+            if (val == 'Custom') {
+                this.customgender = true
+            }
+            if (val == 'Male') {
+                this.customgender = false
+            }
+            if (val == 'Female') {
+                this.customgender = false
+            }
+            if (val == 'Rather not say') {
+                this.customgender = false
+            }
         },
-        'jobname': function(val) {
-            this.jobname = val
-        },
-        'nidimg': function(val) {
-            this.nidimg = val
-        },
-        'jobimg': function(val) {
-            this.jobimg = val
-        },
-        'day': function(val) {
-            this.form.dob = this.year + "-" + this.month + "-" + this.day;
-        },
-        'month': function(val) {
-            this.form.dob = this.year + "-" + this.month + "-" + this.day;
-        },
-        'year': function(val) {
-            this.form.dob = this.year + "-" + this.month + "-" + this.day;
+        'custgender': function(val) {
+            if (val) {
+                this.form.gender = val
+            }
         }
     }
 
@@ -563,8 +373,15 @@ export default {
     justify-content: center;
 }
 
+.auth-outer .auth-box .side-box {
+    background: #f4f6fb;
+    width: 1050px;
+    padding-right: 20px;
+}
+
 .item-list img {
-    width: 120px;
+    width: 100px;
+    height: 100px;
     margin-top: 10px;
 }
 
@@ -572,17 +389,31 @@ export default {
     background: #f4f6fb;
 }
 
+.auth-box .vfl-label {
+    opacity: 1 !important;
+    padding: 8px 10px !important;
+    color: rgba(var(--f52, 142, 142, 142), 1) !important;
+}
+
 .label {
     margin-top: 5px;
 }
 
-.auth-outer {
-    background: #f4f6fb;
-    align-items: inherit;
-    margin: 50px auto 0;
-    max-width: 935px;
-    padding-bottom: 44px;
+.focused {
+    top: -18px !important;
 }
+
+.focused span {
+    background-color: #fff;
+}
+
+.ques {
+    position: relative;
+    top: -15px;
+    right: -111px;
+    cursor: pointer;
+}
+
 
 .login {
     background-color: #fff;
@@ -590,6 +421,18 @@ export default {
     border: 1px solid #dbdbdb;
     border: 1px solid rgba(var(--b6a, 219, 219, 219), 1);
     border-radius: 1px;
+}
+
+.is-thalf {
+    padding-right: 2px;
+    padding-left: 4px;
+    width: 29.2%;
+}
+
+.is-thalf-right {
+    padding-right: 0px;
+    width: 29.2%;
+    padding-left: 3px;
 }
 
 .control input {
@@ -612,12 +455,42 @@ export default {
 }
 
 .field:not(:last-child) {
-    margin-bottom: .35rem;
+    margin-bottom: 0.7rem;
 }
 
 .title {
     margin: 22px auto 12px;
     font-size: 1.7em !important
+}
+
+.file-label .file-cta {
+    padding: 2px;
+    font-size: 1em;
+    height: 2.5em;
+    margin-top: 3px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.file-icon {
+    font-size: 0.2em;
+    padding: 6px;
+}
+
+.file-name {
+    margin-left: 3px;
+    padding: 0.4em;
+    border-width: 1px 1px 1px 1px;
+    margin-top: 2px;
+    font-size: 0.6rem;
+}
+
+.material-icons {
+    font-size: 1rem;
+}
+
+.file-label {
+    font-size: 0.7rem;
 }
 
 .item-list {
@@ -628,13 +501,9 @@ export default {
     position: relative;
     min-height: 480px;
     overflow: hidden;
-    max-width: 430px;
+    max-width: 400px;
     width: 100%;
     height: 100%;
-}
-
-.headline {
-    margin: 0px 52px;
 }
 
 .vs-divider {
@@ -651,6 +520,10 @@ export default {
     font-weight: 600;
 }
 
+.side-box img {
+    margin-top: 10px;
+}
+
 .edu-error {
     margin-top: 5px;
 }
@@ -663,26 +536,17 @@ export default {
     width: 25px;
 }
 
+.help.is-danger {
+    color: #f14668;
+    width: 290px;
+}
+
 .loginfb .loginfbtext {
     margin-top: 2px;
     color: #385185;
     margin-left: 5px;
 }
 
-.goback {
-    background: transparent;
-    text-align: center;
-    justify-content: center;
-    font-weight: 600 !important;
-    color: #0095f6 !important;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 18px;
-    margin-top: 5px;
-    border: 0;
-    float: right;
-    cursor: pointer;
-}
 
 @media only screen and (min-width:768px) {
     .columns.is-gapless {
@@ -722,27 +586,21 @@ export default {
 }
 
 .headline p {
-    color: #8e8e8e;
-    line-height: 20px;
-    display: flex;
+    color: #4e4b4b;
     font-weight: 600;
-    margin: 0px 30px;
-    font-size: 13px;
+    font-size: 18px;
 }
 
-.headline {
-    display: none;
+ul li {
+    color: #4e4b4b;
+    font-size: 18px;
 }
 
 ul {
     list-style: circle !important;
-    margin: 0px 50px;
+    margin: 0px 35px;
 }
 
-ul li {
-    color: #8e8e8e;
-    font-size: 13px;
-}
 
 .tdpc {
     color: rgba(var(--f52, 142, 142, 142), 1);
@@ -767,7 +625,7 @@ ul li {
 }
 
 .is-gapless .column {
-    margin-right: 2px;
+    margin-right: 8px;
 }
 
 .secondlevel {
@@ -778,50 +636,14 @@ ul li {
     font-size: 0.8em !important;
 }
 
-/*.secondlevel button {
-    width: 311px;
-    border: 0;
-    margin-top: 10px;
-    color: #fff;
+.whyneed {
     cursor: pointer;
-    font-size: 14px;
-    border-radius: 4px;
-}*/
-
-.file-label .file-cta {
-    padding: 2px;
-    font-size: 1em;
-    height: 2.5em;
-    margin-top: 3px;
-    padding-right: 5px;
+    color: #0095f6;
 }
 
-.file-icon {
-    font-size: 0.3em;
-    padding: 8px;
-}
 
-.file-name {
-    margin-left: 3px;
-    padding: 0.4em;
-    border-width: 1px 1px 1px 1px;
-    margin-top: 2px;
-    font-size: 0.6rem;
-}
-
-.material-icons {
-    font-size: 1rem;
-}
-
-.file-label {
-    font-size: 0.7rem;
-}
 
 .columns.is-gapless:not(:last-child) {
-    margin-bottom: calc(1.5rem - 1.4rem) !important;
-}
-
-.columns:not(:last-child) {
     margin-bottom: calc(1.5rem - 1.4rem) !important;
 }
 
@@ -832,5 +654,38 @@ ul li {
 .input:active,
 .input:focus {
     border-color: #b1aaaa !important;
+}
+
+.select select {
+    background: #fafafa !important;
+}
+
+.gender {
+    width: 73%;
+}
+
+@media only screen and (max-width:768px) {
+    .gender {
+        width: 85%;
+    }
+
+}
+
+.icon img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.icon.is-right {
+    float: right;
+    position: relative;
+    top: -27px;
+    width: 22px;
+    right: 4px;
+}
+
+.pb-10 {
+    padding-top: 10px;
 }
 </style>

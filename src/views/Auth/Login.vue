@@ -186,7 +186,6 @@ export default {
 }
 .side-img
 {
-    background-image:url('../../assets/images/login.png');
     background-size: cover;
     background-repeat: no-repeat;
     position: relative

@@ -7,7 +7,7 @@
                     <ul style="padding-left:10px">
                         <li style="font-size: 21px;color: rgb(36, 33, 69);font-weight:700">
                             <h4>
-                                {{name}}
+                                {{name.split('')[0]}}
                             </h4>
                         </li>
                         <li>
@@ -24,20 +24,24 @@
             <vs-sidebar-item index="3" to="/task" icon="gavel">
                 Task
             </vs-sidebar-item>
+            <vs-sidebar-item index="4" icon="gavel" @click="logout">
+                <vs-button icon="reply" color="danger" type="flat">log out</vs-button>
+            </vs-sidebar-item>
             <!--   <vs-divider icon="person" to="task" position="left">
         Task -->
-            <div class="footer-sidebar" slot="footer">
+            <!--  <div class="footer-sidebar" slot="footer">
                 <vs-button icon="reply" color="danger" type="flat" @click="logout">log out</vs-button>
-            </div>
+            </div> -->
         </vs-sidebar>
         <nav class="navbar dashboard-nav has-shadow" role="navigation" aria-label="main navigation">
             <div class="container is-fluid">
                 <div class="navbar-brand" style="float:left">
                     <div class="navbar-item">
-                        <h3>TripShipTask</h3>
+                        <router-link :to="{name:'dashboard'}">
+                            <img src="../../assets/images/tst/tstlogo-horizontal.png">
+                        </router-link>
                     </div>
                 </div>
-                
                 <div class="navbar-menu">
                     <div class="navnar-start">
                         <router-link to="/trip">
@@ -51,29 +55,30 @@
                         </router-link>
                         <!--   <vs-button color="success"  @click="trip" type="line">Trip -->
                     </div>
-                    <div class="navbar-end" style="padding-right: 42px;">
-                        <div class="navbar-item drop-pop is-centered nav-icon" v-for="item in items" :key="item.title" style="margin-left:-20px;">
-                            <a class="nav-inner">
-                                <router-link :to="item.to">
-                                    {{item.title}}
-                                </router-link>
-                            </a>
-                        </div>
-                        <div class="navbar-item drop-pop is-centered nav-icon" style="    margin-left:1px;margin-right:-25px;">
+                    <div class="navbar-end">
+                        <div class="navbar-item drop-pop is-centered nav-notification" style="margin-left:20px;">
                             <app-notification></app-notification>
                         </div>
-                        <div class="navbar-item drop-pop is-centered nav-icon" style="    margin-right: -10px;">
+                        <div class="navbar-item drop-pop is-centered nav-icon" :class="status=='verified'?'ver':'unver'">
                             <div class="deal-meta">
                                 <div class="deal-owner">
                                     <div class="dropdown">
                                         <div class="button" @click="dropdown">
-                                            <img :src="photo" style="margin-right: -6px;">
+                                            <img :src="photo">
                                             <div class="owner-meta">
-                                                <span>{{name}}</span>
+                                                <span> {{name.split(' ')[0]}}</span>
+                                                <div class="verified" v-if="status=='verified'">
+                                                    <span class="material-icons">
+                                                        verified
+                                                    </span>
+                                                    <span>Govt Id Verified</span>
+                                                </div>
+
                                                 <span style="color:#444343">{{balance}} Tk</span>
+                                                
                                             </div>
                                             <div class="is-right">
-                                                <span class="material-icons" v-if="menu">
+                                                <span class=" material-icons" v-if="menu">
                                                     keyboard_arrow_up
                                                 </span>
                                                 <span class="material-icons" v-else>
@@ -87,10 +92,6 @@
                                                         Profile
                                                     </a>
                                                 </router-link>
-                                                <router-link :to="{name:'myaccount'}">
-                                                    <a class="dropdown-item">My account</a>
-                                                </router-link>
-                                                <a class="dropdown-item">FAQ</a>
                                                 <a class="dropdown-item">Support</a>
                                                 <a class="dropdown-item" @click="logout">
                                                     Logout
@@ -105,19 +106,19 @@
                 </div>
                 <div class="is-hidden-desktop nav-mobile">
                     <div class="mobile-navbar-end">
-                    <app-notification></app-notification>
-                    <div id="mobile-dashboard-trigger" @click="active='block'">
-                        <span class="menu-toggle">
-                            <span class="icon-box-toggle">
-                                <span class="rotate">
-                                    <i class="icon-line-top"></i>
-                                    <i class="icon-line-center"></i>
-                                    <i class="icon-line-bottom"></i>
+                        <app-notification></app-notification>
+                        <div id="mobile-dashboard-trigger" @click="active='block'">
+                            <span class="menu-toggle">
+                                <span class="icon-box-toggle">
+                                    <span class="rotate">
+                                        <i class="icon-line-top"></i>
+                                        <i class="icon-line-center"></i>
+                                        <i class="icon-line-bottom"></i>
+                                    </span>
                                 </span>
                             </span>
-                        </span>
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
         </nav>
@@ -143,18 +144,16 @@ export default {
             colorx: '#c72a75',
             isOpen: false,
             menu: false,
+            panelmenu: false,
             active: 'none',
-
-
+            name: '',
+            photo: '',
+            status:'',
+            balance: '',
             items: [
-                { title: 'Home', show: this.$store.getters.check, to: '/trip' },
-
-                { title: 'My Trip', to: '/mytrip', data: this.data },
-                { title: 'My Ship', to: '/myship', data: this.data },
-                { title: 'My Task', to: '/mytask', data: this.data },
-
-                // { title: 'Category',show: this.$store.getters.check, to: '/category' },
-                // { title: 'Skill',show: this.$store.getters.check, to: '/skill' },
+                { title: 'Trip', to: '/trip', data: this.data },
+                { title: 'Ship', to: '/ship', data: this.data },
+                { title: 'Task', to: '/task', data: this.data },
 
             ],
 
@@ -168,24 +167,21 @@ export default {
     created() {
         window.addEventListener('click', this.close)
     },
+    mounted() {
+        if (this.$store.getters.user !== null) {
+            this.name = this.$store.getters.user.full_name
+            this.photo = this.$store.getters.user.profile_picture
+            this.balance = this.$store.getters.user.balance
+            this.status = this.$store.getters.user.status
+        }
+    },
+
 
     beforeDestroy() {
         window.removeEventListener('click', this.close)
     },
     computed: {
-        auth() {
-            return this.$store.getters.check
-        },
-        name() {
-            return this.$store.getters.user.full_name
-        },
-        balance() {
-            return this.$store.getters.user.balance
-        },
-        photo() {
-            return this.$store.getters.user.profile_picture
-        },
-
+        
     },
 
     methods: {
@@ -193,6 +189,7 @@ export default {
             if (!this.$el.contains(e.target)) {
                 this.active = 'none'
                 this.menu = false
+                this.panelmenu = false
             }
         },
         seektrip() {
@@ -216,6 +213,10 @@ export default {
             this.menu = !this.menu;
 
         },
+        paneldropdown() {
+            this.panelmenu = !this.panelmenu;
+
+        },
         submenu() {
             this.menu = false
         },
@@ -223,6 +224,7 @@ export default {
             this.active = 'none'
             this.$axios.post('auth/logout')
                 .then(() => {
+                    Cookies.remove('token', { path: '/', domain: '.tripshiptask.com' })
                     Cookies.remove('token');
                     this.$store.commit('Remove_User')
                     this.$router.push('/')
@@ -235,6 +237,7 @@ export default {
         '$route'() {
             this.active = 'none'
             this.menu = false
+            this.panelmenu = false
         }
     }
 
@@ -246,11 +249,11 @@ export default {
 .dropdown-menu {
     display: none;
     min-width: 8rem;
-    padding-top: 13px !important;
+    padding-top:20px !important;
     position: absolute;
     top: 100%;
     z-index: 20;
-    left: -48px !important;
+    left: 40px !important;
 }
 
 .navnar-start .router-link-exact-active .vs-button-line {
@@ -266,7 +269,22 @@ export default {
 }
 
 .navbar {
-    z-index: 10 !important;
+    z-index: 999 !important;
+    position: fixed;
+    width: 100%;
+}
+
+@media only screen and (max-width:768px) {
+    .navbar {
+        z-index: 999 !important;
+        position: relative;
+        width: 100%;
+    }
+}
+
+
+.navbar-item img {
+    max-height: 4rem !important;
 }
 
 .dropdown-item {
@@ -290,13 +308,22 @@ button.dropdown-item {
 
 
 .deal-meta .deal-owner {
-    margin-top: -44px;
+    margin-top: -50px;
 }
 
 .button i {
     margin-left: 6px;
 }
 
+nav.dashboard-nav .nav-main {
+    width: 55px !important;
+    height: 52px !important;
+}
+
+nav.dashboard-nav .nav-notification {
+    width: 60px !important;
+    height: 52px !important;
+}
 
 .vs-sidebar--item a {
     padding: 10px;
@@ -327,6 +354,11 @@ a {
     border-bottom: 1px solid #536dfe;
 }
 
+.navbar-end {
+    padding-right: 42px;
+    padding-top: 16px;
+}
+
 a.navbar-item:hover {
     background-color: #FFFFFF !important;
 }
@@ -334,11 +366,12 @@ a.navbar-item:hover {
 .navnar-start {
     margin-left: 32%;
     margin-top: 10px;
+    padding-top: 16px;
 }
 
 nav.dashboard-nav .container.is-fluid {
     margin: 0;
-    height: 56px !important;
+    height: 80px !important;
 }
 
 .showsidebar {
@@ -362,5 +395,19 @@ nav.dashboard-nav .nav-icon {
 .vs-button-line {
     overflow: hidden;
 }
-
+.verified
+{
+    font-size:12px;
+}
+.ver{
+    margin-right: 35px;
+}   
+.unver
+{
+    margin-right: -14px;
+}
+.verified .material-icons
+{
+    font-size:16px;
+}
 </style>

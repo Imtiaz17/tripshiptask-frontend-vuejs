@@ -1,34 +1,32 @@
 <template>
     <section>
         <div class="columns">
-            <div class="column is-12" style="margin-top:10px;">
+            <div class="column is-12">
                 <div class="control">
-                    <gmap-autocomplete @address_res="handleAddr" placeholder="Pick up point" :premium="premium"></gmap-autocomplete>
+                    <gmap-autocomplete :start_point="pickuppoint" @address_res="handleAddr" label="Pick up point" :verified="verified"></gmap-autocomplete>
                     <input type="hidden" v-model="pickuppoint" v-validate="'required'" name="pick_up">
                     <span v-show="errors.has('pick_up')" class="help is-danger">Pick up point is required</span>
                 </div>
             </div>
         </div>
-        <div class="columns" style="margin-top:-33px">
+        <div class="columns setonmap" v-if="verified">
             <div class="column">
                 <a style="float:right;font-size:12px;color:#039BE5" v-show="start_Marker" @click="startMarker" type="submit">Set on map
                 </a>
             </div>
         </div>
-        <div class="columns" style="margin-top: -27px;">
-            <div class="column is-12">
+        <div class="columns">
+            <div class="column is-6">
                 <div class="control">
-                    <float-label label="What's your preferred pick up date?" fixed>
-                        <date-picker v-model="date" valueType="format" v-validate="'required'" name="date"></date-picker>
+                    <float-label label="Preferred pick up date" :fixed="date==null?false:true">
+                        <a-date-picker v-model="date" valueFormat="YYYY-MM-DD" placeholder="" :disabled-date="disabledDate" v-validate="'required'" name="date" />
                     </float-label>
                     <span v-show="errors.has('date')" class="help is-danger">Preferred pick up date is required</span>
                 </div>
             </div>
-        </div>
-        <div class="columns" style="margin-top: -20px;">
-            <div class="column is-12">
+            <div class="column is-6">
                 <div class="control">
-                    <float-label :dispatch="false" label="What's your preferred pick up time?" fixed>
+                    <float-label :dispatch="false" label="Preferred pick up time">
                         <div class="select">
                             <select name="time" v-model="time" v-validate="'required'">
                                 <option v-for="(item,index) in timeschedule" :key="index" :value="item">{{item}}</option>
@@ -42,60 +40,98 @@
         <div class="columns">
             <div class="column is-12">
                 <div class="control">
-                    <gmap-autocomplete @address_res="handleAddr" placeholder="Preferred delivery point(optional)" :premium="premium"></gmap-autocomplete>
-                    <input type="hidden" v-model="dropoffpoint" v-validate="'required'" name="drop_off">
+                    <gmap-autocomplete :destination="dropoffpoint" @address_res="handleAddr" label="Preferred delivery point(optional)" :verified="verified"></gmap-autocomplete>
+                    <input type="hidden" v-model="dropoffpoint" name="drop_off">
                 </div>
             </div>
         </div>
-        <div class="columns" style="margin-top:-33px">
+        <div class="columns" v-if="verified">
             <div class="column">
                 <a style="float:right;font-size:12px;color:#039BE5" v-show="end_Marker" @click="endMarker" type="submit">Set on map
                 </a>
             </div>
         </div>
-        <div class="columns" style="margin-top:-23px">
-            <div class="column is-7">
-                <div class="control">
-                    <float-label label="Preferred delivery date & time" fixed>
-                        <date-picker format="YYYY-MM-DD hh:mm a" v-model="datetime" type="datetime" value-type="format" v-validate="'required'" name="delivery_dt"></date-picker>
-                    </float-label>
-                    <span v-show="errors.has('delivery_dt')" class="help is-danger">Approx. delivery date and time is required</span>
-                </div>
-            </div>
-            <div class="column is-5">
-                <div class="control">
-                    <float-label label="Asking amount" fixed>
-                        <input type="number" min="0" class="input is-primary-focus" name="asking amount" v-model="amount" v-validate="'required'">
-                    </float-label>
-                    <span v-show="errors.has('asking amount')" class="help is-danger">Asking amount is required</span>
-                </div>
+        <div class="columns">
+            <div class="column">
+                <GmapMap :center="{lat:23.746466,lng:90.376015}" ref="xyz" :zoom="14" map-type-id="terrain" style="width:100%; height:200px">
+                </GmapMap>
             </div>
         </div>
-        <div class="columns" style="margin-top:-8px;padding:0px 10px;">
-            <GmapMap :center="{lat:23.746466,lng:90.376015}" ref="xyz" :zoom="14" map-type-id="terrain" style="width:100%; height:200px">
-            </GmapMap>
-        </div>
-        <div class="columns" style="margin-top:10px">
-            <div class="column is-12">
+        <div class="columns">
+            <div class="column is-6">
                 <div class="control">
-                    <float-label :dispatch="false" label="What size of goods do you prefer to carry?" fixed>
+                    <float-label label="Preferred delivery date" :fixed="delivery_date==null?false:true">
+                        <a-date-picker format="YYYY-MM-DD" v-model="delivery_date" placeholder="" v-validate="'required'" name="delivery_date" />
+                    </float-label>
+                    <span v-show="errors.has('delivery_date')" class="help is-danger">Approx. delivery date and time is required</span>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="control">
+                    <float-label :dispatch="false" label="Preferred delivery time">
                         <div class="select">
-                            <select name="document" v-model="document">
-                                <option v-for="(item,index) in documents" :key="index" :value="item">{{item}}</option>
+                            <select name="delivery_time" v-model="delivery_time" v-validate="'required'">
+                                <option v-for="(item,index) in timeschedule" :key="index" :value="item">{{item}}</option>
                             </select>
                         </div>
                     </float-label>
-                    <span v-show="errors.has('document')" class="help is-danger">Size of package is required</span>
+                    <span v-show="errors.has('delivery_time')" class="help is-danger">Preferred delivery time is required</span>
                 </div>
             </div>
         </div>
-        <div class="columns" style="margin-top:-14px;">
-            <div class="column is-12">
+        <div class="columns" v-if="currencychanged">
+            <div class="column">
+                <label class="label">In which country do you want this to be posted?</label>
+            </div>
+            <div class="column is-5 countrylist">
                 <div class="control">
-                    <float-label :dispatch="false" label="Maximum weight you are willing to carry" fixed>
+                    <div class="select">
+                        <select name="country" v-model="country">
+                            <option v-for="(item,index) in countries" :key="index" :value="item.code">{{item.name}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-6">
+                <div class="field has-addons">
+                    <div class="control">
+                        <float-label label="Asking amount">
+                            <input type="number" min="0" class="input is-primary-focus" name="asking amount" v-model="amount" v-validate="'required'">
+                        </float-label>
+                    </div>
+                    <div class="control">
+                        <span class="select">
+                            <select v-model="currency">
+                                <option :value="usercurrency">{{usercurrency}}</option>
+                                <option v-if="usercurrency !=='USD'" value="USD">USD</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
+                <span v-show="errors.has('asking amount')" class="help is-danger">Asking amount is required</span>
+            </div>
+            <div class="column is-6">
+                <div class="control">
+                    <float-label :dispatch="false" label="Size of package prefer to carry">
                         <div class="select">
-                            <select name="weight" v-model="packagesize" v-validate="'required'">
-                                <option v-for="(item,index) in sizes" :key="index" :value="item">{{item}}</option>
+                            <select name="packagetype" v-model="packagetype">
+                                <option v-for="(item,index) in ptype" :key="index" :value="item">{{item}}</option>
+                            </select>
+                        </div>
+                    </float-label>
+                    <span v-show="errors.has('packagetype')" class="help is-danger">Size of package is required</span>
+                </div>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-6">
+                <div class="control">
+                    <float-label :dispatch="false" label="Weight willing to carry">
+                        <div class="select">
+                            <select name="weight" v-model="weight" v-validate="'required'">
+                                <option v-for="(item,index) in weights" :key="index" :value="item">{{item}}</option>
                             </select>
                         </div>
                     </float-label>
@@ -103,61 +139,69 @@
                 </div>
             </div>
         </div>
-        <div class="columns" style="margin-top:-8px;">
-            <div class="column is-8">
+        <div class="columns is-mobile">
+            <div class="column is-12">
                 <div style="display: inline-flex;">
-                    <label class="label">Do you have a vehicle?</label>
+                    <label class="label">Are you using your own vehicle?</label>
                     <div class="control">
                         <ul class="leftx" style="display: inline-flex;">
                             <li style="margin-left:10px;">
-                                <vs-radio vs-name="radios1" vs-value="yes" @change="yes">Yes</vs-radio>
+                                <vs-radio v-model="ownvehicle" vs-value="1">Yes</vs-radio>
                             </li>
                             <li style="margin-left:10px;">
-                                <vs-radio vs-name="radios1" vs-value="no" @change="no">No</vs-radio>
+                                <vs-radio v-model="ownvehicle" vs-value="0">No</vs-radio>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <input type="" v-model="radio" type="hidden" v-validate="'required'" name="vehicle">
+                <input type="" v-model="ownvehicle" type="hidden" v-validate="'required'" name="vehicle">
                 <span v-show="errors.has('vehicle')" class="help is-danger">Please select an option</span>
             </div>
-            <div class="column is-4" v-if="ownCar" style="margin-top: -4px;padding-left: 0px;">
-                <div class="control" v-if="myVehicles.length>0">
-                    <float-label :dispatch="false" label="Select vehicle" fixed>
-                        <div class="select">
-                            <select v-model="vehicle">
-                                <option v-for="(item,index) in myVehicles" :key="index" :value="item.model">{{item.model}}</option>
-                            </select>
-                        </div>
-                    </float-label>
-                </div>
-                <div class="control" v-else-if="myVehicles.length<1" style="padding-left: 18px;">
-                    <span style="color:red">No vehicle found</span>
-                </div>
-            </div>
         </div>
-        <div class="columns" style="margin-top:-15px;">
-            <div class="column is-9">
+        <div class="columns">
+            <div class="column">
                 <div class="control">
-                    <float-label label="Note" fixed>
+                    <float-label label="Note">
                         <textarea class="textarea is-primary-focus" v-model="details" rows="4"></textarea>
                     </float-label>
                 </div>
             </div>
         </div>
-        <div class="mt-10 has-text-right">
-            <button @click="submit" v-bind:class="(loading)?'button btn-align info-btn raised is-loading':'button btn-align info-btn raised'">Submit
+        <div class="mt-10 has-text-right" v-if="verified">
+            <button @click="submit" v-bind:class="(loading)?'button info-btn raised is-loading':'button info-btn raised'">Submit
             </button>
         </div>
+        <div class="mt-20" v-else>
+            <label class="label">For security, you need to <router-link target="_blank" :to="{name:'nidinfo'}">provide</router-link> your National/Govt id to post.</label>
+        </div <info-required v-if="provideNidInfo" :title="title" />
     </section>
 </template>
 <script>
+import Vue from 'vue';
+import * as VueGoogleMaps from 'vue2-google-maps-withscopedautocomp'
+Vue.use(VueGoogleMaps, {
+    load: {
+        key: 'AIzaSyCdu3RozRNnds9nOhMTPs-ETTWLlV1C-EE',
+        libraries: 'places',
+    },
+});
 import moment from "moment";
-import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
+import { DatePicker } from 'ant-design-vue';
+import { TimePicker } from 'ant-design-vue';
+Vue.use(DatePicker);
+Vue.use(TimePicker);
 import gmapAutocomplete from '../global/gmapautocomplete'
+import VueSweetalert2 from 'vue-sweetalert2';
+import Swal from 'sweetalert2';
+Vue.use(VueSweetalert2);
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: true,
+})
 export default {
     components: {
+        infoRequired: () => import('@/components/global/InfoRequired'),
         gmapAutocomplete,
         DatePicker
     },
@@ -170,63 +214,71 @@ export default {
             dropoffpoint: '',
             start_Marker: true,
             end_Marker: true,
-            date: '',
+            s_lat: null,
+            s_lng: null,
+            d_lat: null,
+            d_lng: null,
+            date: null,
             time: null,
             document: null,
-            radio: '',
-            config: {
-                altInput: true,
-                enableTime: false,
-                dateFormat: "Y-m-d",
-            },
-            config1: {
-                altInput: true,
-                enableTime: true,
-                dateFormat: "Y-m-d H:i",
-            },
+            ownvehicle: '',
+            currencychanged: false,
+            currency: this.$store.getters.user.currency,
+            country: '',
+            countries: [
+                { name: 'Australia', code: 'AUS' },
+                { name: 'Bangladesh', code: 'BD' },
+                { name: 'Canada', code: 'CA' },
+                { name: 'India', code: 'IND' },
+                { name: 'Kenya', code: 'KE' },
+                { name: 'Pakistan', code: 'PK' },
+                { name: 'United Kingdom', code: 'UK' },
+                { name: 'United States', code: 'USA' },
+            ],
             details: '',
-            datetime: '',
+            delivery_date: null,
+            delivery_time: null,
             deliverydatetime: '',
-            packagesize: null,
-            ownCar: false,
+            weight: '',
+            packagetype: null,
             amount: '',
             vehicle: '',
             distance: '',
             duration: '',
             myVehicles: [],
             timeschedule: [
-                'before  6:00 a.m.',
-                'between 6:00 a.m. - 6:30 a.m.',
-                'between 6:30 a.m. - 7:00 a.m.',
-                'between 7:00 a.m. - 7:30 a.m.',
-                'between 7:30 a.m. - 8:00 a.m.',
-                'between 8:00 a.m. - 8:30 a.m.',
-                'between 8:30 a.m. - 9:00 a.m.',
-                'between 9:00 a.m. - 9:30 a.m.',
-                'between 9:30 a.m. - 10:00 a.m.',
-                'between 10:00 a.m. - 10:30 a.m.',
-                'between 10:30 a.m. - 11:00 a.m.',
-                'between 11:00 a.m. - 11:30 a.m.',
-                'between 11:30 a.m. - 12:00 p.m.',
-                'between 12:00 p.m. - 12:30 p.m.',
-                'between 12:30 p.m. - 1:00 p.m.',
-                'between 1:00 p.m. - 1:30 p.m.',
-                'between 1:30 p.m. - 2:00 p.m.',
-                'between 2:00 p.m. - 2:30 p.m.',
-                'between 2:30 p.m. - 3:00 p.m.',
-                'between 3:00 p.m. - 3:30 p.m.',
-                'between 3:30 p.m. - 4:00 p.m.',
-                'between 4:00 p.m. - 4:30 p.m.',
-                'between 4:30 p.m. - 5:00 p.m.',
-                'between 5:00 p.m. - 5:30 p.m.',
-                'between 5:30 p.m. - 6:00 p.m.',
-                'between 6:00 p.m. - 6:30 p.m.',
-                'between 6:30 p.m. - 7:00 p.m.',
-                'between 7:00 p.m. - 7:30 p.m.',
-                'between 7:30 p.m. - 8:00 p.m.',
-                'after  8:00 p.m.',
+                'Before  6:00 a.m.',
+                'Between 6:00 a.m. - 6:30 a.m.',
+                'Between 6:30 a.m. - 7:00 a.m.',
+                'Between 7:00 a.m. - 7:30 a.m.',
+                'Between 7:30 a.m. - 8:00 a.m.',
+                'Between 8:00 a.m. - 8:30 a.m.',
+                'Between 8:30 a.m. - 9:00 a.m.',
+                'Between 9:00 a.m. - 9:30 a.m.',
+                'Between 9:30 a.m. - 10:00 a.m.',
+                'Between 10:00 a.m. - 10:30 a.m.',
+                'Between 10:30 a.m. - 11:00 a.m.',
+                'Between 11:00 a.m. - 11:30 a.m.',
+                'Between 11:30 a.m. - 12:00 p.m.',
+                'Between 12:00 p.m. - 12:30 p.m.',
+                'Between 12:30 p.m. - 1:00 p.m.',
+                'Between 1:00 p.m. - 1:30 p.m.',
+                'Between 1:30 p.m. - 2:00 p.m.',
+                'Between 2:00 p.m. - 2:30 p.m.',
+                'Between 2:30 p.m. - 3:00 p.m.',
+                'Between 3:00 p.m. - 3:30 p.m.',
+                'Between 3:30 p.m. - 4:00 p.m.',
+                'Between 4:00 p.m. - 4:30 p.m.',
+                'Between 4:30 p.m. - 5:00 p.m.',
+                'Between 5:00 p.m. - 5:30 p.m.',
+                'Between 5:30 p.m. - 6:00 p.m.',
+                'Between 6:00 p.m. - 6:30 p.m.',
+                'Between 6:30 p.m. - 7:00 p.m.',
+                'Between 7:00 p.m. - 7:30 p.m.',
+                'Between 7:30 p.m. - 8:00 p.m.',
+                'After  8:00 p.m.',
             ],
-            documents: [
+            ptype: [
                 'Small package (perishable items)',
                 'Small package (non-perishable items)',
                 'Medium package (perishable items)',
@@ -234,7 +286,7 @@ export default {
                 'Large package (perishable items)',
                 'Large package (non-perishable items)',
             ],
-            sizes: [
+            weights: [
                 '0-1Kg',
                 '1-2Kg',
                 '2-3Kg',
@@ -242,13 +294,57 @@ export default {
                 '4-5kg',
                 '5-10 or more'
             ],
-            loading: false
+            loading: false,
+            provideNidInfo: false,
+            title: '',
+            postdata: {
+                module: "ship",
+                type: "carry_package"
+            },
+            savepost: null
         }
     },
     computed: {
+        verified() {
+            return this.$store.getters.user.status == 'verified'
+        },
+        id() {
+            return this.$store.getters.user.id
+        },
+        usercurrency() {
+            return this.$store.getters.user.currency
+        },
+        usercountry() {
+            return this.$store.getters.user.country
+        },
+        queryString() {
+            return Object.keys(this.postdata)
+                .map(k => `${k}=${this.postdata[k]}`)
+                .join('&');
+        },
+
 
     },
+
     mounted() {
+        if (this.usercountry == 'USA') {
+            this.currencychanged = true
+            this.country = 'USA'
+        }
+        EventBus.$on('infoSubmitted', () => {
+            this.provideNidInfo = false
+            this.submit()
+        })
+        EventBus.$on('CarryPackageRepost', (info) => {
+            this.pickuppoint = info.start_point
+            this.dropoffpoint = info.destination
+            this.amount = info.amount
+            this.document = info.documents
+            this.packagetype = info.package_type
+            this.details = info.details
+            this.weight = info.weight
+            this.getRoute()
+        })
 
         this.$refs.xyz.$mapPromise.then(() => {
             this.directionsService = new google.maps.DirectionsService()
@@ -262,6 +358,39 @@ export default {
 
     },
     methods: {
+        disabledDate(current) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return current < today;
+        },
+        disabledHours() {
+            const today = new Date()
+            if (new Date(this.date).toDateString() == today.toDateString()) {
+                var hours = [];
+                for (var i = 0; i < moment().hour(); i++) {
+                    hours.push(i);
+                }
+                return hours;
+            }
+
+        },
+        disabledMinutes(selectedHour) {
+            const today = new Date()
+            if (new Date(this.date).toDateString() == today.toDateString()) {
+                var minutes = [];
+                if (selectedHour === moment().hour()) {
+                    for (var i = 0; i < moment().minute() + 3; i++) {
+                        minutes.push(i);
+                    }
+                }
+                return minutes;
+            }
+        },
+        disabledDateTime() {
+            return {
+                disabledHours: () => this.disabledHours(),
+            };
+        },
         handleAddr(data) {
             if (data.field == "Pick up point") {
                 this.pickuppoint = data.address
@@ -319,7 +448,7 @@ export default {
                     if (status == google.maps.GeocoderStatus.OK) {
                         if (results[0]) {
                             vm.pickuppoint = results[0].formatted_address;
-
+                            EventBus.$emit('setstartlocation', vm.pickuppoint)
                             vm.getRoute()
                         }
                     }
@@ -341,7 +470,7 @@ export default {
                     if (status == google.maps.GeocoderStatus.OK) {
                         if (results[0]) {
                             vm.dropoffpoint = results[0].formatted_address;
-
+                            EventBus.$emit('setendlocation', vm.dropoffpoint)
                             vm.getRoute()
                         }
                     }
@@ -354,27 +483,35 @@ export default {
         loadV() {
             if (this.myVehicles.length > 0) {
 
-            } else
+            } else {
                 this.$axios.get(`getvehiclesinfo/${this.id}`)
-                .then(res => {
-                    this.myVehicles = res.data;
+                    .then(res => {
+                        this.myVehicles = res.data.data;
 
-                })
-                .catch(error => console.log(error.res.data))
+                    })
+                    .catch(error => console.log(error.res.data))
+            }
         },
         getPhoto() {
             let photo = "images/circle.gif";
             return photo;
         },
-        yes() {
-            this.radio = "a",
-                this.ownCar = true
-            this.loadV();
-        },
-        no() {
-            this.radio = "a",
-                this.ownCar = false
-        },
+
+        // retrivePost() {
+        //     this.$axios.get(`/retrivepost?${this.queryString}`)
+        //         .then(res => {
+        //             this.pickuppoint = res.data.data.start_point
+        //             this.dropoffpoint = res.data.data.destination
+        //             this.amount = res.data.data.amount
+        //             this.document = res.data.data.documents
+        //             this.packagetype = res.data.data.package_type
+        //             this.details = res.data.data.details
+        //             this.weight = res.data.data.weight
+        //             this.ownvehicle=res.data.data.own_vehicle
+        //             this.getRoute()
+        //         })
+        // },
+
         submit() {
             this.$validator.validateAll().then((result) => {
                 if (result) {
@@ -387,31 +524,73 @@ export default {
                             date: this.date,
                             time: this.time,
                             vehicle: this.vehicle,
-                            document: this.document,
+                            distance: this.distance,
+                            duration: this.duration,
                             amount: this.amount,
                             notes: this.details,
-                            deliverydatetime: this.deliverydatetime,
-                            packagesize: this.packagesize,
+                            country: this.country,
+                            currency: this.currency,
+                            delivery_date: this.delivery_date,
+                            delivery_time: this.delivery_time,
+                            packagetype: this.packagetype,
+                            weight: this.weight,
+                            ownvehicle: this.ownvehicle
                         })
                         .then((res) => {
+                            EventBus.$emit('CloseRepost')
                             this.loading = false
-                            this.$vs.notify({
-                                title: 'Success',
-                                text: 'Your "Carry a package" has been posted successfully',
-                                position: 'top-right',
-                                color: 'success'
+                            Toast.fire({
+                                type: 'success',
+                                text: 'Your "Carry a package" post is successful',
                             })
+                            const clear = async () => {
+                                this.pickuppoint = ''
+                                this.dropoffpoint = ''
+                                this.date = ''
+                                this.time = ''
+                                this.vehicle = ''
+                                this.goodtype = ''
+                                this.amount = ''
+                                this.details = ''
+                                this.delivery_date = ''
+                                this.delivery_time = ''
+                                this.packagetype = ''
+                                this.weight = ''
+                                this.savepost = null
+                                this.ownvehicle = null
+                            }
+                            clear().then(() => {
+                                this.$validator.reset()
+                            })
+                            EventBus.$emit('removedata')
+                            EventBus.$emit('updateCarryPackageList')
 
-                            this.$router.push(res.data.path)
                         })
                         .catch(error => {
                             this.loading = false
-                            this.$vs.notify({
-                                title: 'Error',
-                                text: 'Oops,somwthing went wrong.Please check again',
-                                position: 'top-right',
-                                color: 'danger'
-                            })
+                            if (error.response.status == 400) {
+                                this.provideNidInfo = true
+                                this.title = error.response.data.error.message
+                            }
+                            if (error.response.status == 403) {
+                                Swal.fire({
+                                    position: 'center',
+                                    type: 'error',
+                                    html: '<p style="text-align:center;">Update E-wallet Balance</p>',
+                                    text: error.response.data.message,
+                                    showConfirmButton: true,
+
+                                })
+                            }
+
+                            if (error.response.status == 422) {
+                                this.$vs.notify({
+                                    title: 'Error',
+                                    text: 'Oops,somwthing went wrong.Please check again',
+                                    position: 'top-right',
+                                    color: 'danger'
+                                });
+                            }
                         });
 
                 }
@@ -419,10 +598,36 @@ export default {
         },
     },
     watch: {
-        'datetime': function(val) {
-            this.datetime = val
-            this.deliverydatetime = moment(val, "YYYY-MM-DD h:mm A").format("YYYY-MM-DD HH:mm:ss")
-        }
+        currency: function(val) {
+            if (val == 'USD') {
+                this.currencychanged = true
+                if (this.usercountry == 'AUS') {
+                    this.countries.splice(0, 1)
+                } else if (this.usercountry == 'BD') {
+                    this.countries.splice(1, 1)
+                } else if (this.usercountry == 'CA') {
+                    this.countries.splice(2, 1)
+                } else if (this.usercountry == 'IND') {
+                    this.countries.splice(3, 1)
+                } else if (this.usercountry == 'KE') {
+                    this.countries.splice(4, 1)
+                } else if (this.usercountry == 'PK') {
+                    this.countries.splice(5, 1)
+                } else if (this.usercountry == 'UK') {
+                    this.countries.splice(6, 1)
+                } else if (this.usercountry == 'USA') {
+                    this.countries.splice(7, 1)
+                }
+            } else {
+                this.currencychanged = false
+                this.currency = this.usercurrency
+                this.country = this.usercountry
+            }
+        },
+        // 'datetime': function(val) {
+        //     this.datetime = val
+        //     this.deliverydatetime = moment(val, "YYYY-MM-DD h:mm A").format("YYYY-MM-DD HH:mm:ss")
+        // }
     }
 }
 </script>
@@ -438,4 +643,19 @@ export default {
     color: #fff !important;
 }
 
+.is-6:first-child {
+    padding-right: 0px;
+}
+
+.con-vs-checkbox {
+    justify-content: start;
+}
+
+.button.light-raised:hover {
+    box-shadow: 0 3px 10px 4px rgba(0, 0, 0, 0.04);
+}
+
+.restrict {
+    font-size: 1em;
+}
 </style>

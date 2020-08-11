@@ -9,95 +9,120 @@
                 </div>
                 <div class="columns">
                     <div class="column">
-                        <label class="label ">Title</label>
                         <div class="control">
-                            <float-label>
-                                <input class="input is-small is-primary-focus " type="text" v-model="data.title" name="title" v-validate="'required'" :class="{'input': true, 'is-danger': errors.has('title') }" placeholder="Title">
+                            <float-label label="Title" fixed>
+                                <input class="input is-primary-focus " type="text" v-model="data.title" name="title" v-validate="'required'">
                             </float-label>
                             <span v-show="errors.has('title')" class="help is-danger">{{ errors.first('title') }}</span>
                         </div>
                     </div>
-                </div>
-                <div class="columns mt-5">
                     <div class="column">
-                        <label class="label ">Category</label>
                         <div class="control">
-                            <float-label :dispatch="false">
-                                <div class="select is-select">
+                            <float-label :dispatch="false" label="Select a category" fixed>
+                                <div class="select">
                                     <select name="category" v-model="data.category" v-validate="'required'">
-                                        <option :value="null" disabled selected>Select a category</option>
                                         <option v-for="(cat,index) in categories" :key="index" :value="cat.name">{{cat.name}}</option>
                                     </select>
                                 </div>
                             </float-label>
-                            <!--  <el-select v-on:change="loadSkills" v-validate="'required'" name="category type" size="small" v-model="data.category" placeholder="Select Category" style="width: 100%;">
-                                    <el-option v-for="(cat,index) in categories" :key="index" :label="cat.name" :value="cat.id">
-                                    </el-option>
-                                </el-select> -->
                             <span v-show="errors.has('category')" class="help is-danger">{{ errors.first('category') }}</span>
                         </div>
                     </div>
-                    <div class="column">
-                        <label class="label">Task Skills</label>
+                </div>
+                <div class="columns mt-5">
+                    <div class="column is-6">
                         <div class="control">
                             <div class="control">
                                 <vs-chips color="rgb(145, 32, 159)" placeholder="Skills required for this task" v-model="data.skills">
-                                    <vs-chip :key="chip" @click="remove(chip)" v-for="chip in form.selectedskill" closable>
+                                    <vs-chip :key="chip" @click="remove(chip)" v-for="chip in data.skills" closable>
                                         {{ chip }}
                                     </vs-chip>
-                                    <div class="ax-global con-chips--remove-all" @click="open"><i class="vs-icon notranslate icon-scale material-icons null">add</i></div>
+                                    <div class="choose-skill" @click="openSkill"><i class="vs-icon notranslate icon-scale material-icons null">add</i></div>
                                 </vs-chips>
                                 <span v-show="errors.has('skill')" class="help is-danger">Skillset is required</span>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="columns">
                     <div class="column">
-                        <label class="label">Date</label>
                         <div class="control">
-                            <VueCtkDateTimePicker id="OfferDatePicker" label="Date of the assignment" :no-label="true" color="#6BA3FF" input-size="sm" v-model="data.date_time" format="DD-MM-YYYY" formatted="ll" output-format="YYYY-MM-DD" :no-header="true" :only-date="true" :no-button="true" :auto-close="true" v-validate="'required'" name="date" />
+                            <float-label label="Date of the task" :fixed="data.date==null?false:true">
+                                <a-date-picker v-model="data.date" valueFormat="YYYY-MM-DD" placeholder="" :disabled-date="disabledDate" v-validate="'required'" name="date" />
+                            </float-label>
                             <span v-show="errors.has('date')" class="help is-danger">{{ errors.first('date') }}</span>
                         </div>
                     </div>
                     <div class="column">
-                        <label class="label">Time:</label>
-                        <VueCtkDateTimePicker id="OfferTimePicker" color="#6BA3FF" input-size="sm" v-model="data.date_time" label="Time of the assignment" :no-label="true" format="hh:mm a" output-format="HH:mm" formatted="LT" :only-time="true" v-validate="'required'" name="time" />
-                        <!-- <flat-pickr class="input is-primary-focus " v-validate="'required'" name="time" :config="config1" placeholder="Select time" :class="{'input': true, 'is-danger': errors.has('time') }" v-model="data.date_time"></flat-pickr> -->
+                        <div class="control">
+                            <float-label label="Time of the task" :fixed="data.time==null?false:true">
+                                <a-time-picker use12-hours placeholder="" :disabled-hours="disabledHours" valueFormat="HH:mm:ss" :disabled-minutes="disabledMinutes" format="h:mm a" v-model="data.time" v-validate="'required'" name="time">
+                                    <vs-button slot="addon" slot-scope="panel" color="primary" type="filled" @click="handleClose">Ok</vs-button>
+                                </a-time-picker>
+                            </float-label>
+                        </div>
                         <span v-show="errors.has('time')" class="help is-danger">{{ errors.first('time') }}</span>
                     </div>
                 </div>
-                <div class="columns">
-                    <div class="column">
+                <div class="columns mt-5">
+                    <div class="column is-6">
                         <div class="field">
-                            <label class="label ">Task Location</label>
                             <div class="control">
-                                <float-label>
-                                    <input type="text" class="input is-primary-focus" id="taskin" v-model="data.location" v-validate="'required'" name="location" placeholder="Assignment location">
+                                <float-label label="Task Location">
+                                    <input type="text" class="input is-primary-focus" id="taskin" v-model="data.location" v-validate="'required'" name="location">
                                 </float-label>
-                                <!--   <input class="input is-small is-primary-focus " type="text" v-model="data.location" name="location" v-validate="'required'" :class="{'input': true, 'is-danger': errors.has('location') }"> -->
                                 <span v-show="errors.has('location')" class="help is-danger">{{ errors.first('location') }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="column">
-                        <label class="label ">Offered Amount</label>
+                        <div class="field has-addons">
+                            <div class="control">
+                                <float-label label="Offering amount">
+                                    <input type="number" min="0" class="input is-primary-focus" name="offer amount" v-model="data.amount" v-validate="'required'">
+                                </float-label>
+                            </div>
+                            <div class="control">
+                                <span class="select">
+                                    <select v-model="data.currency">
+                                        <option :value="data.currency">{{data.currency}}</option>
+                                        <option v-if="data.currency !=='USD'" value="USD">USD</option>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                        <span v-show="errors.has('amount')" class="help is-danger">{{ errors.first('amount') }}</span>
+                    </div>
+                    <div class="column ">
                         <div class="control">
-                            <float-label>
-                                <input type="text" class="input is-primary-focus" name="offer amount" v-model="data.amount" v-validate="'required'" placeholder="Offering amount">
+                            <float-label :dispatch="false" fixed label="Prefer to give task to">
+                                <div class="select">
+                                    <select name="preferred_gender" v-model="data.preferred_gender" v-validate="'required'">
+                                        <option v-for="(item,index) in gender" :key="index" :value="item">{{item}}</option>
+                                    </select>
+                                </div>
                             </float-label>
-                            <!--                             <input class="input is-small is-primary-focus " type="text" v-model="data.amount" name="amount" v-validate="'required'" :class="{'input': true, 'is-danger': errors.has('amount') }"> -->
-                            <span v-show="errors.has('amount')" class="help is-danger">{{ errors.first('amount') }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="columns">
-                    <div class="column is-half">
+                    <div class="column is-6" v-if="data.type=='offer'">
+                        <div class="control">
+                            <float-label label="No of hours needed to carry out the task (by default 1 hr)" fixed>
+                                <input type="number" min="1" class="input is-primary-focus" name="" v-model="data.hour_need">
+                            </float-label>
+                        </div>
+                    </div>
+                     <div class="column is-6" v-else>
+                        <div class="control">
+                            <float-label label="No of hours I am available for this task (by default 1 hr)" fixed>
+                                <input type="number" min="1" class="input is-primary-focus" name="" v-model="data.hour_available">
+                            </float-label>
+                        </div>
+                    </div>
+                    <div class="column ">
                         <div class="field">
-                            <label class="label">Task Details</label>
                             <div class="control">
-                                <float-label>
-                                    <textarea class="textarea is-primary-focus" rows="5" v-model="data.description" name="details" v-validate="'required'" :class="{'input': true, 'is-danger': errors.has('details') }"></textarea>
+                                <float-label label="Task details">
+                                    <textarea class="textarea is-primary-focus" rows="5" v-model="data.note" name="details"></textarea>
                                 </float-label>
                             </div>
                             <span v-show="errors.has('details')" class="help is-danger">{{ errors.first('details') }}</span>
@@ -105,11 +130,10 @@
                     </div>
                 </div>
                 <div class="columns" style="margin-top:10px;margin-bottom:5px;">
-                    <div class="column is-5"></div>
-                    <div class="column is-5"></div>
-                    <div class="column is-2">
-                        <vs-button color="success" type="filled" @click="update">Update</vs-button>
-                        <vs-button color="danger" type="filled" @click="cancel">cancel</vs-button>
+                    <div class="column is-8"></div>
+                    <div class="column is-4">
+                        <vs-button type="gradient" style="float:right" @click="cancel">Cancel</vs-button>
+                        <vs-button color="success" type="gradient" style="float:right;margin-right: 13px" @click="update">Update</vs-button>
                     </div>
                 </div>
             </vs-card>
@@ -118,55 +142,90 @@
 </template>
 <script>
 import Vue from 'vue'
+import moment from "moment";
 import VeeValidate from 'vee-validate';
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
-import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
-Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
+import { DatePicker } from 'ant-design-vue';
+import { TimePicker } from 'ant-design-vue';
+Vue.use(DatePicker);
+Vue.use(TimePicker);
 Vue.use(VeeValidate);
-import VueSweetalert2 from 'vue-sweetalert2';
 import Swal from 'sweetalert2';
-Vue.use(VueSweetalert2);
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: false,
+    timer: 3000,
+    closeButton: 'close-button-class'
+})
+import { mapActions } from 'vuex';
 export default {
     props: ['data'],
 
     data() {
         return {
-            config: {
-                altInput: true,
-                enableTime: false,
-                dateFormat: "Y-m-d",
-            },
-            config1: {
-                altInput: true,
-                enableTime: true,
-                noCalendar: true,
-                dateFormat: "H:i",
-            },
-            categories: [],
+            moment: moment,
             skills: [],
             moduleId: 3,
-
+            gender: ['Male',
+                'Female',
+                'Any'
+            ],
 
         }
     },
+    computed: {
+        categories() {
+            return this.$store.getters.categories
+        },
+    },
     created() {
-        axios.get(`api/skills/${this.data.category}`)
-            .then(res => {
+        if (this.$store.getters.categories.length == 0) {
+            this.getCategories();
+        }
 
-                this.skills = res.data;
-            })
-
-
-        axios.get(`api/categories/${this.moduleId}`)
-            .then(res => {
-                this.categories = res.data;
-            })
-            .catch(error => console.log(error.res.data), )
+        // this.$axios.get('category')
+        //     .then(res => {
+        //         this.categories = res.data;
+        //     })
+        //     .catch(error => console.log(error.res.data), )
     },
     methods: {
+        ...mapActions("task",
+            ['getCategories']),
 
+        disabledDate(current) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return current < today;
+        },
+        disabledHours() {
+            const today = new Date()
+            if (new Date(this.data.date).toDateString() == today.toDateString()) {
+                var hours = [];
+                for (var i = 0; i < moment().hour(); i++) {
+                    hours.push(i);
+                }
+                return hours;
+            }
+
+        },
+        disabledMinutes(selectedHour) {
+            const today = new Date()
+            if (new Date(this.data.date).toDateString() == today.toDateString()) {
+                var minutes = [];
+                if (selectedHour === moment().hour()) {
+                    for (var i = 0; i < moment().minute(); i++) {
+                        minutes.push(i);
+                    }
+                }
+                return minutes;
+            }
+        },
         cancel() {
             EventBus.$emit('cancelTask')
+        },
+        openSkill() {
+
         },
         loadSkills() {
             axios.get(`api/skills/${this.data.category}`)
@@ -177,18 +236,15 @@ export default {
                 .catch(error => console.log(error.res.data))
         },
         update() {
-            axios.patch(`api/task/${this.data.slug}`, this.data, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                })
+            this.$axios.patch(`task/${this.data.slug}`, this.data)
                 .then((res) => {
                     if (res.response = 200) {
-                        Swal.fire({
-                            position: 'center',
+                        Toast.fire({
                             type: 'success',
-                            title: 'Task post successfully updated',
-                            showConfirmButton: false,
-                            timer: 1500
+                            title: 'Task post successfully updated'
                         })
+
+
                         this.cancel()
                     }
 
@@ -212,5 +268,25 @@ export default {
 
 .vs-button {
     padding: 8px 9px;
+}
+
+.con-vs-chip {
+    border-radius: 4px;
+    background: #fafafa;
+    border: 1px solid #d9d9d9;
+}
+
+.vs-chip--text {
+    font-size: 1.1em;
+}
+
+.centerx .checkbox {
+    margin-right: 10px;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #5d5d5d;
+}
+.con-chips {
+    padding-right: 50px;
 }
 </style>

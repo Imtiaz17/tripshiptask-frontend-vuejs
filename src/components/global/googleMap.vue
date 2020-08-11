@@ -1,15 +1,7 @@
 <template>
-    <GmapMap :center="{lat:10, lng:10}" ref="xyz" :zoom="12" map-type-id="terrain" style="width:100%; min-height:320px"> </GmapMap>
+    <GmapMap :center="{lat:10, lng:10}" ref="xyz" :zoom="12" map-type-id="terrain" style="width:100%; min-height:330px"> </GmapMap>
 </template>
 <script>
-import Vue from 'vue';
-import * as VueGoogleMaps from 'vue2-google-maps-withscopedautocomp';
-Vue.use(VueGoogleMaps, {
-    load: {
-        key: 'AIzaSyBsOMFpPA9V9dYG3noMdG3OEy88-gVjmk0',
-        libraries: 'places'
-    }
-})
 export default {
     props: ['data'],
     data() {

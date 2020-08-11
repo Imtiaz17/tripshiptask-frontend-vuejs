@@ -4,11 +4,29 @@
             <div class="columns">
                 <div class="column is-3">
                     <div class="stats-card flex-card light-bordered light-raised">
-                        <div class="img-header" style="min-height:150px;padding-top:10px;     margin-bottom:0px;">
+                        <div class="img-header">
                             <div class="img-block has-text-centered">
-                                <div>
-                                    <img :src="photo"></div>
-                                <div class="name"><b>{{user.full_name}}</b></div>
+                                <img :src="getProfilePhoto(propic)">
+                                <div class="profilename">
+                                    <div class="name"><b>{{user.full_name}}</b>
+                                    </div>
+                                    <div class="verified" v-if="user.status=='verified'">
+                                        <span class="material-icons">
+                                            verified
+                                        </span>
+                                        <span>Govt Id Verified</span>
+                                    </div>
+                                </div>
+                                <div class="file has-name">
+                                    <label class="file-label">
+                                        <input class="file-input" type="file" v-on:change="onPhotoChnage">
+                                        <span class="button is-small btn-align accent-btn raised rounded btn-outlined">
+                                            <span class="file-label">
+                                                Change profile picture
+                                            </span>
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body" style="padding:5px 1px;">
@@ -18,7 +36,7 @@
                                         Income
                                     </div>
                                     <div class="stat-data">
-                                        {{user.receive}}
+                                        {{user.received}} {{currency}}
                                     </div>
                                 </div>
                                 <div class="stats-item">
@@ -26,7 +44,7 @@
                                         Spent
                                     </div>
                                     <div class="stat-data">
-                                        {{user.spent}}
+                                        {{user.spent}} {{currency}}
                                     </div>
                                 </div>
                                 <div class="stats-item">
@@ -34,43 +52,85 @@
                                         Balance
                                     </div>
                                     <div class="stat-data">
-                                        {{user.balance}}
+                                        {{user.balance}} {{currency}}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <aside class="menu">
+                        <ul class="menu-list">
+                            <li>
+                                <router-link :to="{name:'generalinfo'}">
+                                    General & Contact Info
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link :to="{name:'nidinfo'}">
+                                    NID Info
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link :to="{name:'vehicleinfo'}">
+                                    Vehicle Info
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link :to="{name:'changepassword'}">
+                                    Change Password
+                                </router-link>
+                            </li>
+                        </ul>
+                    </aside>
+                    <!-- <div class="columns is-vcentered is-mobile">
+                        <div class="column is-12">
+                            
+                        <router-link :to="{name:'billingpayment'}">
+                            <span>NID Info</span>
+                        </router-link>
+                        <router-link :to="{name:'paymentmethods'}">
+                            <span>Vehicle Info</span>
+                        </router-link>
+                
+                            
+                        </div>
+                    </div> -->
                 </div>
                 <div class="column is-9">
-                    <edit-profile v-if="gediting" :data="user"></edit-profile>
+                    <router-view></router-view>
+                    <!--  <edit-profile v-if="gediting" :data="user"></edit-profile>
                     <security-info v-else-if="sediting" :data="user"></security-info>
-                    <total-balance v-else-if="totalBalance" :data="data"></total-balance>
-                    <div v-else>
-                        <my-profile v-if="myProfile" :data="user"></my-profile>
-                    </div>
+                
+                    <my-profile v-else :data="user"></my-profile> -->
                 </div>
             </div>
         </div>
     </div>
 </template>
 <script>
-import myProfile from '../../components/profile/MyProfile'
-import editProfile from '../../components/profile/editprofile'
-import securityInfo from '../../components/profile/SecurityInfo'
-import totalBalance from '../../components/profile/TotalBalance'
+import Vue from 'vue';
 import { mapActions } from 'vuex';
+import VueSweetalert2 from 'vue-sweetalert2';
+import Swal from 'sweetalert2';
+Vue.use(VueSweetalert2);
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: false,
+    timer: 3000
+})
 export default {
-    components: { myProfile, totalBalance, editProfile, securityInfo },
     data() {
         return {
             isLoading: false,
             myProfile: true,
-            totalBalance: false,
             completedTask: false,
             postedTask: false,
             gediting: false,
             sediting: false,
             form: '',
+            photo: "",
+            provideNidInfo: false,
 
         }
     },
@@ -81,63 +141,54 @@ export default {
         data() {
             return this.$store.getters.transactions.data
         },
-        photo() {
+        propic() {
             return this.$store.getters.user.profile_picture
+        },
+        currency() {
+            return this.$store.getters.user.currency
         },
     },
 
 
     mounted() {
-       this.$axios.get('auth/profile')
-
         EventBus.$on('change', this.getUserTransaction)
-
-        EventBus.$on('credit', () => {
-            this.myProfile = false,
-                this.completedTask = false
-            this.postedTask = false
-            this.totalBalance = true
-        })
-        EventBus.$on('profile', () => {
-            this.myProfile = true,
-                this.completedTask = false
-            this.postedTask = false
-            this.totalBalance = false
-        })
-        EventBus.$on('complete', () => {
-            this.myProfile = false,
-                this.completedTask = true
-        })
-        EventBus.$on('posting', () => {
-            this.myProfile = false,
-                this.completedTask = false,
-                this.postedTask = true
-        })
     },
     methods: {
-       
-        listen() {
-            EventBus.$on('profileEdit', () => {
-                this.gediting = true
-            })
-            EventBus.$on('cancelEditing', () => {
-                this.gediting = false
-            })
-            EventBus.$on('contact', () => {
-                this.general = false
-                this.contact = true
-                this.security = false
-            })
-            EventBus.$on('security', () => {
-                this.general = false
-                this.contact = false
-                this.security = true
-            })
+        editProfile() {
+            //this.gediting=true
+            EventBus.$emit('startEditing')
         },
-        getUserInfo() {
+        editNid() {
+            this.provideNidInfo = true
+        },
+        onPhotoChnage(e) {
+            let file = e.target.files[0];
+            let reader = new FileReader();
+            reader.onload = (file) => {
+                this.photo = reader.result;
+            }
+            reader.readAsDataURL(file);
+            setTimeout(() => {
+                this.$axios.patch(`auth/update/${this.user.id}`, { photo: this.photo })
+                    .then(res => {
+                        if (res.status == 200) {
+                            this.$store.dispatch('getInfo')
+                            Toast.fire({
+                                type: 'success',
+                                title: 'Profile picyure successfuly updated'
+                            })
+                        }
+
+                    })
+            }, 500)
+        },
+        getProfilePhoto(pic) {
+            let photo = (this.photo.length > 200) ? this.photo : pic
+            return photo;
+        },
 
 
-        },
+
     },
 }
 </script>
@@ -152,15 +203,31 @@ export default {
     margin-right: 10px;
 }
 
+.stats-card .img-header .img-block .verified img {
+    border: 0px;
+    padding: 0px;
+    box-shadow: none;
+}
 
 a.link {
     color: #009CDA;
     cursor: pointer;
 }
 
+.profilename {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}
+
+
 .header-title {
     font-size: 30px;
     font-weight: 600
+}
+
+.file {
+    justify-content: center !important;
 }
 
 .editor-link {
@@ -171,8 +238,13 @@ a.link {
     margin-bottom: -11px;
 }
 
-.info-title {
-    font-weight: 600;
+
+.name {
+    padding-bottom: 5px;
+}
+
+.router-link-exact-active {
+    background-color: #EFF4F7;
 }
 
 stats-card .img-header {
@@ -198,16 +270,38 @@ stats-card .img-header {
 
 }
 
+.is-vcentered {
+    text-align: center;
+}
+
+.img-header {
+    min-height: 150px;
+    padding-top: 10px;
+    margin-bottom: 5px;
+}
+
+.button.btn-align {
+    padding: 5px 13px 6px;
+}
+
+.menu {
+    background: #fff;
+    padding: 10px;
+    box-shadow: 0 3px 10px 4px rgba(0, 0, 0, .04);
+}
+
 .stat-data {
     font-weight: bold;
     font-size: 1.1rem !important;
 }
-.inline-stats
-{
-    display:inline-flex;
+
+.inline-stats {
+    display: flex;
+    justify-content: center;
+    font-weight: 500;
 }
-.stats-item
-{
+
+.stats-item {
     margin: 0px 20px;
 }
 </style>

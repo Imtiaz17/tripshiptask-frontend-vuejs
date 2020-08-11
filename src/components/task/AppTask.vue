@@ -1,158 +1,153 @@
 <template>
-    <div style="padding-top:20px;">
+    <div style="padding-top:10px;">
         <div class="columns">
             <div class="column is-4" style="padding:4px">
-                <vs-card style="box-shadow:0 2px 3px 1px rgba(0,0,0,0.04)">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Task
-                        </h3>
-                    </div>
-                </vs-card>
-                <img src="../../assets/images/task.png" width="100%">
                 <vs-tabs>
-                    <vs-tab label="Offer a job" @click="offer">
+                    <vs-tab label="Offer a Task" @click="offer">
                         <offer-task :category="categories"></offer-task>
                     </vs-tab>
-                    <vs-tab label="Want a job" @click="seek">
+                    <vs-tab label="Want a Task" @click="seek">
                         <seek-task :category="categories"></seek-task>
                     </vs-tab>
                 </vs-tabs>
             </div>
             <div class="column is-8" style="padding:4px">
-                <vs-row vs-justify="center">
-                    <vs-col type="flex" vs-justify="center" vs-align="left" vs-w="12">
-                        <vs-card style="box-shadow:0 2px 3px 1px rgba(0,0,0,0.04)">
-                            <div slot="header" class="searchheader">
-                                <h3 style="font-weight: 500;">
-                                    Search Task
-                                </h3>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    <div class="control">
-                                        <input class="input is-primary-focus" placeholder="keywords" type="text" v-model="keywords">
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                        <input class="input is-primary-focus " type="text" v-model="location" name="title" placeholder="Location">
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                           <div class="select">
-                                            <select v-model="categoysearch">
-                                                <option :value="null" disabled hidden>Select Category</option>
-                                                <option v-for="(item,index) in categories" :key="index" :value="item.name">{{item.name}}</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                         <date-picker v-model="searchdate" valueType="format" name="date" placeholder="Task date"></date-picker>
-                                    </div>
-                                </div>
-                            </div>
-                        </vs-card>
-                    </vs-col>
-                </vs-row>
-                <template v-if="offertask">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Offer a Task
-                        </h3>
+                <div class="card search">
+                    <div class="card-header active-header">
+                        Search Tasks
                     </div>
-                    <table class="table is-accent fixed_header ">
-                        <thead>
-                            <tr>
-                                <th width="25%" style="text-align:left">Title</th>
-                                <th width="25%" style="text-align:left">Location</th>
-                                <th width="25%" style="text-align:left">Date & time</th>
-                                <th width="15%" style="text-align:left">Amount</th>
-                                <th width="10%" style="text-align:left">Bids</th>
-                                <th width="10%" style="text-align:left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <div v-if="isTLoading" style="margin-top:-45px;">
+                    <div class="card-content">
+                        <div class="columns">
+                            <div class="column">
+                                <div class="control">
+                                    <input class="input is-primary-focus" placeholder="keywords" type="text" v-model="keywords">
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <input class="input is-primary-focus " type="text" v-model="location" name="title" placeholder="Location">
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <div class="select">
+                                        <select v-model="categoysearch">
+                                            <option :value="null" disabled hidden>Select Category</option>
+                                            <option v-for="(item,index) in categories" :key="index" :value="item.name">{{item.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <date-picker v-model="searchdate" valueType="format" name="date" placeholder="Task date"></date-picker>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <template v-if="offertask">
+                    <div class="card">
+                        <div class="card-header active-header">
+                            Offer a Task
+                        </div>
+                        <div class="card-content">
+                            <div v-if="isTLoading">
                                 <img class="loading" src="../../assets/images/roaling.gif">
                             </div>
-                            <div v-else>
-                                <tr v-for="(item,index) in getOfferedTask" :key="index">
-                                    <td data-th="Title" width="25%" style="text-align:left">
-                                        {{item.title}}
-                                    </td>
-                                    <td data-th="Location" width="25%" style="text-align:left">
-                                        {{item.location.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Date & time" width="25%" style="text-align:left">
-                                        {{moment(item.date_time).format('lll')}}
-                                    </td>
-                                    <td data-th="Amount" width="15%" style="text-align:left">
-                                        {{item.amount}}
-                                    </td>
-                                    <td data-th="Bids" width="10%" style="text-align:left">
-                                        {{item.bids_count}}
-                                    </td>
-                                    <td data-th="Action" width="10%" style="text-align:left">
-                                        <router-link :to="item.path">
-                                            <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
-                                        </router-link>
-                                    </td>
-                                </tr>
-                            </div>
-                        </tbody>
-                    </table>
+                            <div v-else class="fixed_header">
+                            <table class="table is-accent">
+                                <thead>
+                                    <tr>
+                                        <th style="width:19%">Title</th>
+                                        <th>Location</th>
+                                        <th>Date & time</th>
+                                        <th>Amount</th>
+                                        <th>Bids</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in getOfferedTask" :key="index">
+                                        <td>
+                                            {{item.title}}
+                                        </td>
+                                        <td>
+                                            {{item.location.split(',')[0]}}
+                                        </td>
+                                        <td>
+                                            {{moment(item.date).format('ll')}}
+                                            {{item.time}}
+                                        </td>
+                                        <td>
+                                            {{item.amount}}
+                                        </td>
+                                        <td>
+                                            {{item.bids_count}}
+                                        </td>
+                                        <td>
+                                            <router-link :to="item.path">
+                                                <button class="button is-small info-btn raised  btn-outlined">view</button>
+                                            </router-link>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
                 </template>
                 <template v-if="seektask">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Seeking a Task
-                        </h3>
+                    <div class="card">
+                        <div class="card-header active-header">
+                            Want a Task
+                        </div>
+                        <div class="card-content">
+                            <div v-if="isTLoading">
+                                <img class="loading" src="../../assets/images/roaling.gif">
+                            </div>
+                            <div v-else class="fixed_header">
+                            <table class="table is-accent">
+                                <thead>
+                                    <tr>
+                                        <th style="width:19%">Title</th>
+                                        <th>Location</th>
+                                        <th>Date & time</th>
+                                        <th>Amount</th>
+                                        <th>Bids</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in getSeekedTask" :key="index">
+                                        <td>
+                                            {{item.title}}
+                                        </td>
+                                        <td>
+                                            {{item.location.split(',')[0]}}
+                                        </td>
+                                        <td>
+                                            {{moment(item.date).format('ll')}}
+                                            {{item.time}}
+                                        </td>
+                                        <td>
+                                            {{item.amount}}
+                                        </td>
+                                        <td>
+                                            {{item.bids_count}}
+                                        </td>
+                                        <td>
+                                            <router-link :to="item.path">
+                                                <button class="button is-small info-btn raised  btn-outlined">view</button>
+                                            </router-link>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
                     </div>
-                    <table class="table is-accent fixed_header ">
-                        <thead>
-                            <tr>
-                                <th width="25%" style="text-align:left">Title</th>
-                                <th width="25%" style="text-align:left">Location</th>
-                                <th width="25%" style="text-align:left">Date & time</th>
-                                <th width="15%" style="text-align:left">Amount</th>
-                                <th width="10%" style="text-align:left">Bids</th>
-                                <th width="10%" style="text-align:left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <div v-if="isLoading" style="margin-top:-45px;">
-                                <img class="loading" :src="getPhoto()">
-                            </div>
-                            <div v-else>
-                                <tr v-for="(item,index) in getSeekedTask" :key="index">
-                                   <td data-th="Title" width="25%" style="text-align:left">
-                                        {{item.title}}
-                                    </td>
-                                    <td data-th="Location" width="25%" style="text-align:left">
-                                        {{item.location.split(',')[0]}}
-                                    </td>
-                                     <td data-th="Date & time" width="25%" style="text-align:left">
-                                        {{moment(item.date_time).format('lll')}}
-                                    </td>
-                                    <td data-th="Amount" width="15%" style="text-align:left">
-                                        {{item.amount}}
-                                    </td>
-                                    <td data-th="Bids" width="10%" style="text-align:left">
-                                        {{item.bids_count}}
-                                    </td>
-                                    <td data-th="Action" width="10%" style="text-align:left">
-                                        <router-link :to="item.path">
-                                            <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
-                                        </router-link>
-                                    </td>
-                                </tr>
-                            </div>
-                        </tbody>
-                    </table>
                 </template>
             </div>
         </div>
@@ -172,6 +167,7 @@ import 'vue2-datepicker/index.css';
 import moment from 'moment-timezone'
 import VueSweetalert2 from 'vue-sweetalert2';
 import Swal from 'sweetalert2';
+import OfferTask from '@/components/task/OfferTask'
 Vue.use(VueSweetalert2);
 import { mapActions, mapGetters } from 'vuex';
 const Toast = Swal.mixin({
@@ -185,7 +181,7 @@ const Toast = Swal.mixin({
 });
 export default {
     components: {
-        OfferTask: () => import('@/components/task/OfferTask'),
+        OfferTask,
         SeekTask: () => import('@/components/task/SeekTask'),
         DatePicker
     },
@@ -200,7 +196,7 @@ export default {
             isLoading: false,
             keywords: '',
             location: '',
-            categoysearch:null,
+            categoysearch: null,
             skills: [],
             searchdate: '',
             moduleId: 3,
@@ -220,21 +216,25 @@ export default {
         }
     },
     created() {
-        if (this.$store.getters.offerTaskListing.length == 0) {
-            this.getOfferTaskLiting();
-        }
 
-        if (this.$store.getters.seekTaskListing.length == 0) {
-            this.getSeekTaskLiting();
-        }
-        if (this.$store.getters.categories.length == 0) {
-            this.getCategories();
-        }
+        this.getOfferTaskLiting();
+
+        this.getSeekTaskLiting();
+
+        
         // axios.get('api/skill')
         //     .then(res => {
         //         this.skills = res.data.data;
         //     })
         //    .catch(error => console.log(error.res.data), )
+    },
+    mounted() {
+        EventBus.$on('updateOfferTask', () => {
+            this.getOfferTaskLiting();
+        })
+        EventBus.$on('updateSeekTask', () => {
+            this.getSeekTaskLiting();
+        })
     },
     computed: {
         offertasks() {
@@ -311,8 +311,6 @@ export default {
     methods: {
         ...mapActions("task",
             ['getOfferTaskLiting', 'getSeekTaskLiting', 'getCategories']),
-
-
         offer() {
             this.first = true
             this.second = false
@@ -418,33 +416,18 @@ export default {
 
     },
 }
-
 </script>
 <style scoped>
-.taskheader {
-    font-size: 22px;
-    text-align: center;
-    margin-bottom: -31px;
-
-}
-
-.loading {
-    height: auto;
-    max-width: 50%;
-    margin: auto;
-    margin-top: 100px;
-    display: flex;
-    align-items: center;
+.card-header {
+    padding: 10px;
     justify-content: center;
+    display: block !important;
+    text-align: center;
 }
 
-.span {
-    margin-right: -7px;
-}
-
-
-.table th.gap {
-    width: 20%
+.card-content {
+    background-color: transparent;
+    padding: 0.5rem 0rem 0rem;
 }
 
 .button.button-cta {
@@ -464,15 +447,4 @@ export default {
     color: #2d3436;
     background-color: #4adad3b5;
 }
-
-.searchheader {
-    text-align: center;
-    padding: 7px !important;
-    font-size: 18px;
-    color: #2d3436;
-    background-color: #4adad3b5;
-}
-
-
-
 </style>

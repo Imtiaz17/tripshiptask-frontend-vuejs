@@ -1,36 +1,46 @@
 <template>
-    <div class="conbox" id="element">
-        <div class="vld-parent">
+    <div  id="element"  class="columns">
+        <div class="vld-parent column">
             <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
             <div class="flex-card light-bordered light-raised trip-info" id="shipelement">
-                <div class="felx-body">
+                <div class="flex-body">
                     <div class="content">
-                        <div>
-                            <h3 style="border-bottom: 1px solid #e0e0e0;padding: 14px; margin-bottom:0em">
-                                Total {{bidsData.bids_count}} Bids</h3>
+                        <div class="offer-content-heading">
+                            <h3>Offers: {{bidsData.bids_count}}</h3>
                         </div>
                         <article class="media recent-post" style="margin-top:0" v-if="bidsData.bids_count==0">
                             <div class="media-content">
-                                <div class="post-content" style="padding:25px 0;text-align:center">
-                                    <h5>No Bids Yet</h5>
+                                <div class="post-content no-offers">
+                                    <h5>No offers yet</h5>
                                 </div>
                             </div>
                         </article>
-                        <article class="media recent-post" style="margin-top: 12px; margin-bottom: 12px;" v-for="(bid,index) in bidsData.bids" :key="index">
+
+                        <article class="media recent-post" v-for="(bid,index) in bidsData.bids" :key="index">
                             <div class="media-content">
                                 <div class="post-content ">
                                     <div class="full-topic">
                                         <div class="post">
                                             <div class="post-meta">
-                                                <div class="post-owner" style="margin-top:-40px">
+                                                <div class="post-owner">
                                                     <img class="avatar" :src="getPhoto(bid.photo)">
+                                                    <a class="contactlink" @click="showContactModal(index,bid.bidder_name)">Contact</a>
                                                 </div>
                                             </div>
-                                            <div class="post-content" style="margin: -39px 20px;">
+                                            <div class="post-content">
                                                 <div class="columns">
                                                     <div class="column is-4">
-                                                        <a style="color:#1F2836;font-weight:500">{{bid.bidder_name}} </a>
-                                                        <a @click="showContactModal(index,bid.bidder_name)">(See contact info)</a>
+                                                        <div class="basicinfo">
+                                                            <a>{{bid.bidder_name}} </a>
+                                                            <span v-if="bid.bidder_sex=='Male'">M</span>
+                                                            <span v-else-if="bid.bidder_sex=='Female'">F</span>
+                                                            <span v-else>{{bid.bidder_sex}}</span>
+                                                            <span>| {{moment().diff(bid.bidder_dob, 'years') }} </span>
+                                                        </div>
+                                                        <div class="backgroundinfo">
+                                                            <span>{{bid.bidder_education}}</span>
+                                                            <span> | {{bid.bidder_profession}}</span>
+                                                        </div>
                                                     </div>
                                                     <div class="column ">
                                                         <span style="color:grey;font-weight:500">{{bid.posted}} ship posted (<a @click="postedfeedback(index)">{{bid.feedbackcount}} Reviews</a>)</span>
@@ -46,41 +56,52 @@
                                                             <small class="rate">{{bid.completed_rating}}</small>
                                                         </span>
                                                     </div>
-                                                    <div class="column is-2" style="font-size: 16px;font-weight: 500;color:grey;">
+                                                    <div class="column" style="font-size: 16px;font-weight: 500;color:grey;">
                                                         <span style="font-weight:500">Amount(BDT)</span>
                                                         <span style="color:#00B289">{{bid.amount}}</span>
                                                     </div>
+                                                     <!-- <div class="column" v-if="bid.user_id==id && bid.accepted==1 && bid.complete==0">
+                                                    <span class="ongoing">Offer Accepted</span>
+                                                </div> -->
                                                 </div>
-                                                <div class="columns" style="margin:10px 0px;">
+                                                <div class="columns">
                                                     <div class="column is-4">
-                                                        <span style="font-weight:500;">Short message: </span>
+                                                        <span style="font-weight:500;">Message: </span>
                                                         <span>{{bid.cover_letter}}</span>
                                                     </div>
-                                                    <div class="column is-4" v-if="bid.ship_owner==id && bid.co==null" style="margin-top:-20px">
-                                                        <div v-if="bid.accepted==0">
-                                                            <span style="font-weight:500;">Counter Offer</span>
-                                                            <div class="columns">
-                                                                <div class="column is-4">
-                                                                    <input class="input is-primary-focus" v-model="counter_offer[index]" type="text">
-                                                                </div>
-                                                                <div class="column is-2">
-                                                                    <vs-button color="primary" type="filled" @click='submit(bid.id)'>Submit</vs-button>
-                                                                </div>
+                                                    <div class="column is-4" v-if="bid.ship_owner==id && bid.co==null">
+                                                        <div class="columns" v-if="bid.accepted==0">
+                                                            <div class="column is-6">
+                                                                <label class="label">Counter Offer: </label>
+                                                                <input class="input is-primary-focus" v-model="counter_offer[index]" type="text">
+                                                                <a @click="submit(bid.id)" class="button raised info-btn is-small btn-fade" style="margin-top:5px">
+                                                                    Submit
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="column is-4" v-if="bid.
                                                     ship_owner==id && bid.co>0">
-                                                        <span style="font-weight:500;">Counter Offer</span>
-                                                        <span>{{bid.co}}</span>
-                                                        <span style="margin-left:5px;">
-                                                            <span class="button is-small" style=" background-color: #00b289; color:#fff" v-if="bid.agree==1">Accepted</span>
-                                                            <span class="button is-small" style=" background-color: #ff7273; color:#fff" v-else-if="bid.agree==2">Declined</span>
-                                                            <span class="button is-small" style=" background-color: #4FC1EA;  color:#fff" v-else>Pending</span>
+                                                        <label class="label">Counter Offer:</label>
+                                                        <span class="counteramt">{{bid.co}} BDT </span>
+                                                        <span>
+                                                            <vs-chip transparent color="success" v-if="bid.agree==1">Accepted</vs-chip>
+                                                            <vs-chip transparent color="danger" v-else-if="bid.agree==2">Declined</vs-chip>
+                                                            <vs-chip transparent color="primary" v-else>Pending</vs-chip>
                                                         </span>
                                                     </div>
                                                     <div class="column is-4" v-else-if="bid.user_id==id">
                                                         <div v-if="bid.co>0">
+                                                            <label class="label">Counter Offer:</label>
+                                                            <span class="counteramt">{{bid.co}} BDT</span>
+                                                            <span>
+                                                                <vs-chip transparent color="success" v-if="bid.agree==1">Agreed</vs-chip>
+                                                                <vs-chip transparent color="success" v-if="bid.agree==2">Declined</vs-chip>
+                                                                <vs-button type="filled" v-if="bid.agree==0" @click="agree(bid.id)">Agree</vs-button>
+                                                                <vs-button color="danger" type="filled" v-if="bid.agree==0" @click="disagree(bid.id)">Decline</vs-button>
+                                                            </span>
+                                                        </div>
+                                                        <!--    <div v-if="bid.co>0">
                                                             <span style="font-weight:500;">Counter Offer:</span>
                                                             <span>{{bid.co}}</span>
                                                             <span style="margin-left:5px;">
@@ -89,12 +110,12 @@
                                                                 <vs-button color="primary" type="filled" @click="agree(bid.id)" v-if="bid.agree==0">Agree</vs-button>
                                                                 <vs-button color="danger" type="filled" v-if="bid.agree==0" @click="disagree(bid.id)">Decline</vs-button>
                                                             </span>
-                                                        </div>
+                                                        </div> -->
                                                     </div>
                                                     <div class="column is-4" style="margin-bottom:10px" v-if="bid.
                                                     ship_owner==id">
-                                                        <a v-if="bid.accepted==0" @click="accept(bid.id)" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade" style="float:right;">Accept</a>
-                                                        <span v-else-if="bid.accepted==1 && bid.complete==0" class="ongoing" style="float:right;">Bid accepted
+                                                        <a v-if="bid.accepted==0" @click="accept(bid.id)" class="button btn-dash info-btn is-raised rounded btn-fade" style="float:right;">Accept</a>
+                                                        <span v-else-if="bid.accepted==1 && bid.complete==0" class="ongoing" style="float:right;">Offer accepted
                                                         </span>
                                                         <div v-else-if="bid.complete==1 && bid.paid==0" style="float:right;">
                                                             <p style="color: #296557;font-weight: 600;">Shipment has been completed,do you want to pay?</p>
@@ -228,7 +249,7 @@
                             <div class="column">
                                 <a class="forum-channel" @click="byCash(bidd.id,bidd.bidder_name)">
                                     <div class="channel-icon">
-                                        <i class="im im-icon-Dollar"></i>
+                                        <span class="material-icons">money</span>
                                     </div>
                                     <div class="channel-meta">
                                         <span>By Cash</span>
@@ -238,7 +259,7 @@
                             <div class="column">
                                 <a class="forum-channel" @click="wallet(bidd.id,bidd.bidder_name,bidd.payable_amount)">
                                     <div class="channel-icon">
-                                        <i class="im im-icon-Wallet-2"></i>
+                                        <span class="material-icons">account_balance_wallet</span>
                                     </div>
                                     <div class="channel-meta">
                                         <span>By E-wallet</span>
@@ -248,7 +269,7 @@
                             <div class="column">
                                 <a class="forum-channel">
                                     <div class="channel-icon">
-                                        <i class="im im-icon-Visa"></i>
+                                        <span class="material-icons">credit_card</span>
                                     </div>
                                     <div class="channel-meta">
                                         <span>By Card</span>
@@ -315,22 +336,25 @@
             </vs-popup>
         </div>
         <!-- feedback to the shipper by carrier -->
-        <vs-sidebar position-right parent="body" default-index="1" color="primary" class="sidebarx" spacer v-model="completedfeedbackShow">
-            <div v-for="(bidsrecord,index) in bidsData.bids" v-if="completedFeedbackRecord(index)" style="margin-top:-10px">
-                <div class="header-sidebar" slot="header">
+        <a-drawer :width="720" :visible="completedfeedbackShow" :body-style="{ paddingBottom: '80px' }" @close="onClose">
+            <div v-for="(bidsrecord,index) in bidsData.bids" v-if="completedFeedbackRecord(index)">
+                <div class="header">
                     <vs-avatar size="70px" :src="'/images/' + bidsrecord.photo" style="float:left" />
                     <div class="con-colors" style="overflow:hidden">
-                        <ul style="padding-left:10px">
-                            <li style="font-size: 21px;color: rgb(36, 33, 69);font-weight:700">
+                        <ul>
+                            <li>
                                 <h4>
                                     {{bidsrecord.bidder_name}}
                                 </h4>
                             </li>
                             <li>
-                                <span class="rating">
+                                <div class="rating">
+                                    <a-rate :default-value="bidsrecord.completed_rating" disabled allow-half />
+                                </div>
+                                <!--  <span class="rating">
                                     <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="bidsrecord.completed_rating" style="float:left"> </star-rating>
                                     <small class="userrating">{{bidsrecord.completed_rating}}</small>
-                                </span>
+                                </span> -->
                             </li>
                             <li>
                             </li>
@@ -340,25 +364,26 @@
                 <vs-divider />
                 <completed-ship-feedback :data="bidsrecord.ship_completed_feedbacks"></completed-ship-feedback>
             </div>
-        </vs-sidebar>
-        <vs-sidebar position-right parent="body" default-index="1" color="primary" class="sidebarx" spacer v-model="postedfeedbackShow">
-            <div v-for="(bidsrecord,index) in bidsData.bids" :key="index" v-if="postedFeedbackRecord(index)" style="margin-top:-10px">
-                <div class="header-sidebar" slot="header">
+        </a-drawer>
+        <a-drawer :width="720" :visible="postedfeedbackShow" :body-style="{ paddingBottom: '80px' }" @close="onClose">
+            <div v-for="(bidsrecord,index) in bidsData.bids" :key="index" v-if="postedFeedbackRecord(index)">
+                <div class="header">
                     <vs-avatar size="70px" :src="'/images/' + bidsrecord.photo" style="float:left" />
                     <div class="con-colors" style="overflow:hidden">
-                        <ul style="padding-left:10px">
-                            <li style="font-size: 21px;color: rgb(36, 33, 69);font-weight:700">
+                        <ul>
+                            <li>
                                 <h4>
                                     {{bidsrecord.bidder_name}}
                                 </h4>
                             </li>
                             <li>
-                                <span class="rating">
+                                <div class="rating">
+                                    <a-rate :default-value="bidsrecord.rating" disabled allow-half />
+                                </div>
+                                <!--  <span class="rating">
                                     <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="bidsrecord.rating" style="float:left"> </star-rating>
                                     <small class="userrating">{{bidsrecord.rating}}</small>
-                                </span>
-                            </li>
-                            <li>
+                                </span> -->
                             </li>
                         </ul>
                     </div>
@@ -366,7 +391,7 @@
                 <vs-divider />
                 <posted-ship-feedback :data="bidsrecord.ship_posted_feedbacks"></posted-ship-feedback>
             </div>
-        </vs-sidebar>
+        </a-drawer>
         <div v-for="(bidd,index) in bidsData.bids" v-if="reviewModalRecord(index)">
             <vs-popup class="holamundo" :title="title" :active.sync="paynReview">
                 <div class="columns">
@@ -389,6 +414,7 @@
 </template>
 <script>
 import Vue from 'vue'
+import moment from 'moment-timezone';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import StarRating from 'vue-star-rating'
@@ -409,6 +435,7 @@ export default {
     props: ['data'],
     data() {
         return {
+            moment: moment,
             title: "",
             popupActive: false,
             paynReview: false,
@@ -552,6 +579,10 @@ export default {
 
     },
     methods: {
+        onClose() {
+            this.postedfeedbackShow = false
+            this.completedfeedbackShow = false
+        },
         getPhoto(pic) {
             return pic
         },
@@ -617,7 +648,7 @@ export default {
                 })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -631,7 +662,7 @@ export default {
             this.$axios.patch(`shipbids/${id}`, { completed: this.completed })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -686,7 +717,7 @@ export default {
                 })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -711,7 +742,7 @@ export default {
             this.$axios.patch(`shipbids/${id}`, { co: this.counter_offer })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -725,7 +756,7 @@ export default {
             this.$axios.patch(`shipbids/${id}`, { agree: this.counter_offer_accepted })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -740,7 +771,7 @@ export default {
             this.$axios.patch(`shipbids/${id}`, { disagree: this.counter_offer_decline })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -763,7 +794,7 @@ export default {
                 .then((res) => {
                     this.shipOwnerReviewModalActive = false
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -780,7 +811,7 @@ export default {
                 })
                 .then((res) => {
                     setTimeout(() => {
-                        this.$axios.get('/getShip/' + this.data.id)
+                        this.$axios.get('/getShip/' + this.data.slug)
                             .then(res => {
                                 this.bidsData = res.data.data
                             })
@@ -829,30 +860,6 @@ export default {
     padding-right: 20px;
 }
 
-.fa {
-    color: gray;
-    cursor: pointer;
-    font-size: x-large !important;
-    position: absolute;
-    top: 8px;
-    right: 11px
-}
-
-.fa-close:hover {
-    color: #0984E3;
-}
-
-.el-rate__icon {
-    font-size: 24px !important;
-    margin-right: 6px;
-    color: #C0C4CC;
-    transition: .3s;
-}
-
-.el-rate__item {
-    margin-left: 0px;
-}
-
 .small {
     color: #fff;
     background-color: #4FC1EA;
@@ -868,11 +875,6 @@ export default {
     color: #00B289;
     margin-top: -1px;
     margin-left: 3px;
-}
-
-.rating {
-    width: 100%;
-    display: inline-flex;
 }
 
 .userrating {
@@ -896,8 +898,6 @@ export default {
     margin-top: 6px;
 }
 
-
-
 .full-topic {
     width: 100%;
     background: #fff;
@@ -905,15 +905,6 @@ export default {
     margin-top: -10px;
     border: none;
     margin: 0
-}
-
-.header {
-    width: 100%;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    height: 50px;
-    color: #444;
-    box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.04);
 }
 
 .namenrating {

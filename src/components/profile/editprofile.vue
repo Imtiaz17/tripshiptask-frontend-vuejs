@@ -1,7 +1,10 @@
 <template>
-    <section>
-        <vs-tabs>
-            <vs-tab label="General & Contact Info">
+    <div class="card">
+        <header class="card-header">
+            Update General & Contact Info
+        </header>
+        <div class="card-content">
+            <div class="content">
                 <div class="columns is-mobile">
                     <div class="column is-6">
                         <div class="info-item">
@@ -18,17 +21,16 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="info-item">
                             <div class="columns">
                                 <div class="column is-6">
                                     <div class="info-title">
-                                        Location :
+                                        Residance Area :
                                     </div>
                                 </div>
                                 <div class="column is-6">
                                     <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.residance_area" type="text">
+                                        <input class="input is-primary-focus" v-model="data.residance_area" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -42,7 +44,11 @@
                                 </div>
                                 <div class="column is-6">
                                     <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.education" type="text">
+                                        <div class="select">
+                                            <select v-model="data.education" name="education" v-validate="'required'">
+                                                <option v-for="edu in education" :value="edu">{{edu}}</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -56,7 +62,11 @@
                                 </div>
                                 <div class="column is-6">
                                     <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.profession" type="text">
+                                        <div class="select">
+                                            <select v-model="data.profession" name="education" v-validate="'required'">
+                                                <option v-for="profession in professions" :value="profession">{{profession}}</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -98,14 +108,14 @@
                             <div class="columns">
                                 <div class="column is-6">
                                     <div class="info-title">
-                                        Sex :
+                                        Gender :
                                     </div>
                                 </div>
                                 <div class="column is-6">
                                     <div class="control">
                                         <div class="select is-select">
-                                            <select name="sex" v-model="data.sex" v-validate="'required'">
-                                                <option :value="null" disabled selected>Select sex</option>
+                                            <select name="sex" v-model="data.gender" v-validate="'required'">
+                                                <option :value="null" disabled selected>Select Dender</option>
                                                 <option v-for="(item,index) in sex" :key="index" :value="item.value">{{item.label}}</option>
                                             </select>
                                         </div>
@@ -122,30 +132,26 @@
                                 </div>
                                 <div class="column is-6">
                                     <div class="control">
-                                        <div v-for="item in langs" style="display:inline-flex">
-                                            <label class="checkbox">
+                                        <div v-for="item in langs" class="languages">
+                                            <label class="checkbox" v-if="data.language!==null">
                                                 <input type="checkbox" :value="item.value" v-model="data.language">{{item.text}} </label>
+                                            <label class="checkbox" v-else>
+                                                <input type="checkbox" :value="item.value" v-model="userlang">{{item.text}} </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="column is-6">
-                        <div class="info-item">
-                            <div class="columns">
+                        <!-- <div class="info-item">
+                            <div class="columns ">
                                 <div class="column is-6">
-                                    <div class="info-title">
-                                        Email :
-                                    </div>
-                                </div>
-                                <div class="column is-6">
-                                    <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.email" type="text">
-                                    </div>
+                                  
+                                   
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
+                    </div>
+                    <div class="column is-6">
                         <div class="info-item">
                             <div class="columns">
                                 <div class="column is-6">
@@ -164,26 +170,12 @@
                             <div class="columns">
                                 <div class="column is-6">
                                     <div class="info-title">
-                                        Home contact number :
-                                    </div>
-                                </div>
-                                <div class="column is-6">
-                                    <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.home_contact" type="text">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="columns">
-                                <div class="column is-6">
-                                    <div class="info-title">
                                         Emergency contact number:
                                     </div>
                                 </div>
                                 <div class="column is-6">
                                     <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.emergency_number" type="text">
+                                        <input class="input  is-primary-focus" v-model="data.emergency_contact_number" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -198,22 +190,8 @@
                                 <div class="column is-6">
                                     <div class="control">
                                         <div class="info-description">
-                                            <input class="input  is-primary-focus" v-model="data.emergency_contact_name" type="text">
+                                            <input class="input  is-primary-focus" v-model="data.emergency_contact_person_name" type="text">
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <div class="columns">
-                                <div class="column is-6">
-                                    <div class="info-title">
-                                        Skype:
-                                    </div>
-                                </div>
-                                <div class="column is-6">
-                                    <div class="control">
-                                        <input class="input  is-primary-focus" v-model="data.skype" type="text">
                                     </div>
                                 </div>
                             </div>
@@ -232,218 +210,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="info-item" v-if="data.vehicle==0">
-                            <div class="columns">
-                                <div class="column is-6">
-                                    <div class="info-title">
-                                        Have a reliable vehicle?
-                                    </div>
-                                </div>
-                                <div class="column is-6">
-                                    <div class="control">
-                                        <ul class="leftx" style="display: inline-flex;">
-                                            <li>
-                                                <vs-radio vs-name="radios1" vs-value="yes" @change="yes">Yes</vs-radio>
-                                            </li>
-                                            <li style="margin-left: 10px;">
-                                                <vs-radio vs-name="radios1" vs-value="no" @change="no">No</vs-radio>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info-item" v-if="haveVehicle">
-                            <div class="haveVehicle" v-for="(row,index) in rows" :key="index">
-                                <vs-row vs-justify="center">
-                                    <vs-col type="flex" vs-justify="center" vs-align="left" vs-w="12">
-                                        <vs-card>
-                                            <input type="hidden" v-model="row.id">
-                                            <div class="columns">
-                                                <div class="column is-6">
-                                                    <div class="info-title">
-                                                        Vehicle Type :
-                                                    </div>
-                                                </div>
-                                                <div class="column is-6">
-                                                    <div class="control">
-                                                        <input type="hidden" v-model="row.id">
-                                                        <div class="select is-select">
-                                                            <select v-model="row.type">
-                                                                <option v-for="(item,index) in voptions" :key="index" :value="item">{{item}}</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="columns" style="margin-top:-20px">
-                                                <div class="column is-6">
-                                                    <div class="info-title">
-                                                        Model :
-                                                    </div>
-                                                </div>
-                                                <div class="column is-6">
-                                                    <div class="control">
-                                                        <input class="input  is-primary-focus" v-model="row.model" type="text">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="columns" style="margin-top:-20px">
-                                                <div class="column is-6">
-                                                    <div class="info-title">
-                                                        Licence Number:
-                                                    </div>
-                                                </div>
-                                                <div class="column is-6">
-                                                    <div class="control">
-                                                        <input class="input  is-primary-focus" v-model="row.licence_number" type="text">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="columns" style="margin-top:-20px">
-                                                <div class="column is-6">
-                                                    <div class="info-title">
-                                                        Vin number :
-                                                    </div>
-                                                </div>
-                                                <div class="column is-6">
-                                                    <div class="control">
-                                                        <input class="input  is-primary-focus" v-model="row.vin_number" type="text">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="columns" style="margin-top:-20px">
-                                                <div class="column is-6">
-                                                    <div class="info-title">
-                                                        Color :
-                                                    </div>
-                                                </div>
-                                                <div class="column is-6">
-                                                    <div class="control">
-                                                        <div class="select is-select">
-                                                            <select v-model="row.color">
-                                                                <option v-for="(item,index) in colors" :key="index" :value="item">{{item}}</option>
-                                                            </select>
-                                                        </div>
-                                                        <!--  <el-select size="small" v-model="row.color" placeholder="select vehicle color">
-                                                        <el-option v-for="item,index in colors" :key="index" :label="item" :value="item">
-                                                        </el-option>
-                                                    </el-select> -->
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="columns" style="margin-top:-20px">
-                                                <div class="column is-6">
-                                                    <div class="info-title">
-                                                        Registration document :
-                                                    </div>
-                                                </div>
-                                                <div class="column is-6">
-                                                    <div class="file has-name">
-                                                        <label class="file-label">
-                                                            <input type="file" v-validate="'image'" data-vv-as="image" data-vv-delay="100" @change="onRegChnage($event,index)" name="image_field">
-                                                        </label>
-                                                    </div>
-                                                    <span class="error">{{ errors.first('image_field') }}</span>
-                                                    <figure v-if="row.document" class="image is-5by4" style="width:200px;height:200px;margin-top:2px;">
-                                                        <img :src="getLicencePhoto(index,row.document)">
-                                                    </figure>
-                                                </div>
-                                            </div>
-                                            <div slot="footer">
-                                                <vs-row vs-justify="flex-end">
-                                                    <vs-button @click="deleteRow(index,row.id)" type="gradient" color="danger" icon="delete"></vs-button>
-                                                </vs-row>
-                                            </div>
-                                        </vs-card>
-                                    </vs-col>
-                                </vs-row>
-                            </div>
-                            <vs-button @click="addRow" type="gradient">Add vehicle</vs-button>
-                        </div>
                     </div>
                 </div>
                 <hr>
-                <div class="columns pt-10">
-                    <div class="column is-6">
-                        <div class="info-item">
-                            <div class="columns ">
-                                <div class="column is-7">
-                                    <div class="info-title">
-                                        Profile Picture
-                                    </div>
-                                    <div class="info-description">
-                                        <figure class="image is-5by4">
-                                            <img :src="getProfilePhoto(data.profile_picture)">
-                                        </figure>
-                                    </div>
-                                    <br>
-                                    <div class="file has-name">
-                                        <label class="file-label">
-                                            <input class="file-input" type="file" v-on:change="onPhotoChnage">
-                                            <span class="file-cta">
-                                                <span class="file-icon">
-                                                    <span class="material-icons">publish</span>
-                                                </span>
-                                                <span class="file-label">
-                                                    Upload
-                                                </span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column is-6">
-                        <div class="info-item">
-                            <div class="columns ">
-                                <div class="column is-7">
-                                    <div class="info-title">
-                                        Identity
-                                    </div>
-                                    <div class="info-description">
-                                        <figure class="image is-5by4">
-                                            <img :src="getIdenityPhoto(data.licence)">
-                                        </figure>
-                                    </div>
-                                    <br>
-                                    <div class="file has-name">
-                                        <label class="file-label">
-                                            <input class="file-input" type="file" v-on:change="onIdChange">
-                                            <span class="file-cta">
-                                                <span class="file-icon">
-                                                    <span class="material-icons">publish</span>
-                                                </span>
-                                                <span class="file-label">
-                                                    Upload
-                                                </span>
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="columns pb-10">
                     <div class="column">
                         <div class="form-group" style="float:right">
-                            <a @click="update" class="button primary-btn btn-dash raised has-icon">
-                                <span class="material-icons">save</span>
-                            </a>
-                            <a @click="cancel" class="button  is-primary btn-dash raised  has-icon">
-                                <span class="material-icons">clear</span>
+                            <a @click="update" v-bind:class="(isLoading)?'button is-success raised is-loading':'button is-success raised'" class=" ">
+                            Update
+                        </a>
+                            <a @click="cancel" class="button  is-primary btn-dash raised">
+                                Cancel
                             </a>
                         </div>
                     </div>
                 </div>
-            </vs-tab>
-            <vs-tab label="Change password">
-                <security-Info></security-Info>
-            </vs-tab>
-        </vs-tabs>
-    </section>
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import Vue from 'vue';
@@ -463,11 +247,8 @@ const Toast = Swal.mixin({
 })
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate);
-import securityInfo from './SecurityInfo'
-import sideBar from './sidebar'
-
 export default {
-    components: { sideBar, securityInfo, DatePicker },
+    components: { DatePicker },
     props: ['data'],
     data() {
 
@@ -478,15 +259,7 @@ export default {
                 'Passport',
                 'Driving licence',
             ],
-            voptions: [
-                'Car',
-                'Mini van',
-                'Motorcycle',
-                'Electric Scooter',
-                'CNG',
-                'Rickshaw',
-                'Bicycle',
-            ],
+
             langs: [
                 { text: 'English', value: 'English' },
                 { text: 'Bangla', value: 'Bangla' },
@@ -494,6 +267,7 @@ export default {
                 { text: 'Chinese', value: 'Chinese' },
                 { text: 'Spanish', value: 'Spanish' },
             ],
+            userlang: [],
             bloodgroups: [
                 'A+',
                 'A-',
@@ -504,7 +278,7 @@ export default {
                 'AB+',
                 'AB-',
             ],
-            colors: ['White', 'Black', 'Gray', 'Red', 'Green', 'Blue', 'Silver', 'Brown'],
+
             sex: [{
                 value: 'Male',
                 label: 'Male'
@@ -512,18 +286,22 @@ export default {
                 value: 'Female',
                 label: 'Female'
             }],
-            rows: [{
-                'id': '',
-                'user_id': '',
-                'type': '',
-                'model': '',
-                'licence_number': '',
-                'vin_number': '',
-                'color': '',
-                'regname': '',
-                'document': ''
-            }],
 
+            education: [
+                'High School Incomplete',
+                'Completed High School or equivalent',
+                'Bachelor Degree or equivalent',
+                'Master Degree or equivalent',
+                'Doctoral Degree or equivalent',
+            ],
+            professions: [
+                'Business/Self Employed',
+                'Government Job',
+                'Private Job',
+                'Student',
+                'Retired',
+                'Driving'
+            ],
             langoptions: [
                 'English',
                 'Bangla',
@@ -532,128 +310,51 @@ export default {
                 'Spanish',
 
             ],
-            vehicleoptions: [
-                'Sedan Car',
-                'MicroBus',
-                'CNG',
-                'Rickshaw',
-            ],
-            vehicleinfo: [],
-            haveVehicle: false,
+            isLoading: false,
             select2: [],
             language: [],
-            vehicle: '',
-            first: true,
-            second: false,
-            change: false,
-            nid: this.data.nid,
             profile_photo: this.data.profile_picture,
             config: {
                 altInput: true,
                 enableTime: false,
                 dateFormat: "Y-m-d",
             },
-            form: {
-                identification: '',
-                photo: ''
-            },
 
         }
     },
     computed: {
+        checkArray() {
+            return Array.isArray(this.data.identity_img)
+        },
         users() {
             return this.$store.state.user
         },
-        // getProfilePhoto()
-        // {
-        //     return this.$store.getters.user.profile_picture
-        // },
 
     },
     created() {
         this.data.language = this.data.language.toString().split(",");
         // this.$store.dispatch('getUserInfo');
-        this.$axios.get(`getvehiclesinfo/${this.data.id}`)
-            .then(res => {
-                this.rows = res.data.data
 
-            })
-        this.id = this.data.id
     },
 
     methods: {
-        addRow: function() {
-            this.rows.push({
-                'user_id': this.id,
-                'id': '',
-                'type': '',
-                'model': '',
-                'licence_number': '',
-                'vin_number': '',
-                'color': '',
-                'regname': '',
-                'document': ''
-            });
-        },
-        deleteRow(index, id) {
 
-            if (id) {
-                this.$axios.delete(`vehicle/${id}`)
-                    .then(
-                        this.rows.splice(index, 1),
-                        Toast.fire({
-                            type: 'success',
-                            title: 'Vehicle successfully deleted'
-                        })
-                    )
-            }
-            this.rows.splice(index, 1);
-        },
+
 
         onSelectChange() {
             this.change = true
             this.form.idname = "Choose Id"
         },
-        yes() {
-            this.haveVehicle = true
-        },
-        no() {
-            this.haveVehicle = false
-        },
-        general() {
-            this.first = true,
-                this.second = false
-        },
-        security() {
-            this.first = false,
-                this.second = true
-        },
+
         cancel() {
-            this.$router.push('/profile')
             EventBus.$emit('cancelEditing')
         },
-        getIdenityPhoto(pic) {
-            let idenity = (this.form.identification.length > 200) ? this.form.identification : pic
-            return idenity;
-        },
+
         getProfilePhoto(pic) {
             let photo = (this.form.photo.length > 200) ? this.form.photo : pic
             return photo;
         },
-        getLicencePhoto(index, pic) {
-            let photo = (this.rows[index].document.length > 200) ? this.rows[index].document : pic
-            return photo;
-        },
-
-        onIdChange(e) {
-            let file = e.target.files[0];
-            //this.form.idname = file.name
-            let reader = new FileReader();
-            reader.onload = (file) => {
-                this.form.identification = reader.result;
-            }
-            reader.readAsDataURL(file);
-        },
+       
 
         onPhotoChnage(e) {
             let file = e.target.files[0];
@@ -665,54 +366,34 @@ export default {
             }
             reader.readAsDataURL(file);
         },
-        onRegChnage(e, index) {
-            let file = e.target.files[0];
-            this.rows[index].regname = file.name
-            let reader = new FileReader();
-            reader.onload = (file) => {
-                this.rows[index].document = reader.result;
-            }
-            reader.readAsDataURL(file);
-        },
+
         update() {
-            if (this.$validator.validateAll()) {
-                this.$axios.patch(`auth/update/${this.data.id}`, {
-                        user_id: this.data.id,
-                        first_name: this.data.first_name,
-                        middle_name: this.data.middle_name,
-                        last_name: this.data.last_name,
-                        email: this.data.email,
-                        education: this.data.education,
-                        sex: this.data.sex,
-                        blood_group: this.data.blood_group,
-                        residance_area: this.data.residance_area,
-                        profession: this.data.profession,
-                        identification: this.form.identification,
-                        photo: this.form.photo,
-                        language: this.data.language,
-                        rows: this.rows,
-                        dob: this.data.dob,
-                        fbid: this.data.fblink,
-                        friends_fbid: this.data.friends_fblink,
-                        mobile: this.data.mobile,
-                        home_number: this.data.home_contact,
-                        emergency_number: this.data.emergency_number,
-                        emergency_contact_name: this.data.emergency_contact_name,
-                        skype: this.data.skype,
-                        referred_person: this.data.reffered_person,
-                        disability: this.data.disability
+            this.isLoading=true
+            this.$axios.patch(`auth/update/${this.data.id}`, {
+                    full_name: this.data.full_name,
+                    education: this.data.education,
+                    gender: this.data.gender,
+                    blood_group: this.data.blood_group,
+                    residance_area: this.data.residance_area,
+                    profession: this.data.profession,
+                    language: this.data.language,
+                    dob: this.data.dob,
+                    fblink: this.data.fblink,
+                    mobile: this.data.mobile,
+                    emergency_contact_number: this.data.emergency_contact_number,
+                    emergency_contact_person_name: this.data.emergency_contact_person_name,
+                })
+                .then((result) => {
+                    this.isLoading=false
+                    this.$store.dispatch('getInfo')
+                    EventBus.$emit('cancelEditing')
+                    Toast.fire({
+                        type: 'success',
+                        title: 'Profile successfuly updated'
                     })
-                    .then(
-                        // this.$router.push('/profile'),
-                        Toast.fire({
-                            type: 'success',
-                            title: 'Profile successfuly updated'
-                        }),
+                })
+                .catch(error => console.log(error.res.data))
 
-
-                    )
-                    .catch(error => console.log(error.res.data))
-            }
         }
 
 
@@ -721,6 +402,9 @@ export default {
         'data.id_type': function(val) {
             this.onSelectChange()
 
+        },
+        userlang() {
+            this.data.language = this.userlang
         }
     }
 }
@@ -728,6 +412,10 @@ export default {
 <style scoped>
 section {
     margin-bottom: 7%;
+}
+
+.checkbox input {
+    margin-right: 3px;
 }
 
 .info-title {
@@ -745,13 +433,14 @@ section {
     line-height: 1.2;
 }
 
+.card-header {
+    padding: 16px;
+    font-weight: 500;
+}
+
 
 .error {
     color: red;
-}
-
-.haveVehicle {
-    margin-top: 10px;
 }
 
 .haveVehicle .columns {
@@ -785,5 +474,9 @@ section {
 
 ::placeholder {
     color: #62646a;
+}
+
+.button.btn-align {
+    padding: 5px 13px 6px;
 }
 </style>

@@ -1,12 +1,13 @@
 <template>
     <section>
+        <vue-headful title="Reset Password | TripShipTask" />
         <div class="hero-body" style="padding-top:20px">
             <div class="container">
                 <div class="columns is-centered is-mobile" style="text-align:center;">
                     <div class="column is-12">
                         <router-link to="/">
-                        <img class="featured-drawing" src="../../assets/images/tst/tst-logo.jpg" alt="" width="150px">
-                    </router-link>
+                            <img class="featured-drawing" src="../../assets/images/tst/tstlogo.png" alt="" width="150px">
+                        </router-link>
                     </div>
                 </div>
                 <div class="columns is-centered is-desktop">
@@ -24,22 +25,30 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="columns">
+                                <div class="columns" style="margin-top:0px;">
                                     <div class="column">
                                         <div class="control">
-                                            <float-label>
-                                                <input type="password" class="input is-primary-focus" name="password" v-validate="'required|min:6'" ref="password" v-model="form.password" placeholder="New password">
+                                            <float-label label="New password">
+                                                <input :type="pwdType" class="input is-primary-focus" name="password" v-validate="'required|min:6'" ref="password" v-model="form.password">
                                             </float-label>
+                                            <span class="icon is-small is-right" @click="pwdcheck">
+                                                <img v-if="pwdType=='password'" src="../../assets/images/tst/close-eye.png">
+                                                <img v-else src="../../assets/images/tst/open-eye.png">
+                                            </span>
                                             <span v-show="errors.has('password')" class="help is-danger">{{ errors.first('password') }}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="columns">
+                                <div class="columns" :style="errors.has('password_confirmation')?'':'margin-top:-20px'">
                                     <div class="column">
                                         <div class="control">
-                                            <float-label>
-                                                <input type="password" class="input is-primary-focus" name="password_confirmation" v-validate="'confirmed:password'" data-vv-as="password" v-model="form.password_confirmation" placeholder="Retype password">
+                                            <float-label label="Retype password">
+                                                <input :type="pwdType" class="input is-primary-focus" name="password_confirmation" v-validate="'confirmed:password'" data-vv-as="password" v-model="form.password_confirmation">
                                             </float-label>
+                                            <span class="icon is-small is-right" @click="pwdcheck">
+                                                <img v-if="pwdType=='password'" src="../../assets/images/tst/close-eye.png">
+                                                <img v-else src="../../assets/images/tst/open-eye.png">
+                                            </span>
                                             <span v-show="errors.has('password_confirmation')" class="help is-danger">Password does not match</span>
                                         </div>
                                     </div>
@@ -47,7 +56,7 @@
                                 <div class="columns">
                                     <div class="column">
                                         <p class="control" style="text-align:center">
-                                            <button @click="reset" v-bind:class="(loading)?'button button-cta primary-btn is-bold is-loading rounded raised no-lh ':'button button-cta primary-btn btn-outlined is-bold rounded raised no-lh'">
+                                            <button @click="reset" v-bind:class="(loading)?'button is-info is-bold is-loading rounded raised no-lh ':'button is-info is-bold rounded raised no-lh'">
                                                 Reset password
                                             </button>
                                         </p>
@@ -101,6 +110,7 @@ export default {
     },
     data() {
         return {
+            pwdType: 'password',
             loading: false,
             form: {
                 email: '',
@@ -112,6 +122,13 @@ export default {
         };
     },
     methods: {
+        pwdcheck() {
+            if (this.pwdType === 'password') {
+                this.pwdType = 'text';
+            } else {
+                this.pwdType = 'password';
+            }
+        },
         reset() {
             this.$validator.validateAll().then((result) => {
                 if (result) {
@@ -189,6 +206,18 @@ select {
     height: 2.2rem !important;
     min-height: 2.4rem !important;
     font-size: 0.9rem !important;
+}
+.icon img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.icon.is-right {
+    float: right;
+    position: relative;
+    top: -27px;
+    width: 22px;
+    right: 4px;
 }
 
 .title.is-2 {

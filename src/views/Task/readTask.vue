@@ -2,8 +2,7 @@
     <section>
         <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true"></loading>
         <div v-if="task">
-            <show-task :data=task>
-            </show-task>
+            <show-task :data=task></show-task>
         </div>
     </section>
 </template>

@@ -1,101 +1,176 @@
 <template>
-    <div class="card">
-        <header class="card-header">
-            <p class="card-header-title">
-                Payment method
-            </p>
-        </header>
-        <div class="card-content">
-            <div class="content">
-                <div class="add_payment">
-                    <span class="material-icons">
-                        add_circle_outline
-                    </span>
-                    <span>Add a new payment methods</span>
-                </div>
-            </div>
-            <div class="columns">
-                <div class="column">
-                    <div class="control">
-                        <div v-for="item in pmethods">
-                            <ul style="display:inline-flex">
-                                <li>
-                                    <vs-radio v-model="paymethod" vs-name="pm" :vs-value="item.value">{{item.text}}</vs-radio>
-                                </li>
-                            </ul>
+    <div class="section-wrapper">
+        <vue-headful title="Payment methods" />
+        <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Payment method
+                </p>
+                <p class="subtitle">
+                    Please enter your preferred payment method information so you can withdraw your earnings to your preferred account
+                </p>
+            </header>
+            <div class="paymentcontent">
+                <div class="columns">
+                    <div class="column is-3">
+                        <h3>Bkash</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Number">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
                         </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                    <div class="column is-3">
+                        <h3>UCash</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Number">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                    <div class="column is-3">
+                        <h3>Rocket</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Number">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                    <div class="column is-3">
+                        <h3>MPesa</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Number">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column is-3">
+                        <h3>Paypal</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Paypal Id">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                    <div class="column is-6">
+                        <h3>Bank</h3>
+                        <div class="columns">
+                            <div class="column is-4">
+                                <div class="control">
+                                    <float-label fixed label="Account Name">
+                                        <input type="text" class="input is-primary-focus" v-model="form.b_acc_name">
+                                    </float-label>
+                                </div>
+                            </div>
+                            <div class="column is-4">
+                                <div class="control">
+                                    <float-label fixed label="Bank Name">
+                                        <input type="text" class="input is-primary-focus" v-model="form.b_name">
+                                    </float-label>
+                                </div>
+                            </div>
+                            <div class="column is-4">
+                                <div class="control">
+                                    <float-label fixed label="Account Number">
+                                        <input type="text" class="input is-primary-focus" v-model="form.b_acc_number">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-4">
+                                <float-label fixed label="Bank Branch">
+                                    <input type="text" class="input is-primary-focus" v-model="form.b_branch">
+                                </float-label>
+                            </div>
+                            <div class="column is-4">
+                                <div class="control">
+                                    <float-label fixed label="Swift Code or Routing number">
+                                        <input type="text" class="input is-primary-focus" v-model="form.b_routing_number">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column">
+                                <vs-radio v-model="default_method" vs-name="default_method" vs-value="bank">Preferred default method</vs-radio>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-3">
+                        <h3>Payoneer</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Email address">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Payoneer Id">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column is-3">
+                        <h3>Skrill</h3>
+                        <div class="columns">
+                            <div class="column is-10">
+                                <div class="control">
+                                    <float-label fixed label="Paypal Id">
+                                        <input type="text" class="input is-primary-focus" v-model="form.paypalid">
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <vs-radio v-model="default_method" vs-name="default_method" vs-value="paypal">Preferred default method</vs-radio>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column is-4">
+                        <button class="button button-cta info-btn is-bold rounded raised">
+                            Save
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="paymentcontent" v-show="paymethod=='card'">
-            <div class="columns">
-                <div class="column pb-10">
-                    <img src="https://pay.skype.com/static/3.20/commerce.payment.psp.card.capture.pci/frame-2.3/images/method_list.svg" alt="">
-                </div>
-            </div>
-            <div class="columns">
-                <div class="column is-4">
-                    <float-label>
-                        <input type="text" class="input is-primary-focus" name="offer amount" placeholder="Card number">
-                    </float-label>
-                </div>
-            </div>
-            <div class="columns">
-                <div class="column is-3">
-                    <float-label :dispatch="false">
-                        <div class="select is-select">
-                            <select name="Select vehicle" v-model="month">
-                                <option :value="null" disabled selected>Month</option>
-                                <option>January</option>
-                                <option>February</option>
-                            </select>
-                        </div>
-                    </float-label>
-                </div>
-                <div class="column is-3">
-                    <float-label :dispatch="false">
-                        <div class="select is-select">
-                            <select v-model="year">
-                                <option :value="null" disabled selected>year</option>
-                                <option>2020</option>
-                                <option>2011</option>
-                                <option>2022</option>
-                            </select>
-                        </div>
-                    </float-label>
-                </div>
-            </div>
-            <div class="columns">
-                <div class="column is-3">
-                    <float-label :dispatch="false">
-                        <input type="text" class="input is-primary-focus" name="Security code" placeholder="Security code">
-                    </float-label>
-                </div>
-            </div>
-            <button class="button button-cta primary-btn is-bold rounded raised no-lh">
-                Add
-            </button>
-        </div>
-        <div class="paymentcontent" v-show="paymethod=='paypal'">
-            <h2>Paypal</h2>
-            <p>Select "Pay now" to complete your purchase. You will be redirected to the PayPal checkout.</p>
-            <p>
-                Sign in using your PayPal username and password to complete your purchase using your preferred payment option. Or create a PayPal account if you don't have one.
-            </p>
-            <br>
-            <p>
-                By clicking "Pay now", you agree to the Microsoft Services Agreement and Privacy and Cookies policy, and you authorize Skype to store your payment details.
-            </p>
-            <br>
-            <button class="button button-cta primary-btn is-bold rounded raised no-lh">
-                Pay now
-            </button>
-            <button class="button button-cta primary-btn btn-outlined is-bold rounded raised no-lh">
-                Cancel order
-            </button>
-        </div>
-    </div>
     </div>
 </template>
 <script>
@@ -103,14 +178,41 @@ export default {
     name: 'paymentmethods',
     data() {
         return {
+            isLoading: false,
+            default_method: '',
             methods: false,
-            month: null,
-            year: null,
+            month: '04',
+            months: [
+                { num: "01", month: "January" },
+                { num: "02", month: "February" },
+                { num: "03", month: "March" },
+                { num: "04", month: "April" },
+                { num: "05", month: "May" },
+                { num: "06", month: "June" },
+                { num: "07", month: "July" },
+                { num: "08", month: "August" },
+                { num: "09", month: "September" },
+                { num: "10", month: "October" },
+                { num: "11", month: "November" },
+                { num: "12", month: "December" }
+            ],
+            year: '',
             paymethod: null,
             pmethods: [
                 { text: 'Credit/debit card', value: 'card' },
                 { text: 'Paypal', value: 'paypal' },
+                { text: 'Bank', value: 'bank' },
             ],
+            form: {
+                card_number: '',
+                security_code: '',
+                paypalid: '',
+                b_acc_name: '',
+                b_name: '',
+                b_acc_number: '',
+                b_branch: '',
+                b_routing_number: ''
+            }
         }
     },
     computed: {
@@ -123,6 +225,33 @@ export default {
 
     },
     methods: {
+        saveCard() {
+            this.$axios.post('paymentmethod', {
+                paymethod: this.paymethod,
+                card_number: this.form.card_number,
+                month: this.month,
+                year: this.year,
+                security_code: this.form.security_code,
+            })
+        },
+        savePaypal() {
+            this.$axios.post('paymentmethod', {
+                paymethod: this.paymethod,
+                paypalid: this.form.paypalid
+            })
+
+        },
+        saveBank() {
+            this.$axios.post('paymentmethod', {
+                paymethod: this.paymethod,
+                b_acc_name: this.form.b_acc_name,
+                b_name: this.form.b_name,
+                b_acc_number: this.form.b_acc_number,
+                b_branch: this.form.b_branch,
+                b_routing_number: this.form.b_routing_number
+            })
+
+        }
 
     },
     watch: {
@@ -135,8 +264,16 @@ export default {
     display: inline-flex;
 }
 
+.con-vs-radio {
+    float: left;
+}
+
 .add_payment span {
     margin-right: 4px;
+}
+
+.con-vs-checkbox {
+    margin: 14px;
 }
 
 .add_payment .material-icons {
@@ -150,10 +287,18 @@ export default {
 .select {
     width: 100%;
 }
-.paymentcontent
-{
+
+.paymentcontent {
     padding: 20px;
 }
+
+.paymentcontent h3 {
+    font-size: 1.4em;
+    font-weight: 600;
+    padding-bottom: 10px;
+
+}
+
 select {
     width: 100% !important;
 }

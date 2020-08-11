@@ -1,15 +1,8 @@
 <template>
-    <div style="padding-top:20px;">
+    <div style="padding-top:10px;">
         <div class="columns">
             <div class="column is-4" style="padding:4px">
-                <vs-card style="box-shadow:0 2px 3px 1px rgba(0,0,0,0.04)">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Ship
-                        </h3>
-                    </div>
-                </vs-card>
-                <img src="../../assets/images/shipping.png" width="100%">
+                <!--   <img src="../../assets/images/shipping.png" width="100%"> -->
                 <vs-tabs>
                     <vs-tab label="Send a package" @click="send">
                         <send-package></send-package>
@@ -20,140 +13,147 @@
                 </vs-tabs>
             </div>
             <div class="column is-8" style="padding:4px">
-                <vs-row vs-justify="center">
-                    <vs-col type="flex" vs-justify="center" vs-align="left" vs-w="12">
-                        <vs-card style="box-shadow:0 2px 3px 1px rgba(0,0,0,0.04)">
-                            <div slot="header" class="searchheader">
-                                <h3 style="font-weight: 500;">
-                                    Search Ship
-                                </h3>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    <div class="control">
-                                        <input class="input is-primary-focus " placeholder="Pick up point" v-model="startsearch" type="text">
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                        <input class="input is-primary-focus " placeholder="Drop off point" v-model="endsearch" type="text">
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                        <div class="select">
-                                            <select v-model="goodstype">
-                                                <option :value="null" disabled hidden>Select type of goods</option>
-                                                <option v-for="(item,index) in gtype" :key="index" :value="item">{{item}}</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <date-picker v-model="searchdate" valueType="format" placeholder="Pick up date" name="date"></date-picker>
-                                </div>
-                            </div>
-                        </vs-card>
-                    </vs-col>
-                </vs-row>
-                <template v-if="sendpackage">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Sending a package
-                        </h3>
+                <div class="card search">
+                    <div class="card-header active-header">
+                        Search Shipments
                     </div>
-                    <table class="table is-accent fixed_header ">
-                        <thead>
-                            <tr>
-                                <th width="20%" style="text-align:left">Pickup Point</th>
-                                <th width="20%" style="text-align:left">Dropoff Point</th>
-                                <th width="20%" style="text-align:left">Documents</th>
-                                <th width="20%" style="text-align:left">Pickup Date</th>
-                                <th width="20%" style="text-align:left">Delivery Date</th>
-                                <th width="10%" style="text-align:left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <div v-if="isSLoading" style="margin-top:-45px;">
+                    <div class="card-content">
+                        <div class="columns">
+                            <div class="column">
+                                <div class="control">
+                                    <input class="input is-primary-focus " placeholder="Pick up point" v-model="startsearch" type="text">
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <input class="input is-primary-focus " placeholder="Drop off point" v-model="endsearch" type="text">
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <div class="select">
+                                        <select v-model="goodstype">
+                                            <option :value="null" disabled hidden>Select type of goods</option>
+                                            <option v-for="(item,index) in gtype" :key="index" :value="item">{{item}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <date-picker v-model="searchdate" valueType="format" placeholder="Pick up date" name="date"></date-picker>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <template v-if="sendpackage">
+                    <div class="card">
+                        <div class="card-header active-header">
+                            Sending a package
+                        </div>
+                        <div class="card-content">
+                            <div v-if="isSLoading">
                                 <img class="loading" src="../../assets/images/roaling.gif">
                             </div>
-                            <div v-else>
-                                <tr v-for="(item,index) in getShipments" :key="index">
-                                    <td data-th="Pickup Point" width="20%" style="text-align:left">
-                                        {{item.start_point.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Dropoff Point" width="20%" style="text-align:left">
-                                        {{item.destination.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Documents" width="20%" style="text-align:left">
-                                        {{item.documents}}
-                                    </td>
-                                    <td data-th="Pickup Date" width="20%" style="text-align:left">
-                                        {{moment(item.pickup_date).format("ll")}}
-                                    </td>
-                                    <td data-th="Delivery Date" width="20%" style="text-align:left">
-                                        {{moment(item.delivery_date_time).format("lll")}}
-                                    </td>
-                                    <td data-th="Action" width="10%" style="text-align:left">
-                                        <router-link :to="item.path">
-                                            <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
-                                        </router-link>
-                                    </td>
-                                </tr>
+                            <div v-else class="fixed_header">
+                                <table class="table is-accent">
+                                    <thead>
+                                        <tr>
+                                            <th>Pickup Point</th>
+                                            <th>Dropoff Point</th>
+                                            <th>Documents</th>
+                                            <th>Pickup Date</th>
+                                            <th>Delivery Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <div v-if="isSLoading">
+                                            <img class="loading" src="../../assets/images/roaling.gif">
+                                        </div>
+                                        <tr v-else v-for="(item,index) in getShipments" :key="index">
+                                            <td>
+                                                {{item.start_point.split(',')[0]}}
+                                            </td>
+                                            <td>
+                                                {{item.destination.split(',')[0]}}
+                                            </td>
+                                            <td>
+                                                {{item.documents}}
+                                            </td>
+                                            <td>
+                                                {{moment(item.pickup_date).format("ll")}}
+                                            </td>
+                                            <td>
+                                                {{moment(item.delivery_date_time).format("lll")}}
+                                            </td>
+                                            <td data-th="Action">
+                                                <router-link :to="item.path">
+                                                    <button class="button is-small info-btn raised  btn-outlined">view</button>
+                                                </router-link>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
                 </template>
                 <template v-if="carrypackage">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
+                    <div class="card">
+                        <div class="card-header active-header">
                             Carry a package
-                        </h3>
+                        </div>
+                        <div class="card-content">
+                            <div v-if="isSLoading">
+                                <img class="loading" src="../../assets/images/roaling.gif">
+                            </div>
+                            <div v-else class="fixed_header">
+                                <table class="table is-accent">
+                                    <thead>
+                                        <tr>
+                                            <th>Pickup Point</th>
+                                            <th>Dropoff Point</th>
+                                            <th>Weight</th>
+                                            <th>Pickup Date</th>
+                                            <th>Delivery Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <div v-if="isSLoading">
+                                            <img class="loading" :src="getPhoto()">
+                                        </div>
+                                        <tr v-else v-for="(item,index) in getCarryShipments" :key="index">
+                                            <td>
+                                                {{item.start_point.split(',')[0]}}
+                                            </td>
+                                            <td v-if="item.destination">
+                                                {{item.destination.split(',')[0]}}
+                                            </td>
+                                            <td v-else>
+                                                {{item.destination}}
+                                            </td>
+                                            <td>
+                                                {{item.weight}}
+                                            </td>
+                                            <td>
+                                                {{moment(item.pickup_date).format("ll")}}
+                                            </td>
+                                            <td>
+                                                {{moment(item.delivery_date_time).format("lll")}}
+                                            </td>
+                                            <td>
+                                                <router-link :to="item.path">
+                                                    <button class="button is-small info-btn raised  btn-outlined">view</button>
+                                                </router-link>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <table class="table is-accent fixed_header ">
-                        <thead>
-                            <tr>
-                                <th width="20%" style="text-align:left">Pickup Point</th>
-                                <th width="20%" style="text-align:left">Dropoff Point</th>
-                                <th width="20%" style="text-align:left">Documents</th>
-                                <th width="20%" style="text-align:left">Pickup Date</th>
-                                <th width="20%" style="text-align:left">Delivery Date</th>
-                                <th width="10%" style="text-align:left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <div v-if="isSLoading" style="margin-top:-45px;">
-                                <img class="loading" :src="getPhoto()">
-                            </div>
-                            <div v-else>
-                                <tr v-for="(item,index) in getCarryShipments" :key="index">
-                                    <td data-th="Pickup Point" width="20%" style="text-align:left">
-                                        {{item.start_point.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Dropoff Point" width="20%" style="text-align:left" v-if="item.destination">
-                                        {{item.destination.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Dropoff Point" width="20%" style="text-align:left" v-else>
-                                        {{item.destination}}
-                                    </td>
-                                    <td data-th="Documents" width="20%" style="text-align:left">
-                                        {{item.documents}}
-                                    </td>
-                                    <td data-th="Pickup Date" width="20%" style="text-align:left">
-                                        {{moment(item.pickup_date).format("ll")}}
-                                    </td>
-                                    <td data-th="Delivery Date" width="20%" style="text-align:left">
-                                        {{moment(item.delivery_date_time).format("lll")}}
-                                    </td>
-                                    <td data-th="Action" width="10%" style="text-align:left">
-                                        <router-link :to="item.path">
-                                            <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
-                                        </router-link>
-                                    </td>
-                                </tr>
-                            </div>
-                        </tbody>
-                    </table>
                 </template>
             </div>
         </div>
@@ -173,10 +173,10 @@ Vue.use(VueGoogleMaps, {
         libraries: 'places',
     },
 });
-
+import sendPackage from '@/components/ship/SendPackage';
 export default {
     components: {
-        sendPackage: () => import('@/components/ship/SendPackage'),
+        sendPackage,
         carryPackage: () => import('@/components/ship/CarryPackage'),
         DatePicker
     },
@@ -263,13 +263,17 @@ export default {
 
     },
     created() {
-        if (this.$store.getters.sendlisting.length == 0) {
+        this.getSendLiting();
+        this.getCarryListing();
+    },
+    mounted() {
+        EventBus.$on('updateSendPackageList', () => {
             this.getSendLiting();
-        }
-
-        if (this.$store.getters.carrylisting.length == 0) {
+        })
+        EventBus.$on('updateCarryPackageList', () => {
             this.getCarryListing();
-        }
+        })
+
     },
     methods: {
         ...mapActions("ship",
@@ -326,25 +330,15 @@ export default {
 }
 </script>
 <style scoped>
-.con-vs-tabs {
-    background: #fff;
-}
-
-.searchheader {
-    text-align: center;
-    padding: 7px !important;
-    font-size: 18px;
-    color: #2d3436;
-    background-color: #1abc9c61;
-}
-
-.loading {
-    height: auto;
-    max-width: 50%;
-    margin: auto;
-    margin-top: 100px;
-    display: flex;
-    align-items: center;
+.card-header {
+    padding: 10px;
     justify-content: center;
+    display: block !important;
+    text-align: center;
+}
+
+.card-content {
+    background-color: transparent;
+    padding: 0.5rem 0rem 0rem;
 }
 </style>

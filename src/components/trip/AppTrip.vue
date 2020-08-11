@@ -1,184 +1,206 @@
 <template>
-    <div style=" padding-top:20px;">
+    <div style=" padding-top:10px;">
         <div class="columns">
             <div class="column is-4" style="padding:4px">
-                <vs-card style="box-shadow:0 2px 3px 1px rgba(0,0,0,0.04)">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Trip
-                        </h3>
-                    </div>
-                </vs-card>
-                <img src="../../assets/images/ride.png" width="100%">
+                <!--  <img src="../../assets/images/ride.png" width="100%"> -->
                 <vs-tabs>
-                    <vs-tab label="Give a ride" @click="offer">
+                    <vs-tab label="Give a Ride" @click="offer">
                         <offer-trip></offer-trip>
                     </vs-tab>
-                    <vs-tab label="Take a ride" @click="trip">
+                    <vs-tab label="Get a Ride" @click="seek">
                         <seek-trip></seek-trip>
                     </vs-tab>
                 </vs-tabs>
             </div>
             <div class="column is-8" style="padding:4px">
-                <vs-row vs-justify="center">
-                    <vs-col type="flex" vs-justify="center" vs-align="left" vs-w="12">
-                        <vs-card style="box-shadow:0 2px 3px 1px rgba(0,0,0,0.04)">
-                            <div slot="header" class="searchheader">
-                                <h3 style="font-weight: 500;">
-                                    Search Trips
-                                </h3>
-                            </div>
-                            <div class="columns">
-                                <div class="column">
-                                    <div class="control">
-                                        <float-label label="Start point" fixed>
-                                            <input class="input is-primary-focus " type="text" v-model="startsearch">
-                                        </float-label>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                        <float-label label="Destination" fixed>
-                                            <input class="input is-primary-focus " type="text" v-model="endsearch">
-                                        </float-label>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                        <float-label :dispatch="false" label="Select vehicle" fixed>
-                                            <div class="select">
-                                                <select v-model="vehiclesearch">
-                                                    <option v-for="(item,index) in voptions" :key="index" :value="item">{{item}}</option>
-                                                </select>
-                                            </div>
-                                        </float-label>
-                                    </div>
-                                </div>
-                                <div class="column">
-                                    <div class="control">
-                                        <float-label label="Trip date" fixed>
-                                            <date-picker v-model="searchdate" valueType="format"></date-picker>
-                                        </float-label>
-                                    </div>
-                                </div>
-                            </div>
-                        </vs-card>
-                    </vs-col>
-                </vs-row>
-                <template v-if="offertrip">
-                    <div slot="header" class="searchheader">
-                        <h3 style="font-weight: 500;">
-                            Offering a Ride
-                        </h3>
+                <div class="card search">
+                    <div class="card-header active-header">
+                        Search Trips
                     </div>
-                    <table class="table is-accent fixed_header ">
-                        <thead>
-                            <tr>
-                                <th width="25%" style="text-align:left">Start Point</th>
-                                <th width="25%" style="text-align:left">Destination</th>
-                                <th width="10%" style="text-align:left">Amount</th>
-                                <th width="20%" style="text-align:left">Vehicle</th>
-                                <th width="10%" style="text-align:left">Passenger</th>
-                                <th width="20%" style="text-align:left">Bids</th>
-                                <th width="10%" style="text-align:left">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <div v-if="isLoading" style="margin-top:-45px;">
+                    <div class="card-content">
+                        <div class="columns">
+                            <div class="column is-3">
+                                <div class="control">
+                                    <gmap-autocomplete @address_res="handleAddr" label="Start point" :verified="verified"></gmap-autocomplete>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <float-label label="Radius">
+                                        <input type="number" min="0" class="input is-primary-focus" v-model="search.sradious">
+                                    </float-label>
+                                </div>
+                            </div>
+                            <div class="column is-3">
+                                <div class="control">
+                                    <gmap-autocomplete @address_res="handleAddr" label="Destination" :verified="verified"></gmap-autocomplete>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="control">
+                                    <float-label label="Radius">
+                                        <input type="number" min="0" class="input is-primary-focus" v-model="search.dradious">
+                                    </float-label>
+                                </div>
+                            </div>
+                            <div class="column is-2">
+                                <div class="control">
+                                    <float-label :dispatch="false" label="Select vehicle">
+                                        <div class="select">
+                                            <select v-model="search.vehicle">
+                                                <option v-for="(item,index) in voptions" :key="index" :value="item">{{item}}</option>
+                                            </select>
+                                        </div>
+                                    </float-label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-3">
+                                <div class="control">
+                                    <float-label label="Trip date">
+                                        <date-picker v-model="search.date" valueType="format"></date-picker>
+                                    </float-label>
+                                </div>
+                            </div>
+                            <div class="column is-1">
+                                <div class="control">
+                                    <button @click="searchTrips" class="button searchbtn info-btn raised">Search</button>
+                                </div>
+                            </div>
+                            <div class="column is-2">
+                                <div class="control">
+                                    <button @click="clearsearch" class="button clearbtn info-btn raised">Clear Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <template v-if="offertrip">
+                    <div class="card">
+                        <div class="card-header active-header">
+                            Give a Ride
+                        </div>
+                        <div class="card-content">
+                            <div v-if="isofferLoading">
                                 <img class="loading" src="../../assets/images/roaling.gif">
                             </div>
-                            <div v-else>
-                                <tr v-for="(item,index) in getOfferedTrips" :key="index">
-                                    <td data-th="Start Point" width="25%" style="text-align:left">
-                                        {{item.start_point.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Destination" width="25%" style="text-align:left">
-                                        {{item.destination.split(',')[0]}}
-                                    </td>
-                                    <td data-th="Amount" width="10%" style="text-align:left">
-                                        {{item.pay}}
-                                    </td>
-                                    <td data-th="Vehicle" width="20%" style="text-align:left">
-                                        {{item.vehicle_type}}
-                                    </td>
-                                    <td data-th="Passenger" width="10%" style="text-align:left">
-                                        {{item.seat}}
-                                    </td>
-                                    <td data-th="Bids" width="20%" style="text-align:left">
-                                        {{item.bids_count}}
-                                    </td>
-                                    <td data-th="Action" width="10%" style="text-align:left">
-                                        <router-link :to="item.path">
-                                            <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
-                                        </router-link>
-                                    </td>
-                                </tr>
-                            </div>
-                        </tbody>
-                    </table>
-                    <div v-if="trips && trips.length>30" style="margin-top:10px;text-align: center;">
-                        <button @click="loadMore" :class="isload?'is-loading':''" class="button primary-btn" style="">Load More...</button>
-                    </div>
-                </template>
-                <template v-if="seektrip">
-                    <div v-if="isLoading">
-                        <img class="loading" :src="getPhoto()">
-                    </div>
-                    <div v-else>
-                        <div slot="header" class="searchheader">
-                            <h3 style="font-weight: 500;">
-                                Seeking a Ride
-                            </h3>
-                        </div>
-                        <table class="table is-accent fixed_header ">
-                            <thead>
-                                <tr>
-                                    <th width="25%" style="text-align:left">Start Point</th>
-                                    <th width="25%" style="text-align:left">Destination</th>
-                                    <th width="10%" style="text-align:left">Amount</th>
-                                    <th width="20%" style="text-align:left">Vehicle</th>
-                                    <th width="10%" style="text-align:left">Passenger</th>
-                                    <th width="20%" style="text-align:left">Bids</th>
-                                    <th width="10%">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <div v-if="isLoading" style="margin-top:-45px;">
-                                    <img class="loading" :src="getPhoto()">
+                            <div v-else-if="trips.length==0">
+                                <div style="padding:60px;">
+                                    <p style="font-size:26px;text-align:center;color:#ccc">No results found</p>
                                 </div>
-                                <div v-else>
-                                    <tr v-for="(item,index) in getSeekedTrips" :key="index">
-                                        <td data-th="Start Point" width="25%" style="text-align:left">
+                            </div>
+                            <div v-else class="fixed_header">
+                            <table class="table is-accent">
+                                <thead>
+                                    <tr>
+                                        <th style="width:17%">Start Point</th>
+                                        <th>Destination</th>
+                                        <th>Amount</th>
+                                        <th>Vehicle</th>
+                                        <th>Passenger</th>
+                                        <th>Bids</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in trips" :key="index">
+                                        <td>
                                             {{item.start_point.split(',')[0]}}
                                         </td>
-                                        <td data-th="Destination" width="25%" style="text-align:left">
+                                        <td>
                                             {{item.destination.split(',')[0]}}
                                         </td>
-                                        <td data-th="Amount" width="10%" style="text-align:left">
+                                        <td>
                                             {{item.pay}}
                                         </td>
-                                        <td data-th="Vehicle" width="20%" style="text-align:left">
+                                        <td>
                                             {{item.vehicle_type}}
                                         </td>
-                                        <td data-th="Passenger" width="10%" style="text-align:left">
-                                            {{item.seat}}
+                                        <td>
+                                            {{item.vehicle_seat}}
                                         </td>
-                                        <td data-th="Bids" width="20%" style="text-align:left">
+                                        <td>
                                             {{item.bids_count}}
                                         </td>
-                                        <td data-th="Action" width="10%">
+                                        <td>
                                             <router-link :to="item.path">
-                                                <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
+                                                <button class="button is-small info-btn raised  btn-outlined">view</button>
                                             </router-link>
                                         </td>
                                     </tr>
-                                </div>
-                            </tbody>
-                        </table>
-                        <div v-if="seektrips.length>30" @click="seekLoadMore" style="margin-top:10px;text-align: center;">
-                            <button :class="isload?'is-loading':''" class="button primary-btn" style="">Load More...</button>
+                                </tbody>
+                            </table>
+                            </div>
                         </div>
                     </div>
+                    <!--  <div v-if="trips.length>30" @click="offerloadMore" style="margin-top:10px;text-align: center;">
+                        <button :class="isload?'is-loading':''" class="button raised is-small info-btn" style="">Load More...</button>
+                    </div> -->
+                </template>
+                <template v-if="seektrip">
+                    <div class="card">
+                        <div class="card-header active-header">
+                            Get a Ride
+                        </div>
+                        <div class="card-content">
+                           
+                            <div v-if="isseekLoading">
+                                <img class="loading" src="../../assets/images/roaling.gif">
+                            </div>
+                             <div v-else-if="seektrips.length==0">
+                                <div style="padding:60px;">
+                                    <p style="font-size:26px;text-align:center;color:#ccc">No results found</p>
+                                </div>
+                            </div>
+                            <div v-else class="fixed_header">
+                            <table class="table is-accent">
+                                <thead>
+                                    <tr>
+                                        <th style="width:17%">Start Point</th>
+                                        <th>Destination</th>
+                                        <th>Amount</th>
+                                        <th>Vehicle</th>
+                                        <th>Passenger</th>
+                                        <th>Bids</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item,index) in seektrips" :key="index">
+                                        <td>
+                                            {{item.start_point.split(',')[0]}}
+                                        </td>
+                                        <td>
+                                            {{item.destination.split(',')[0]}}
+                                        </td>
+                                        <td>
+                                            {{item.pay}}
+                                        </td>
+                                        <td>
+                                            {{item.vehicle_type}}
+                                        </td>
+                                        <td>
+                                            {{item.vehicle_seat}}
+                                        </td>
+                                        <td>
+                                            {{item.bids_count}}
+                                        </td>
+                                        <td>
+                                            <router-link :to="item.path">
+                                                <button class="button is-small info-btn raised  btn-outlined">view</button>
+                                            </router-link>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--  <div v-if="seektrips.length>30" @click="seekLoadMore" style="margin-top:10px;text-align: center;">
+                        <button :class="isload?'is-loading':''" class="button info-btn raised is-small" style="">Load More...</button>
+                    </div> -->
                 </template>
             </div>
         </div>
@@ -186,22 +208,25 @@
 </template>
 <script>
 import Vue from "vue";
-import * as VueGoogleMaps from 'vue2-google-maps-withscopedautocomp'
-Vue.use(VueGoogleMaps, {
-    load: {
-        key: 'AIzaSyCdu3RozRNnds9nOhMTPs-ETTWLlV1C-EE',
-        libraries: 'places',
-    },
-});
-
+import VueSweetalert2 from 'vue-sweetalert2';
+import Swal from 'sweetalert2';
+Vue.use(VueSweetalert2);
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: true,
+    timerProgressBar: true,
+})
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
-// import VeeValidate from 'vee-validate';
+import gmapAutocomplete from '../global/gmapautocomplete';
+import offerTrip from './offerTrip';
 import { mapActions, mapGetters } from 'vuex';
 export default {
     components: {
+        gmapAutocomplete,
         offeringTrips: () => import('./OfferingTrips'),
-        offerTrip: () => import('./offerTrip'),
+        offerTrip,
         seekTrip: () => import('./seekTrip'),
         DatePicker
     },
@@ -220,7 +245,7 @@ export default {
             },
             voptions: [
                 'Car',
-                'Mini van',
+                'Mini Van/Micro',
                 'Motorcycle',
                 'Electric Scooter',
                 'CNG',
@@ -264,23 +289,31 @@ export default {
             details: '',
             startsearch: '',
             endsearch: '',
-            vehiclesearch: null,
             busy: false,
             page: 1,
             spage: 1,
-
+            active: true,
+            search: {
+                slat: '',
+                slng: '',
+                dlat: '',
+                dlng: '',
+                sradious: '',
+                dradious: '',
+                vehicle: '',
+                date: '',
+                post_type: 'offer',
+            },
+            isofferLoading: false,
+            isseekLoading: false,
+            trips: [],
+            seektrips: [],
         }
     },
 
     created() {
-
-
-        if (this.$store.getters.trips.length == 0) {
-            this.getOfferrips();
-        }
-        if (this.$store.getters.seektrips.length == 0) {
-            this.getSeekTrips();
-        }
+        this.getOfferrips();
+        this.getSeekTrips();
     },
     mounted() {
         EventBus.$on('updateOfferTrips', () => {
@@ -291,80 +324,50 @@ export default {
         })
     },
 
-    // EventBus.$on('seekingtrip', () => {
-
-    //     this.first = false
-    //     this.second = true
-    //     this.$router.push('/home')
-    // })
-
-
     computed: {
-        trips() {
-            return this.$store.getters.trips.data
+        queryString() {
+            return Object.keys(this.search)
+                .map(k => `${k}=${this.search[k]}`)
+                .join('&');
         },
-        seektrips() {
-            return this.$store.getters.seektrips.data
-        },
-        isLoading() {
-            return this.$store.getters.isLoading
+        verified() {
+            return this.$store.getters.user.status == 'verified'
         },
         id() {
-            return this.$store.getters.id
-        },
-
-        getOfferedTrips() {
-            return this.trips.filter(trip => {
-                if (this.vehiclesearch == null && this.searchdate == null) {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase())
-                } else if (this.vehiclesearch == null) {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase()) &&
-                        trip.date.includes(this.searchdate)
-                } else if (this.searchdate == null) {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase()) &&
-                        trip.vehicle_type.toLowerCase().includes(this.vehiclesearch.toLowerCase())
-                } else {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase()) &&
-                        trip.vehicle_type.toLowerCase().includes(this.vehiclesearch.toLowerCase()) &&
-                        trip.date.includes(this.searchdate)
-                }
-
-            })
-
-        },
-
-        getSeekedTrips() {
-            return this.seektrips.filter(trip => {
-                if (this.vehiclesearch == null && this.searchdate == null) {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase())
-                } else if (this.vehiclesearch == null) {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase()) &&
-                        trip.date.includes(this.searchdate)
-                } else if (this.searchdate == null) {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase()) &&
-                        trip.vehicle_type.toLowerCase().includes(this.vehiclesearch.toLowerCase())
-                } else {
-                    return trip.start_point.toLowerCase().includes(this.startsearch.toLowerCase()) &&
-                        trip.destination.toLowerCase().includes(this.endsearch.toLowerCase()) &&
-                        trip.vehicle_type.toLowerCase().includes(this.vehiclesearch.toLowerCase()) &&
-                        trip.date.includes(this.searchdate)
-                }
-
-            })
-
+            return this.$store.getters.user.id
         },
 
     },
+
     methods: {
-        ...mapActions("trip",
-            ['getOfferrips', 'getSeekTrips']),
+        offer() {
+            this.offertrip = true
+            this.seektrip = false
+            this.search.post_type = 'offer'
+        },
+        seek() {
+            this.offertrip = false
+            this.seektrip = true
+            this.search.post_type = 'seek'
+        },
+        getOfferrips() {
+            this.isofferLoading = true
+            this.$axios.get('offertrip?page=' + this.page)
+                .then(response => {
+                    this.trips = response.data.data;
+                    this.isofferLoading = false
+                });
+        },
+        getSeekTrips() {
+            this.isseekLoading = true
+            this.$axios.get('seektrip?page=' + this.spage)
+                .then(response => {
+                    this.seektrips = response.data.data;
+                    this.isseekLoading = false
+                });
+
+        },
+
         startPlace(place) {
             this.startsearch = place.name
         },
@@ -374,7 +377,7 @@ export default {
         loadMoreData() {
             this.isload = true
         },
-        loadMore: function() {
+        offerloadMore: function() {
             this.isload = true
             this.$axios.get('offertrip?page=' + this.page)
                 .then(response => {
@@ -393,37 +396,49 @@ export default {
                 })
 
         },
-        alloffertrips() {
 
-            this.$store.dispatch('trip/getAllTrips');
-            // .then(response => {
-            //     this.trips = response.data.data
-            //     this.isLoading = false
-            //     this.page += 1
-            // });
+        handleAddr(data) {
+            if (data.field == "Start point") {
+                this.search.slat = data.latitude
+                this.search.slng = data.longitude
+            } else if (data.field == "Destination") {
+                this.search.dlat = data.latitude
+                this.search.dlng = data.longitude
+            }
+        },
+        searchTrips() {
+            if (this.search.post_type == 'offer') {
+                this.isofferLoading = true
+                this.trips = []
+                this.$axios.get(`/search?${this.queryString}`)
+                    .then((res) => {
+                        this.isofferLoading = false
+                        this.trips = res.data.data
+                    })
 
+            } else {
+                this.isseekLoading = true
+                this.seektrips = []
+                this.$axios.get(`/search?${this.queryString}`)
+                    .then((res) => {
+                        this.isseekLoading = false
+                        this.seektrips = res.data.data
+                    })
+            }
 
         },
-        allseektrips() {
-            this.$axios.get('seektrip?page=' + this.spage)
-                .then(response => {
-                    this.seektrips = response.data.data
-                    this.isLoading = false
-                    this.spage += 1
-                });
+        clearsearch() {
+            EventBus.$emit('removedata')
+            this.search.slat = ''
+            this.search.slng = ''
+            this.search.dlat = ''
+            this.search.dlng = ''
+            this.search.sradious = ''
+            this.search.dradious = ''
+            this.search.vehicle = ''
+            this.search.date = ''
+            this.getOfferrips()
         },
-        handleClick(tab, event) {
-            console.log(tab, event);
-        },
-        offer() {
-            this.offertrip = true
-            this.seektrip = false
-        },
-        trip() {
-            this.offertrip = false
-            this.seektrip = true
-        },
-
         getPhoto() {
             let photo = "images/roaling.gif";
             return photo;
@@ -478,49 +493,7 @@ export default {
         }
     },
 
-    // var routes = response.routes;
-    // for (var j = 0; j < routes.length; j++) {
-    //     var points = routes[j].overview_path;
-    //     //getLiText(points[j]);
-    //     for (var i = 0; i < points.length; i++) {
-    //         getLiText(points[i]);
-    //     }
-    // }
 
-    // function getLiText(point) {
-    //     var lat = point.lat(),
-    //         lng = point.lng();
-    //    console.log(lat+"-"+lng)
-
-    // }
-
-
-    //          var map;
-    // var service;
-    // var infowindow;
-    //           var pyrmont = new google.maps.LatLng(this.startsearch,this.endsearch);
-
-    //   map = new google.maps.Map(document.getElementById('map'), {
-    //         center: {lat:this.startsearch, lng: this.endsearch},
-    //       zoom: 15
-    //     });
-
-    //       let request = {
-    //     location:pyrmont,
-    //     radius: '500'
-    //   };
-
-    //   service = new google.maps.places.PlacesService(map);
-    //   service.nearbySearch(request, callback);
-    //   function callback(results, status) {
-    //   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    //     for (var i = 0; i < results.length; i++) {
-    //       var place = results[i];
-    //       // createMarker(results[i]);
-    //       console.log(results[i]);
-    //     }
-    //   }
-    // }
 
     watch: {
         vehiclesearch: function(val) {
@@ -536,14 +509,18 @@ export default {
             this.second = val
         },
 
-        startsearch: function(val) {
-            this.startsearch = val
+        "search.plat": function(val) {
+            this.search.plat = val;
         },
-
-        endsearch: function(val) {
-            this.endsearch = val
+        "search.plng": function(val) {
+            this.search.plng = val;
+        },
+        "search.dlat": function(val) {
+            this.search.dlat = val;
+        },
+        "search.dlng": function(val) {
+            this.search.dlng = val;
         }
-
 
         // this.first = false
         // this.second = true
@@ -554,8 +531,16 @@ export default {
 }
 </script>
 <style scoped>
-.con-vs-tabs {
-    background: #fff;
+.card-header {
+    padding: 10px;
+    justify-content: center;
+    display: block !important;
+    text-align: center;
+}
+
+.card-content {
+    background-color: transparent;
+    padding: 0.5rem 0rem 0rem;
 }
 
 div.wrapper {
@@ -569,22 +554,8 @@ div.wrapper {
     width: 5px;
 }
 
-.searchheader {
-    text-align: center;
-    padding: 7px !important;
-    font-size: 18px;
-    color: #2d3436;
-    background-color: #1abc9c61;
-}
-
-.loading {
-    height: auto;
-    max-width: 50%;
-    margin: auto;
-    margin-top: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.search .column {
+    padding: 10px 4px;
 }
 
 .load {
@@ -614,6 +585,11 @@ input.input.is-small {
     font-size: 13px;
 }
 
+.clearbtn {
+    height: 34px;
+    width: 87px;
+    font-size: 13px;
+}
 
 
 #map {
@@ -627,5 +603,15 @@ input.input.is-small {
     min-height: 2.2rem !important;
     font-size: 14px;
     color: #878787;
+}
+
+.searchbtn {
+    height: 34px;
+    width: 58px;
+    font-size: 13px;
+}
+
+.table {
+    width: 100%;
 }
 </style>

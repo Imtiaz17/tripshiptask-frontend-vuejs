@@ -1,32 +1,42 @@
 <template>
     <section>
-        <div v-if="data.length>0">
-            <table class="responsive-table is-accent fixed_header ">
+        <div v-if="data.length>0" class="fixed_header">
+            <table class="table is-accent">
                 <thead>
                     <tr>
-                        <th style="width:43% ;text-align:center">Title</th>
-                        <th style="width:24%;text-align:center">Amount</th>
-                        <th style="width:28%;text-align:center">Rating</th>
-                        <th style="text-align:center">Action</th>
+                        <th style="width:30%">From - To</th>
+                        <th>Trip Id</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Rating</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item,index) in data" :key="index" v-if="item.paid==1">
-                        <td data-th="Title" style="width:40%;text-align:left">
+                    <tr v-for="(item,index) in data" :key="index">
+                        <td style="width:30%">
                             {{item.title}}
                         </td>
-                        <td data-th="Amount" style="width:24%;text-align:center">
-                            {{item.amount}}
+                        <td>
+                            {{item.trip_id}}
                         </td>
-                        <td data-th="Rating" style="width:27%;text-align:center">
+                        <td>
+                            {{moment(data.date).format('DD/MM/YYYY')}}
+                        </td>
+                        <td>
+                            {{item.amount}} {{currency}}
+                        </td>
+                        <td style="width:20%">
                             <span class="rating">
-                                <star-rating :show-rating=false :star-size="17" :read-only="true" :increment="0.1" :rating="item.rating"></star-rating>
-                                <small class="rate">{{item.rating}}</small>
+                                <a-rate :default-value="item.trip_rating" disabled allow-half />
+                                <small class="rate">{{item.trip_rating}}</small>
                             </span>
                         </td>
-                        <td data-th="Action" style="text-align:center">
+                        <td>
+                            <button @click="offershowtrip(item)" v-if="item.post_type=='offer'" class="button is-small info-btn raised rounded">Repost</button>
+                            <button @click="seekshowtrip(item)" v-else-if="item.post_type=='seek'" class="button is-small info-btn raised rounded">Repost</button>
                             <router-link :to="item.path">
-                                <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
+                                <button class="button is-small secondary-btn raised rounded btn-outlined">View</button>
                             </router-link>
                         </td>
                     </tr>
@@ -38,42 +48,68 @@
                 <p style="font-size:26px;text-align:center;color:#ccc">No records found</p>
             </div>
         </div>
+        <vs-popup class="holamundo" title="title" :active.sync="offerpopupActivo">
+            <offer-trip></offer-trip>
+        </vs-popup>
+        <vs-popup class="holamundo" title="title" :active.sync="seekpopupActivo">
+            <seek-trip></seek-trip>
+        </vs-popup>
     </section>
 </template>
 <script>
-import StarRating from 'vue-star-rating'
+import Vue from 'vue'
+import { Rate } from 'ant-design-vue';
+import 'ant-design-vue/lib/rate/style/index.css'
+Vue.use(Rate);
 import moment from 'moment'
 export default {
-    components: { StarRating },
+    components: {
+        seekTrip: () => import('@/components/trip/seekTrip'),
+        offerTrip: () => import('@/components/trip/offerTrip')
+    },
 
     props: ['data'],
     data() {
         return {
             moment: moment,
+            offerpopupActivo: false,
+            seekpopupActivo: false
         }
     },
+    computed: {
+        currency() {
+            return this.$store.getters.user.currency
+        },
+    },
+    methods: {
+        offershowtrip(info) {
+            this.offerpopupActivo = true;
+            EventBus.$emit('Repost', info)
 
+        },
+        seekshowtrip(info) {
+            this.seekpopupActivo = true;
+            EventBus.$emit('GetRideRepost', info)
 
+        },
+    }
 
 }
-
 </script>
 <style scoped>
-table th {
-    background-color: #fff !important;
+table td button {
+    margin-right: 4px;
 }
 
 .rate {
     color: #00B289;
     margin-top: 1px;
     margin-left: 3px;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight:600;
 }
 
 .rating {
-    width: 100%;
     display: inline-flex;
-    margin-left: 85px;
 }
-
 </style>

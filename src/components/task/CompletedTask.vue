@@ -1,30 +1,34 @@
 <template>
     <section>
-        <div v-if="data.length>0">
-            <table class="responsive-table is-accent fixed_header ">
+        <div v-if="data.length>0" class="fixed_header">
+            <table class="table is-accent">
                 <thead>
                     <tr>
-                        <th style="width:43% ;text-align:center">Title</th>
-                        <th style="width:24%;text-align:center">Amount</th>
-                        <th style="width:28%;text-align:center">Rating</th>
-                        <th style="text-align:center">Action</th>
+                        <th style="width:30%">Title</th>
+                        <th>Task Id</th>
+                        <th>Amount</th>
+                        <th>Rating</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item,index) in data" :key="index" v-if="item.paid==1">
-                        <td data-th="Title" style="width:43%;text-align:left">
+                    <tr v-for="(item,index) in data" :key="index">
+                        <td>
                             {{item.title}}
                         </td>
-                        <td data-th="Amount" style="width:24%;text-align:center">
+                        <td>
+                            {{item.task_id}}
+                        </td>
+                        <td>
                             {{item.amount}}
                         </td>
-                        <td data-th="Rating" style="width:28%;text-align:center">
+                        <td>
                             <span class="rating">
-                                <star-rating :show-rating=false :star-size="17" :read-only="true" :increment="0.1" :rating="item.rating"></star-rating>
-                                <small class="rate">{{item.rating}}</small>
+                                <star-rating :show-rating=false :star-size="17" :read-only="true" :increment="0.1" :rating="item.task_rating"></star-rating>
+                                <small class="rate">{{item.task_rating}}</small>
                             </span>
                         </td>
-                        <td data-th="Action" style="text-align:center">
+                        <td>
                             <router-link :to="item.path">
                                 <button class="button is-small btn-align accent-btn raised rounded btn-outlined">view</button>
                             </router-link>
@@ -56,19 +60,15 @@ export default {
     },
 
     methods: {
-        onChange(page) {
-
-            EventBus.$emit('change', page)
-        }
+        currency() {
+            return this.$store.getters.user.currency
+        },
     }
 
 }
-
 </script>
 <style scoped>
-table th {
-    background-color: #fff !important;
-}
+
 
 .rate {
     color: #00B289;
@@ -78,9 +78,6 @@ table th {
 }
 
 .rating {
-    width: 100%;
     display: inline-flex;
-    margin-left: 85px;
 }
-
 </style>

@@ -1,12 +1,14 @@
 <template>
     <div class="maincolumns">
+        <vue-headful title="Trip" description="Trip" />
         <app-trip></app-trip>
     </div>
 </template>
 <script>
 export default {
     components: {
-        AppTrip:() => import('@/components/trip/AppTrip')},
+        AppTrip: () => import('@/components/trip/AppTrip')
+    },
     data() {
         return {
 
@@ -25,13 +27,6 @@ export default {
 }
 </script>
 <style scoped>
-.maincolumns {
-
-    padding-left: 13px;
-    padding-right: 13px;
-    padding-bottom: 35px;
-}
-
 .tabs:not(:last-child) {
     margin-bottom: -0.5rem;
 }

@@ -1,38 +1,46 @@
 <template>
     <section>
-        <table class="table is-accent fixed_header ">
-            <thead>
-                <tr>
-                    <th width="25%" style="text-align:center">Type</th>
-                    <th width="25%" style="text-align:center">Amount</th>
-                    <th width="45%" style="text-align:center">Date</th>
-                    <th width="35%"  style="text-align:center">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <div v-if="isLoading" style="margin-top:-45px;">
-                    <img class="loading" src="../../assets/images/roaling.gif">
+        <div class="columns">
+            <div class="column is-3">
+                <div class="control">
+                    <float-label :dispatch="false" label="Transaction Status" fixed>
+                        <div class="select">
+                            <select v-model="status">
+                                <option v-for="(item,index) in statuses" :key="index" :value="item">{{item}}</option>
+                            </select>
+                        </div>
+                    </float-label>
                 </div>
-                <div v-else>
-                    <tr v-for="(item,index) in data" :key="index">
-                        <td data-th="Type" width="25%" style="text-align:center">
+            </div>
+        </div>
+        <div class="fixed_header">
+            <table class="table is-accent">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item,index) in results" :key="index">
+                        <td>
                             {{item.type}}
                         </td>
-                        <td data-th="Amount" width="25%" style="text-align:center">
+                        <td>
                             {{item.amount}}
                         </td>
-                        <td data-th="Date" width="45%"  style="text-align:center">
+                        <td>
                             {{moment(item.date).format('lll')}}
                         </td>
-                        <td data-th="Status" width="35%" style="text-align:center">
+                        <td>
                             {{item.status}}
                         </td>
-                        
                     </tr>
-                </div>
-            </tbody>
-        </table>
-        
+                </tbody>
+            </table>
+        </div>
     </section>
 </template>
 <script>
@@ -42,8 +50,29 @@ export default {
     data() {
         return {
             moment: moment,
+            status:'All',
+            statuses:['All','Recieved','Withdrawn','Paid']
         }
 
+
+    },
+    computed:{
+          results() {
+            return this.data.filter(data => {
+                if (this.status == 'All') {
+                    return data
+                }
+                if (this.status == 'Recieved') {
+                    return data.status=='received'
+                }
+                if (this.status == 'Withdrawn') {
+                    return data.status=='withdrawn'
+                }
+                if (this.status == 'Paid') {
+                    return data.status=='sent'
+                }
+            })
+        }
     },
     mounted() {
 
@@ -56,5 +85,4 @@ export default {
 }
 </script>
 <style scoped>
-
 </style>

@@ -1,10 +1,11 @@
 <template>
     <main>
+        <vue-headful title="Login | TripShipTask" description="Login" />
         <div class="auth-outer">
-              <article class="message is-danger" v-show="errormessage">
+            <article class="message is-danger" v-show="errormessage">
                 <div class="message-header">
                     <p>Login failed!</p>
-                    <button class="delete" aria-label="delete"  @click="errormessage=false"></button>
+                    <button class="delete" aria-label="delete" @click="errormessage=false"></button>
                 </div>
                 <div class="message-body">
                     <p>{{error}}</p>
@@ -12,37 +13,41 @@
             </article>
             <div class="auth-box">
                 <div class="side-box">
-                    <div class="headline">
-                        <p>TripShipTask helps you connect with others to</p>
-                        <ul>
-                            <li>give or get rides</li>
-                            <li>send or receive any goods</li>
-                            <li>give or get tasks</li>
-                        </ul>
-                        <p style="margin-left: 15px;">and make money while you are at it.</p>
+                    <div class="carosal-wrapper">
+                        <carousel :items="1" :dots="false" :nav="false" :autoplay="true">
+                            <img class="featured-drawing" src="../../assets/images/tst/trip_mobile.png" alt="" width="100px">
+                            <img class="featured-drawing" src="../../assets/images/tst/ship_mobile.png" alt="" width="100px">
+                            <img class="featured-drawing" src="../../assets/images/tst/task_mobile.png" alt="" width="100px">
+                        </carousel>
                     </div>
-                    <img class="featured-drawing" src="../../assets/images/tst/people.png" alt="" width="400px">
                 </div>
                 <div class="form-wrapper">
                     <div class="login">
                         <div class="item-list">
-                            <img class="featured-drawing" src="../../assets/images/tst/tst-logo.jpg" alt="" width="100px">
+                            <img class="featured-drawing" src="../../assets/images/tst/tstlogo.png" alt="" width="100px">
                         </div>
                         <div class="body">
                             <form @submit.prevent="login">
                                 <div class="field">
                                     <div class="control">
-                                        <input type="text" class="input" placeholder="Email" v-model="form.email" name="email" v-validate="'required'" :class="{ 'is-danger': errors.has('email') }" />
+                                        <float-label label="Email">
+                                            <input type="text" class="input" v-model="form.email" name="email" v-validate="'required'" :class="{ 'is-danger': errors.has('email') }" />
+                                        </float-label>
                                     </div>
                                     <span v-show="errors.has('email')" class="help is-danger">Email is required</span>
                                 </div>
                                 <div class="field">
                                     <div class="control">
-                                        <input type="password" class="input" v-model="form.password" placeholder="Password" name="password" v-validate="'required'" :class="{ 'is-danger': errors.has('password') }" />
+                                        <float-label label="Password">
+                                            <input :type="pwdType" class="input" v-model="form.password" name="password" v-validate="'required'" :class="{ 'is-danger': errors.has('password') }" />
+                                        </float-label>
+                                        <span class="icon is-small is-right" @click="pwdcheck">
+                                              <img v-if="pwdType=='password'" src="../../assets/images/tst/close-eye.png">
+                                                <img v-else src="../../assets/images/tst/open-eye.png">
+                                        </span>
                                     </div>
                                     <span v-show="errors.has('password')" class="help is-danger">Password is required</span>
                                 </div>
-                               
                                 <button type="submit" v-bind:class="(loading)?'button is-info is-small is-loading':'button is-info is-small'">Login</button>
                                 <vs-divider>OR</vs-divider>
                                 <div class="loginfb">
@@ -74,17 +79,22 @@
                 </div>
             </div>
         </div>
+         <app-footer></app-footer>
     </main>
 </template>
 <script>
 import Vue from 'vue';
+import carousel from "vue-owl-carousel";
+import appFooter from "../../components/global/AppFooter";
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate)
 export default {
+    components: { carousel,appFooter },
 
     data() {
         return {
-            errormessage:false,
+            pwdType: 'password',
+            errormessage: false,
             error: '',
             loading: false,
             sitekey: "6Le8TekUAAAAAO7Qf7rYfvIEoV2t8fmWYSD_AyfJ",
@@ -95,7 +105,33 @@ export default {
             }
         };
     },
+    directives: {
+        carousel: {
+            inserted: function(el) {
+                $(el).owlCarousel({
+                    loop: true,
+                    margin: 20,
+                    responsive: {
+                        0: {
+                            items: 1
+                        },
+                        600: {
+                            items: 3
+                        }
+                    }
+                }).trigger('to.owl.carousel', app.items.length)
+                console.log("crousel inserted")
+            },
+        }
+    },
     methods: {
+        pwdcheck() {
+            if (this.pwdType === 'password') {
+                this.pwdType = 'text';
+            } else {
+                this.pwdType = 'password';
+            }
+        },
         onVerify(response) {
             this.form.recaptcha = response;
         },
@@ -112,8 +148,8 @@ export default {
                         })
                         .catch(error => {
                             this.loading = false
-                            this.errormessage=true
-                            this.error=error.response.data.message
+                            this.errormessage = true
+                            this.error = error.response.data.message
                             // if (error.response.status == 422) {
                             //     this.error.push("Please enter valid Email or Password");
                             // } else {
@@ -133,22 +169,14 @@ export default {
 
 .item-list img {
     width: 100px;
+    height: 100px;
 }
 
 .auth-outer .auth-box .side-box {
     background: #f4f6fb;
-    width: 1050px;
-    padding-right: 20px;
+    width: 550px;
 }
 
-.auth-outer {
-    background: #f4f6fb;
-    height: 100vh;
-    align-items: inherit;
-    margin: 70px auto 0;
-    max-width: 935px;
-    padding-bottom: 44px;
-}
 
 .login {
     background-color: #fff;
@@ -159,7 +187,7 @@ export default {
 }
 
 .control input {
-    height: 38px !important;
+    height: 2.9em !important;
     border-radius: 3px !important;
     padding: 8px 0 7px 8px !important;
     font-size: 12px !important;
@@ -178,7 +206,7 @@ export default {
 }
 
 .field:not(:last-child) {
-    margin-bottom: .35rem;
+    margin-bottom: 0.7rem;
 }
 
 .title {
@@ -207,6 +235,7 @@ export default {
     text-align: center;
     justify-content: center;
     font-weight: 600;
+    border: 0;
 }
 
 .loginfb img {
@@ -251,6 +280,11 @@ export default {
     margin-top: 15px;
 }
 
+.side-box img {
+    margin-left: 89px;
+    margin-top: -26px;
+}
+
 .applink img {
     margin-right: 7px;
 }
@@ -269,19 +303,29 @@ export default {
     color: #8e8e8e;
 }
 
-ul {
-    list-style: circle !important;
-    margin: 0px 35px;
+.carosal-wrapper {
+
+    max-width: 417px;
+
 }
 
-ul li {
-    color: #4e4b4b;
-    font-size: 18px;
+.icon img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
 }
 
-.headline p {
-    color: #4e4b4b;
-    font-weight: 600;
-    font-size: 18px;
+.icon.is-right {
+    float: right;
+    position: relative;
+    top: -27px;
+    width: 22px;
+    right: 4px;
+}
+
+.side-box img {
+    width: 380px !important;
+    height: auto;
+
 }
 </style>

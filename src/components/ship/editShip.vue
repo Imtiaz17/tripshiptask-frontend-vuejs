@@ -1,6 +1,4 @@
 <template>
-
-
     <vs-row vs-justify="center">
         <vs-col type="flex" vs-justify="center" vs-align="center" vs-w="12">
             <vs-card>
@@ -11,49 +9,55 @@
                 </div>
                 <div class="columns">
                     <div class="column">
-                        <label class="label">Pick up point</label>
                         <div class="control">
                             <div class="control">
-                                <gmap-autocomplete placeholder="Ride start point" class="input is-small is-primary-focus" @place_changed="startPlace" data-vv-validate-on="startPlace|required" name="start" id="start">
-                                </gmap-autocomplete>
+                                <gmap-autocomplete label="Pick up Point" :start_point="info.start_point" placeholder="Pickup Point" :verified="verified" @address_res="handleAddr"></gmap-autocomplete>
                                 <span v-show="errors.has('start')" class="help is-danger">{{ errors.first('start') }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="column">
-                        <label class="label">Dropoff point</label>
                         <div class="control">
-                            <gmap-autocomplete placeholder="destination" v-validate="'required'" name="destination" class="input is-small is-primary-focus" id="des" @place_changed="endPlace">
-                            </gmap-autocomplete>
-                            <span v-show="errors.has('destination')" class="help is-danger">{{ errors.first('destination') }}</span>
+                            <float-label label="Date you plan to mail the item" :fixed="info.date==null?false:true">
+                                <a-date-picker v-model="info.pickup_date" valueFormat="YYYY-MM-DD" placeholder="" :disabled-date="disabledDate" v-validate="'required'" name="date" />
+                            </float-label>
+                            <span v-show="errors.has('date')" class="help is-danger">{{ errors.first('date') }}</span>
                         </div>
                     </div>
-                </div>
-                <div class="columns mt-15">
-                    <div class="column is-4">
-                        <label class="label">What's your preferred pick up date?</label>
+                    <div class="column">
                         <div class="control">
-                            <div class="control">
-                                <flat-pickr class="input is-primary-focus " v-validate="'required'" name="date" :config="config" placeholder="Select a date" :class="{'input': true, 'is-danger': errors.has('date') }" v-model="info.pickup_date"></flat-pickr>
-                                <span v-show="errors.has('date')" class="help is-danger">{{ errors.first('date') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column is-4">
-                        <label class="label">What's your preferred pick up time?</label>
-                        <div class="control">
-                            <el-select name="time" size="small" v-model="info.pickup_time" v-validate="'required'" placeholder="Select Time">
-                                <el-option v-for="(time,index) in timeschedule" :key="index" :label="time" :value="time">
-                                </el-option>
-                            </el-select>
+                            <float-label :dispatch="false" label="Time you plan to mail the item" fixed>
+                                <div class="select">
+                                    <select name="time" v-model="info.pickup_time" v-validate="'required'">
+                                        <option v-for="(item,index) in timeschedule" :key="index" :value="item">{{item}}</option>
+                                    </select>
+                                </div>
+                            </float-label>
                             <span v-show="errors.has('time')" class="help is-danger">{{ errors.first('time') }}</span>
                         </div>
                     </div>
-                    <div class="column is-4">
-                        <label class="label">Preferred delivery date & time</label>
+                </div>
+                <div class="columns">
+                    <div class="column">
                         <div class="control">
-                            <flat-pickr class="input is-primary-focus " v-validate="'required'" name="delivery date & time" :config="config1" placeholder="Select a date & time" :class="{'input': true, 'is-danger': errors.has('date') }" v-model="info.delivery_date_time"></flat-pickr>
-                            <span v-show="errors.has('delivery date & time')" class="help is-danger">{{ errors.first('delivery date & time') }}</span>
+                            <gmap-autocomplete :verified="verified" :destination="info.destination" label="Drop off Point" placeholder="Destination" @address_res="handleAddr"></gmap-autocomplete>
+                            <span v-show="errors.has('destination')" class="help is-danger">{{ errors.first('destination') }}</span>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="control">
+                            <float-label :dispatch="false" label="Preferred delivery date & time" fixed>
+                                <a-date-picker show-time use12-hours :show-time="{ defaultValue: moment('00:00:00', 'h:mm A') }" format="YYYY-MM-DD h:mm A" v-model="info.delivery_date_time" placeholder="" v-validate="'required'" name="delivery_dt" />
+                            </float-label>
+                            <span v-show="errors.has('delivery_dt')" class="help is-danger">{{ errors.first('delivery_dt') }}</span>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="control">
+                            <float-label label="What are you sending?" fixed>
+                                <input type="text" class="input is-primary-focus" name="document" v-model="info.documents" v-validate="'required'">
+                            </float-label>
+                            <span v-show="errors.has('document')" class="help is-danger">{{ errors.first('document') }}</span>
                         </div>
                     </div>
                 </div>
@@ -62,70 +66,80 @@
                     </GmapMap>
                 </div>
                 <div class="columns mt-15">
-                    <div class="column" v-if="info.post_type=='send_package'">
-                        <label class="label">What are you sending?</label>
+                    <div class="column">
                         <div class="control">
-                            <input class="input is-primary-focus" v-model="info.documents" name="document">
-                            <span v-show="errors.has('document')" class="help is-danger">{{ errors.first('document') }}</span>
-                        </div>
-                    </div>
-                    <div class="column" v-else>
-                        <label class="label">What do you prefer to carry?</label>
-                        <div class="control">
-                            <el-select name="package type" size="small" v-model="info.package_type" v-validate="'required'" placeholder="Select package type">
-                                <el-option v-for="(item,index) in types" :key="index" :label="item" :value="item">
-                                </el-option>
-                            </el-select>
+                            <float-label :dispatch="false" label="Packaging type" fixed>
+                                <div class="select">
+                                    <select name="package_type" v-model="info.package_type" v-validate="'required'">
+                                        <option v-for="(item,index) in ptype" :key="index" :value="item">{{item}}</option>
+                                    </select>
+                                </div>
+                            </float-label>
                             <span v-show="errors.has('package type')" class="help is-danger">{{ errors.first('package type') }}</span>
-                        </div>
-                    </div>
-                    <div class="column" v-if="info.post_type=='send_package'">
-                        <label class="label">Packaging type</label>
-                        <div class="control">
-                            <el-select name="package type" size="small" v-model="info.package_type" v-validate="'required'" placeholder="Select package type">
-                                <el-option v-for="(item,index) in types" :key="index" :label="item" :value="item">
-                                </el-option>
-                            </el-select>
-                            <span v-show="errors.has('package type')" class="help is-danger">{{ errors.first('package type') }}</span>
-                        </div>
-                    </div>
-                    <div class="column" v-else>
-                        <label class="label">Packaging size</label>
-                        <div class="control">
-                            <el-select name="package size" size="small" v-model="info.package_size" v-validate="'required'" placeholder="Select package type">
-                                <el-option v-for="(item,index) in sizes" :key="index" :label="item" :value="item">
-                                </el-option>
-                            </el-select>
-                            <span v-show="errors.has('package size')" class="help is-danger">{{ errors.first('package size') }}</span>
                         </div>
                     </div>
                     <div class="column">
-                        <label class="label" v-if="info.post_type=='send_package'">Willing to pay</label>
-                        <label class="label" v-else> Asking amount</label>
                         <div class="control">
-                            <input class="input is-primary-focus" v-model="info.amount" name="amount">
-                            <span v-show="errors.has('amount')" class="help is-danger">{{ errors.first('amount') }}</span>
+                            <float-label :dispatch="false" label="Type of goods" fixed>
+                                <div class="select">
+                                    <select name="goods_type" v-model="info.good_type">
+                                        <option v-for="(item,index) in gtype" :key="index" :value="item">{{item}}</option>
+                                    </select>
+                                </div>
+                            </float-label>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <float-label label="Willing to pay">
+                                    <input type="number" min="0" class="input is-primary-focus" name="amount" v-model="info.amount" v-validate="'required'">
+                                </float-label>
+                            </div>
+                            <div class="control">
+                                <span class="select">
+                                    <select v-model="info.currency">
+                                        <option :value="info.currency">{{info.currency}}</option>
+                                        <option v-if="info.currency !=='USD'" value="USD">USD</option>
+                                    </select>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="columns  mt-15" style="margin-bottom: 10px;">
-                    <div class="column is-3" v-if="info.post_type=='carry_package'">
-                        <label class="label">Vehicle</label>
+                <div class="columns mt-5">
+                    <div class="column is-4">
                         <div class="control">
-                            <el-select name="vehicle" size="small" v-model="info.vehicle" v-validate="'required'" placeholder="Select vehicle">
-                                <el-option v-for="(item,index) in vehicles" :key="index" :label="item.model" :value="item.model">
-                                </el-option>
-                            </el-select>
-                            <span v-show="errors.has('vehicle')" class="help is-danger">{{ errors.first('vehicle') }}</span>
+                            <float-label label="Approx. value of the goods" fixed>
+                                <input type="number" min="0" class="input is-primary-focus" name="amount" v-model="info.document_price">
+                            </float-label>
                         </div>
                     </div>
-                    <div class="column">
-                        <label class="label">Notes</label>
-                        <div class="control">
-                            <textarea class="textarea is-primary-focus" placeholder="write details about your ride" rows="3" v-model="info.details" name="details" :class="{'input': true, 'is-danger': errors.has('details') }"></textarea>
+                    <div class="column is-4">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <float-label label="Weight of package" fixed>
+                                    <input type="number" min="0" class="input is-primary-focus" name="weight" v-model="info.weight">
+                                </float-label>
+                            </div>
+                            <div class="control">
+                                <span class="select">
+                                    <select>
+                                        <option>KG</option>
+                                        <option>Lbs</option>
+                                    </select>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="column is-3" style="margin-top: 100px;">
+                </div>
+                <div class="columns mt-5">
+                    <div class="column is-6">
+                        <float-label label="Note" fixed>
+                            <textarea class="textarea is-primary-focus" v-model="info.details" rows="4"></textarea>
+                        </float-label>
+                    </div>
+                    <div class="column" style="margin-top: 100px;">
                         <vs-button type="gradient" style="float:right" @click="cancelUpdate">Cancel</vs-button>
                         <vs-button color="success" type="gradient" style="float:right;margin-right: 13px" @click="update">Update</vs-button>
                     </div>
@@ -140,17 +154,22 @@ import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate, {
     events: 'startPlace'
 });
-import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
+import moment from "moment";
+import { DatePicker } from 'ant-design-vue';
+import { TimePicker } from 'ant-design-vue';
+Vue.use(DatePicker);
+Vue.use(TimePicker);
 import gmapAutocomplete from '@/components/global/gmapautocomplete';
 export default {
-     components: {
+    components: {
         gmapAutocomplete,
         DatePicker
     },
     props: ['info'],
     data() {
         return {
+            moment: moment,
+            verified: true,
             config: {
                 altInput: true,
                 enableTime: false,
@@ -164,38 +183,38 @@ export default {
             duration: '',
             distance: '',
             timeschedule: [
-                'before  6:00 a.m.',
-                'between 6:00 a.m. - 6:30 a.m.',
-                'between 6:30 a.m. - 7:00 a.m.',
-                'between 7:00 a.m. - 7:30 a.m.',
-                'between 7:30 a.m. - 8:00 a.m.',
-                'between 8:00 a.m. - 8:30 a.m.',
-                'between 8:30 a.m. - 9:00 a.m.',
-                'between 9:00 a.m. - 9:30 a.m.',
-                'between 9:30 a.m. - 10:00 a.m.',
-                'between 10:00 a.m. - 10:30 a.m.',
-                'between 10:30 a.m. - 11:00 a.m.',
-                'between 11:00 a.m. - 11:30 a.m.',
-                'between 11:30 a.m. - 12:00 p.m.',
-                'between 12:00 p.m. - 12:30 p.m.',
-                'between 12:30 p.m. - 1:00 p.m.',
-                'between 1:00 p.m. - 1:30 p.m.',
-                'between 1:30 p.m. - 2:00 p.m.',
-                'between 2:00 p.m. - 2:30 p.m.',
-                'between 2:30 p.m. - 3:00 p.m.',
-                'between 3:00 p.m. - 3:30 p.m.',
-                'between 3:30 p.m. - 4:00 p.m.',
-                'between 4:00 p.m. - 4:30 p.m.',
-                'between 4:30 p.m. - 5:00 p.m.',
-                'between 5:00 p.m. - 5:30 p.m.',
-                'between 5:30 p.m. - 6:00 p.m.',
-                'between 6:00 p.m. - 6:30 p.m.',
-                'between 6:30 p.m. - 7:00 p.m.',
-                'between 7:00 p.m. - 7:30 p.m.',
-                'between 7:30 p.m. - 8:00 p.m.',
-                'after  8:00 p.m.',
+                'Before  6:00 a.m.',
+                'Between 6:00 a.m. - 6:30 a.m.',
+                'Between 6:30 a.m. - 7:00 a.m.',
+                'Between 7:00 a.m. - 7:30 a.m.',
+                'Between 7:30 a.m. - 8:00 a.m.',
+                'Between 8:00 a.m. - 8:30 a.m.',
+                'Between 8:30 a.m. - 9:00 a.m.',
+                'Between 9:00 a.m. - 9:30 a.m.',
+                'Between 9:30 a.m. - 10:00 a.m.',
+                'Between 10:00 a.m. - 10:30 a.m.',
+                'Between 10:30 a.m. - 11:00 a.m.',
+                'Between 11:00 a.m. - 11:30 a.m.',
+                'Between 11:30 a.m. - 12:00 p.m.',
+                'Between 12:00 p.m. - 12:30 p.m.',
+                'Between 12:30 p.m. - 1:00 p.m.',
+                'Between 1:00 p.m. - 1:30 p.m.',
+                'Between 1:30 p.m. - 2:00 p.m.',
+                'Between 2:00 p.m. - 2:30 p.m.',
+                'Between 2:30 p.m. - 3:00 p.m.',
+                'Between 3:00 p.m. - 3:30 p.m.',
+                'Between 3:30 p.m. - 4:00 p.m.',
+                'Between 4:00 p.m. - 4:30 p.m.',
+                'Between 4:30 p.m. - 5:00 p.m.',
+                'Between 5:00 p.m. - 5:30 p.m.',
+                'Between 5:30 p.m. - 6:00 p.m.',
+                'Between 6:00 p.m. - 6:30 p.m.',
+                'Between 6:30 p.m. - 7:00 p.m.',
+                'Between 7:00 p.m. - 7:30 p.m.',
+                'Between 7:30 p.m. - 8:00 p.m.',
+                'After  8:00 p.m.',
             ],
-            types: [
+            ptype: [
                 'Small Envelope',
                 'Large Envelope',
                 'Small package (perishable items)',
@@ -204,6 +223,10 @@ export default {
                 'Medium package (non-perishable items)',
                 'Large package (perishable items)',
                 'Large package (non-perishable items)',
+            ],
+            gtype: [
+                'Perishable',
+                'Non-perishable',
             ],
             sizes: [
                 '0-1Kg',
@@ -219,11 +242,6 @@ export default {
         }
     },
     mounted() {
-
-        this.getvehicles()
-        document.getElementById('start').value = this.info.pickup
-        document.getElementById('des').value = this.info.dropoff
-
         this.$refs.xyz.$mapPromise.then(() => {
             this.directionsService = new google.maps.DirectionsService()
             this.directionsDisplay = new google.maps.DirectionsRenderer()
@@ -233,14 +251,31 @@ export default {
     },
 
     methods: {
-        getvehicles() {
-            axios.get(`api/getvehiclesinfo/${this.info.user_id}`)
-                .then(res => {
-                    this.vehicles = res.data;
-                })
-                .catch(error => console.log(error.res.data))
-
+        disabledDate(current) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return current < today;
         },
+        handleAddr(data) {
+            if (data.field == "Start point") {
+                this.info.start_point = data.address
+                this.getRoute();
+            } else if (data.field == "Destination") {
+                this.info.destination = data.address
+                this.getRoute();
+            } else {
+                this.info.via = data.address
+                this.getRoute();
+            }
+        },
+        // getvehicles() {
+        //     axios.get(`api/getvehiclesinfo/${this.info.user_id}`)
+        //         .then(res => {
+        //             this.vehicles = res.data;
+        //         })
+        //         .catch(error => console.log(error.res.data))
+
+        // },
         startPlace(place) {
             if (place.name == place.address_components[0].long_name) {
                 this.info.pickup = place.formatted_address
@@ -262,32 +297,64 @@ export default {
         cancel() {
             EventBus.$emit('edited')
         },
+
         getRoute() {
             var vm = this
+            var waypts = [];
+            var midpoint = this.info.via
+            if (midpoint) {
+                waypts.push({
+                    location: midpoint,
+                    stopover: true
+                })
+            };
 
             vm.directionsService.route({
-                origin: this.info.pickup,
-                destination: this.info.dropoff,
+                origin: this.info.start_point,
+                destination: this.info.destination,
                 travelMode: 'DRIVING',
+                waypoints: waypts
             }, function(response, status) {
                 if (status === google.maps.DirectionsStatus.OK) {
-                    if (response.routes[0].legs.length > 1) {
-                        var metere = response.routes[0].legs[0].distance.value + response.routes[0].legs[1].distance.value;
-                        vm.info.distance = (metere / 1000).toFixed(1);
-                        var min = response.routes[0].legs[0].duration.value + response.routes[0].legs[1].duration.value;
-                        vm.info.duration = (Math.round(min / 60));
-                    } else {
-                        var metere = ((response.routes[0].legs[0].distance.value) / 1000).toFixed(1);
-                        vm.info.distance = metere
-                        var min = (response.routes[0].legs[0].duration.value)
-                        vm.info.duration = (Math.round(min / 60));
-                    }
+                    let mile = response.routes[0].legs[0].distance.text;
+                    vm.info.distance = mile;
+                    let duration = response.routes[0].legs[0].duration.text;
+                    vm.info.duration = duration;
                     vm.directionsDisplay.setDirections(response)
                 } else {
                     console.log('Directions request failed due to ' + status)
                 }
+
             })
+
         },
+
+        // getRoute() {
+        //     var vm = this
+
+        //     vm.directionsService.route({
+        //         origin: this.info.pickup,
+        //         destination: this.info.dropoff,
+        //         travelMode: 'DRIVING',
+        //     }, function(response, status) {
+        //         if (status === google.maps.DirectionsStatus.OK) {
+        //             if (response.routes[0].legs.length > 1) {
+        //                 var metere = response.routes[0].legs[0].distance.value + response.routes[0].legs[1].distance.value;
+        //                 vm.info.distance = (metere / 1000).toFixed(1);
+        //                 var min = response.routes[0].legs[0].duration.value + response.routes[0].legs[1].duration.value;
+        //                 vm.info.duration = (Math.round(min / 60));
+        //             } else {
+        //                 var metere = ((response.routes[0].legs[0].distance.value) / 1000).toFixed(1);
+        //                 vm.info.distance = metere
+        //                 var min = (response.routes[0].legs[0].duration.value)
+        //                 vm.info.duration = (Math.round(min / 60));
+        //             }
+        //             vm.directionsDisplay.setDirections(response)
+        //         } else {
+        //             console.log('Directions request failed due to ' + status)
+        //         }
+        //     })
+        // },
         loadV() {
             axios.post(`api/vehicles/${this.info.user_id}`, {
                     ve: this.info.vehicle_type,
@@ -308,14 +375,13 @@ export default {
         },
         update() {
             if (this.$validator.validateAll()) {
-
-                axios.patch(`api/ship/${this.info.slug}`, this.info)
+                 this.$axios.patch(`ship/${this.info.slug}`, this.info)
                     .then((res) => {
                         this.$router.push(res.data.path)
                         setTimeout(() => {
-                            axios.get('/api/getShip/' + res.data.slug)
+                            this.$axios.get('getShip/' + res.data.slug)
                                 .then(res => {
-                                    EventBus.$emit('updated', res.data.data)
+                                    EventBus.$emit('ShipUpdated', res.data.data)
                                 }, 0)
                         })
 
@@ -342,7 +408,6 @@ export default {
     }
 
 }
-
 </script>
 <style scoped>
 .vs-card--content {
@@ -378,5 +443,4 @@ export default {
 .el-select {
     width: 100%;
 }
-
 </style>

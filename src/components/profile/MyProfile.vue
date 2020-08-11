@@ -1,35 +1,34 @@
 <template>
-    <div>
+    <section>
         <edit-profile v-if="gediting" :data="data"></edit-profile>
         <div v-else style="margin-bottom: 5%;">
             <div class="border-card">
                 <vs-tabs>
-                    <vs-tab label="General & Contact Info">
+                    <vs-tab id="general-&-contact-info" name="general" label="General & Contact Info">
                         <div class="columns is-mobile">
-                            <div class="column is-5-desktop is-6-mobile">
+                            <div class="column is-6-desktop is-6-mobile">
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Full name
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                        <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description highlighted">
                                                 {{data.full_name}}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                             
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                         <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Education
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                       <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.education}}
                                             </div>
@@ -38,12 +37,12 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Profession
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                        <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.profession}}
                                             </div>
@@ -52,12 +51,12 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Date of Birth
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                        <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.dob}}
                                             </div>
@@ -66,12 +65,26 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
+                                            <div class="info-title">
+                                                NID No:
+                                            </div>
+                                        </div>
+                                        <div class="column is-8-desktop is-6-mobile">
+                                            <div class="info-description">
+                                                {{data.identity_no}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="columns is-mobile">
+                                        <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Blood Group
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                         <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.blood_group}}
                                             </div>
@@ -80,14 +93,14 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Age
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                        <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description" v-if="data.dob">
-                                                <!-- <span>{{  data.dob| moment("from", "now", true) }}</span> -->
+                                                
                                                 <span>{{moment().diff(data.dob, 'years') }}</span>
                                             </div>
                                         </div>
@@ -95,12 +108,12 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                       <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Gender
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                       <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.gender}}
                                             </div>
@@ -109,31 +122,30 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                       <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Language
                                             </div>
                                         </div>
-                                        <div class="column is-6">
-                                             <div class="info-description">
-                                            {{data.language}}
-                                               </div>
+                                       <div class="column is-8-desktop is-6-mobile">
+                                            <div class="info-description">
+                                                {{data.language}}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="column is-2-desktop is-0-mobile">
-                                
-                            </div>
-                            <div class="column is-5-desktop is-6-mobile">
+                           <!--  <div class="column is-1-desktop is-0-mobile">
+                            </div> -->
+                            <div class="column is-6-desktop is-6-mobile">
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                         <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Email
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                       <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.email}}
                                             </div>
@@ -142,12 +154,12 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Personal Number
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                        <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.mobile}}
                                             </div>
@@ -156,31 +168,54 @@
                                 </div>
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                       <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
-                                                Location
+                                                Residance Area
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                       <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.residance_area}}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
-                               
-                                
-                               
-                               
                                 <div class="info-item">
                                     <div class="columns is-mobile">
-                                        <div class="column is-6">
+                                        <div class="column is-4-desktop is-6-mobile">
+                                            <div class="info-title">
+                                                Emergency contact number
+                                            </div>
+                                        </div>
+                                        <div class="column is-8-desktop is-6-mobile">
+                                            <div class="info-description">
+                                                {{data.emergency_contact_number}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="columns is-mobile">
+                                       <div class="column is-4-desktop is-6-mobile">
+                                            <div class="info-title">
+                                                Emergency contact person name
+                                            </div>
+                                        </div>
+                                       <div class="column is-8-desktop is-6-mobile">
+                                            <div class="info-description">
+                                                {{data.emergency_contact_person_name}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="columns is-mobile">
+                                         <div class="column is-4-desktop is-6-mobile">
                                             <div class="info-title">
                                                 Facebook profile link
                                             </div>
                                         </div>
-                                        <div class="column is-6">
+                                       <div class="column is-8-desktop is-6-mobile">
                                             <div class="info-description">
                                                 {{data.fblink}}
                                             </div>
@@ -189,63 +224,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="columns pt-10">
-                            
-                            <div class="column is-9">
-                                <div class="info-title">
-                                    Vehicles
-                                </div>
-                                <vs-row vs-justify="left">
-                                    <vs-col type="flex" vs-justify="left" vs-align="left" vs-w="4" v-for="item in vehicles" :key="item.id" style="padding:10px;">
-                                        <vs-card class="cardx" fixedHeight>
-                                            <div class="columns">
-                                                <div class="column">
-                                                    <span class="title">Model:</span>
-                                                    <span style="font-size:14px">{{item.model}}</span>
-                                                </div>
-                                            </div>
-                                            <div class="columns">
-                                                <div class="column">
-                                                    <span class="title">Color:</span>
-                                                    <span style="font-size:14px">{{item.color}}</span>
-                                                </div>
-                                            </div>
-                                            <div class="columns">
-                                                <div class="column">
-                                                    <span class="title">Licence Number:</span>
-                                                    <span style="font-size:14px">{{item.licence_number}}</span>
-                                                </div>
-                                            </div>
-                                            <div class="columns">
-                                                <div class="column">
-                                                    <span class="title">Vin Number:</span>
-                                                    <span style="font-size:14px">{{item.vin_number}}</span>
-                                                </div>
-                                            </div>
-                                            <div class="columns">
-                                                <div class="column">
-                                                    <span class="title"> Registration Document:</span>
-                                                    <img :src="document_photo(item.document)">
-                                                </div>
-                                            </div>
-                                        </vs-card>
-                                    </vs-col>
-                                </vs-row>
-                            </div>
-                        </div>
+                       
                         <div class="lifetime-wrapper">
                             <div class="has-text-right">
-                                <a @click="edit" class="button btn-dash primary-btn btn-dash raised ripple">Edit Profile</a>
+                                <a @click="edit" class="button btn-dash info-btn raised ripple">Edit Profile</a>
                             </div>
                         </div>
                     </vs-tab>
-                    <vs-tab label="Change password">
+                    <vs-tab id="change-password" name="password" label="Change password">
                         <security-Info></security-Info>
                     </vs-tab>
                 </vs-tabs>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 <script>
 import editProfile from './editprofile'
@@ -282,9 +274,7 @@ export default {
 
     },
     created() {
-        if (this.$store.getters.vehicles.length == 0) {
-            this.getVehicleInfo()
-        }
+        this.getVehicleInfo()
         // axios.get(`api/getvehiclesinfo/${this.id}`)
         //     .then(res => {
         //         this.vehicles = res.data;
@@ -297,6 +287,10 @@ export default {
             this.gediting = false
 
         })
+        EventBus.$on('startEditing', () => {
+           this.gediting = true
+
+        })
 
 
     },
@@ -307,8 +301,9 @@ export default {
         document_photo(pic) {
             return pic
         },
-        edit() {
-            this.gediting = true
+        edit()
+        {
+            this.gediting=true
         },
         general() {
             this.first = true,
@@ -319,20 +314,20 @@ export default {
                 this.second = true
         },
         getProfilePhoto() {
-            return require('../../assets/images/'+this.data.profile_picture)
+            return require('../../assets/images/' + this.data.profile_picture)
         },
         getIdentityPhoto() {
-            return require('../../assets/images/'+ this.data.nid)
+            return require('../../assets/images/' + this.data.nid)
 
         },
     }
 
 
 }
-
 </script>
 <style scoped>
-.info-title {
+.info-title,
+.v-title {
     font-weight: 600;
 }
 
@@ -347,16 +342,20 @@ img {
     border: 1px solid #DCDFE6;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
 }
-.info-title::after { 
-  content: ":";
-  float:right;
+
+.info-title::after {
+    content: ":";
+    float: right;
+}
+.info-title;{
+    font-weight:500;
 }
 .title {
     font-family: 'Segoe UI', sans-serif;
     font-size: 14px;
 }
-.info-description
-{
+
+.info-description {
     word-wrap: break-word
 }
 </style>

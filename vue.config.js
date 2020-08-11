@@ -1,3 +1,4 @@
 module.exports = {
-  filenameHashing:true
+  filenameHashing:true,
+  productionSourceMap: false,
 }

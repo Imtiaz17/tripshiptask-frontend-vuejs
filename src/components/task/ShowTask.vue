@@ -2,289 +2,308 @@
     <section>
         <div class="content  vld-parent">
             <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true"></loading>
-            <div id="main-dashboard" class="conbox">
-                <div id="main-dashboard">
-                    <div id="social-layout" class="dashboard-columns">
-                        <div class="columns">
-                            <div class="column is-8" style="padding-right:0px">
-                                <div v-if="tasked">
-                                    <edit-task :data="data"></edit-task>
-                                </div>
-                                <div v-else>
-                                    <div class="flex-card featured-feed-post light-bordered light-raised" style="min-height:100px; max-height:380px">
-                                        <div class="c-body">
-                                            <div class="columns" style="margin-top:30px">
-                                                <div class="column is-8" style="margin-top:-27px">
-                                                    <span class="taskid">
-                                                        Task id: {{data.task_id}}
-                                                    </span>
-                                                    <h4 class="tasktitle">
-                                                        {{data.title}}
-                                                    </h4>
-                                                </div>
-                                                <div class="column is-4">
-                                                    <div class="author-meta" style="margin-top: -26px;float:right;padding:0px 17px">
-                                                        <div style="color:gray">Published by
-                                                            <span style="color: black;font-weight:600">{{data.user}}</span>
-                                                        </div>
-                                                        <div style="color:gray">
-                                                            Posted
-                                                            <span>
-                                                                {{moment(data.created_at).fromNow()}}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr style="margin:0;margin-top:-11px">
-                                            <div class="post-detail-section">
-                                                <div class="post-body">
-                                                    <h5>Task Details</h5>
-                                                    <div class="divider"></div>
-                                                    <p style="font-size: 15px;line-height: 23px;">
-                                                        {{data.details}}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="post-activity">
-                                                <div class="columns tactivity  is-mobile">
-                                                    <div class="left column" v-if="data.person_need !== null">
-                                                        <section class="section" style="padding: 0rem;">
-                                                            <h5>Task
-                                                                Preffered</h5>
-                                                            <div class="divider"></div>
-                                                        </section>
-                                                        <div class="field" style="display:inline-flex">
-                                                            <label class="label">Person Need:</label>
-                                                            <div class="control" style="margin-left:5px;margin-top:-2px;">
-                                                                <label>{{data.person_need}}</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="left column">
-                                                        <h5>Task
-                                                            Activity</h5>
-                                                        <div class="divider"></div>
-                                                        <div class="field" style="display:inline-flex">
-                                                            <label class="label">Total Bids:</label>
-                                                            <div class="control" style="margin-left:5px;margin-top:-2px;">
-                                                                <label>{{data.bids_count}}</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="right column is-3" v-if="task_owner">
-                                                        <vs-button type="filled" @click="editTask">Edit</vs-button>
-                                                        <vs-button color="danger" type="filled" @click="deleteTask(data.slug)">Delete</vs-button>
-                                                    </div>
-                                                    <div class="column is-3" v-else-if="data.post_type=='offer'" v-show="canBid">
-                                                        <a @click="bidoffertask" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade right"><span class="material-icons">
-                                                                add_alert
-                                                            </span> Bid</a>
-                                                    </div>
-                                                    <div class="column is-3" v-else-if="data.post_type=='seek'" v-show="canBid">
-                                                        <a @click="bidseektask" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade"><span class="material-icons right">
-                                                                add_alert
-                                                            </span> Bid</a>
-                                                    </div>
-                                                </div>
+            <div id="main-dashboard">
+                <div class="columns">
+                    <div class="column is-8">
+                        <div v-if="tasked">
+                            <edit-task :data="data"></edit-task>
+                        </div>
+                        <div v-else>
+                            <div class="flex-card featured-feed-post light-bordered light-raised" style="min-height:100px; max-height:380px">
+                                <div class="body">
+                                    <div class="columns is-mobile">
+                                        <div class="column is-8">
+                                            <span class="taskid">
+                                                Task id: {{data.task_id}}
+                                            </span>
+                                            <h4 class="tasktitle">
+                                                {{data.title}}
+                                            </h4>
+                                        </div>
+                                        <div class="column is-4">
+                                            <div class="posting-time">
+                                                <span>Posted {{moment(data.created_at).fromNow()}}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div style="margin-top:-12px">
-                                         <gmap-map
-                                            :center="data.lat_lng"
-                                            :zoom="16"
-                                            ref="map"
-                                            style="width: 100%; min-height:240px"
-                                            >
-                                            <gmap-marker
-                                            :position="data.lat_lng"
-                                            ></gmap-marker>
-                                        </gmap-map>
+                                    <hr style="margin: -7px 0px 0px;">
+                                    <div class="post-detail-section">
+                                        <div class="post-body">
+                                            <h5>Notes</h5>
+                                            <div class="divider"></div>
+                                            <p style="font-size: 15px;line-height: 23px;">
+                                                {{data.note}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="post-activity">
+                                        <div class="columns tactivity  is-mobile">
+                                            <div class="left column">
+                                            </div>
+                                            <div class="right column is-3" v-if="task_owner">
+                                                <vs-button type="filled" @click="editTask">Edit</vs-button>
+                                                <vs-button color="danger" type="filled" @click="deleteTask(data.slug)">Delete</vs-button>
+                                            </div>
+                                            <div class="column is-3" v-else-if="data.post_type=='offer'" v-show="canBid">
+                                                <a v-if="verified" @click="bidoffertask" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade right"><span class="material-icons">
+                                                        add_alert
+                                                    </span>Offer</a>
+                                            </div>
+                                            <div class="column is-3" v-else-if="data.post_type=='seek'" v-show="canBid">
+                                                <a @click="bidseektask" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade"><span class="material-icons right">
+                                                        add_alert
+                                                    </span> Bid</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="column is-4">
-                                <div class="flex-card light-bordered light-raised task-info">
-                                    <h3 class="card-heading is-bordered">Task information</h3>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32" style="padding-top: 5px;">
-                                                <span class="material-icons">
-                                                    nature_people
-                                                </span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <p class="post-title">Skills Required:</p>
-                                            <div v-for="skill,index in data.skills" :key="index">
-                                                <vs-chip>
-                                                    {{skill}}
-                                                </vs-chip>
-                                            </div>
-                                        </div>
-                                    </article>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32" style="padding-top: 5px;">
-                                                <span class="material-icons">
-                                                    my_location
-                                                </span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <p class="post-title">Task Location</p>
-                                            <p class="post-info">{{data.location}}</p>
-                                        </div>
-                                    </article>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32" style="padding-top: 5px;">
-                                                <span class="material-icons">money</span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <p class="post-title">Offered Amount</p>
-                                            <span class="amount">{{data.amount}}</span>
-                                        </div>
-                                    </article>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32" style="padding-top: 5px;">
-                                                <span class="material-icons">calendar_today</span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <div>
-                                                <p class="post-title">Task Date & Time</p>
-                                                <div class="post-timestamp"></div>
-                                                <div class="post-read-more">
-                                                    {{moment(data.date_time).format("MMMM Do YYYY,h:mm:ss a")}}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </article>
-                                </div>
-                                <div class="flex-card light-bordered light-raised task-poster-info">
-                                    <h3 class="card-heading is-bordered">Task poster's information</h3>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32">
-                                                <span class="material-icons">star_border</span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content" @click="taskPosterRating" style="cursor: pointer;">
-                                            <span class="rating">
-                                                <star-rating :show-rating=false :star-size="16" :read-only="true" :increment="0.1" :rating="data.task_poster_rating"></star-rating>
-                                                <span class="rate">{{data.task_poster_rating}}</span>
-                                            </span>
-                                        </div>
-                                    </article>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32">
-                                                <span class="material-icons">
-                                                    note_add
-                                                </span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <h5 class="post-title"> {{data.total_task}} Task posted</h5>
-                                        </div>
-                                    </article>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32">
-                                                <img src="https://img.icons8.com/material/48/000000/facebook-new.png" />
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <div>
-                                                <div class="post-share">
-                                                    <a :href="fb" target="_blank">
-                                                        {{fb}}
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </article>
-                                    <article class="media recent-post">
-                                        <div class="media-left is-hidden-mobile">
-                                            <figure class="image is-32x32">
-                                                <span class="material-icons">history</span>
-                                            </figure>
-                                        </div>
-                                        <div class="media-content">
-                                            <div style="display:inline-flex">
-                                                <h5 class="post-title">Member since</h5>
-                                                <div class="post-read-more" style="    margin-left: 5px;margin-top: -2px;">{{data.user_created}}</div>
-                                            </div>
-                                        </div>
-                                    </article>
-                                </div>
+                            <div style="margin-top:-12px">
+                                <gmap-map :center="data.lat_lng" :zoom="16" ref="map" style="width: 100%; min-height:320px">
+                                    <gmap-marker :position="data.lat_lng"></gmap-marker>
+                                </gmap-map>
                             </div>
                         </div>
                     </div>
-                    <offering-bids v-if="data.post_type=='offer'" :data="content"></offering-bids>
-                    <seeking-bids v-else-if="data.post_type=='seek'" :data="content"></seeking-bids>
-                    <!-- <bid-task v-else :data="data"></bid-task> -->
+                    <div class="column is-4">
+                        <div class="flex-card light-bordered light-raised task-info">
+                            <h3 class="card-heading is-bordered">Task information</h3>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">
+                                            nature_people
+                                        </span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Skills Required :</p>
+                                    <div v-for="skill,index in data.skills" :key="index">
+                                        <vs-chip>
+                                            {{skill}}
+                                        </vs-chip>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">
+                                            my_location
+                                        </span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Task Location :</p>
+                                    <p class="post-info">{{data.location}}</p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">money</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Offered Amount :</p>
+                                    <p class="post-info">
+                                        <span class="amountpayble"> {{data.amount}} {{data.currency}}</span>
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">calendar_today</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <div>
+                                        <p class="post-title">Task Date & Time :</p>
+                                        <div class="post-timestamp"></div>
+                                        <div class="post-read-more">
+                                            {{data.date}} {{data.time}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">query_builder</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <div v-if="data.post_type='offer'">
+                                        <p class="post-title">Hour available :</p>
+                                        <div class="post-timestamp"></div>
+                                        <div class="post-read-more">
+                                            {{data.hour_available}} hr
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <p class="post-title">Hour needed</p>
+                                        <div class="post-timestamp"></div>
+                                        <div class="post-read-more">
+                                            {{data.hour_need}} hr
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32" style="padding-top: 5px;">
+                                        <span class="material-icons">person_add_alt_1</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <div>
+                                        <p class="post-title">Persons needed :</p>
+                                        <div class="post-timestamp"></div>
+                                        <div class="post-read-more">
+                                            {{data.person_need}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="flex-card light-bordered light-raised task-poster-info">
+                            <h3 class="card-heading is-bordered">Task poster's information</h3>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <i class="material-icons">local_offer</i>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Posted :</p>
+                                    <div class="post-info">
+                                        <div class="verified">
+                                            <span class="username">
+                                                {{data.user.split(' ')[0]}}</span>
+                                            <span class="material-icons">
+                                                verified
+                                            </span>
+                                            <span class="text">Govt Id Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">star_border</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content" @click="taskPosterRating" style="cursor: pointer;">
+                                    <span class="rating">
+                                        <star-rating :show-rating=false :star-size="16" :read-only="true" :increment="0.1" :rating="data.task_poster_rating"></star-rating>
+                                    </span>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">local_offer</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <p class="post-title">Tasks posted :</p>
+                                    <p class="post-info">
+                                        {{data.total_task}}
+                                    </p>
+                                </div>
+                            </article>
+                            <article class="media recent-post">
+                                <div class="media-left is-hidden-mobile">
+                                    <figure class="image is-32x32">
+                                        <span class="material-icons">history</span>
+                                    </figure>
+                                </div>
+                                <div class="media-content">
+                                    <div style="display:inline-flex">
+                                        <h5 class="post-title">Member since :</h5>
+                                        <div class="post-read-more" style="    margin-left: 5px;margin-top: -2px;">{{data.user_created}}</div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
                 </div>
+                <!-- <bid-task v-else :data="data"></bid-task> -->
             </div>
         </div>
+        <offering-bids v-if="data.post_type=='offer'" :data="content"></offering-bids>
+        <seeking-bids v-else-if="data.post_type=='seek'" :data="content"></seeking-bids>
         <!-- Bid for seek task -->
-        <vs-popup class="holamundo" title="Bid for this Task" :active.sync="bid">
-            <div class="columns">
-                <div class="column is-three-quarters">
-                    <div class="field">
-                        <label class="label">Short Message</label>
+        <vs-popup class="holamundo" title="Offer" :active.sync="bid">
+            <div class="columns is-vcentered">
+                <div class="column is-half">
+                    <div class="field has-addons">
                         <div class="control">
-                            <textarea class="textarea is-primary-focus" rows="5" v-model="form.cover_letter"></textarea>
+                            <float-label label="Amount">
+                                <input type="number" v-model="form.amount" name="amount" class="input is-primary-focus">
+                            </float-label>
+                        </div>
+                        <div class="control">
+                            <span class="select">
+                                <select>
+                                    <option>{{data.currency}}</option>
+                                </select>
+                            </span>
                         </div>
                     </div>
                 </div>
+                <span class="infotext">Put in the amount only if you want to negotiate</span>
             </div>
             <div class="columns">
-                <div class="column is-half">
-                    <div class="field">
-                        <label class="label">Bid Amount</label>
-                        <div class="control">
-                            <input type="number" style="font-weight: 500;" v-model="form.amount" name="amount" class="input is-primary-focus" placeholder="amount">
-                        </div>
-                        <span style="color:rgb(154, 152, 152);font-weight:400">Put bid amount only if you want to negotiate or else leave it blank</span>
+                <div class="column is-three-quarters">
+                    <div class="control">
+                        <float-label label="Short Message (optional)">
+                            <textarea class="textarea is-primary-focus" v-model="form.cover_letter" rows="4"></textarea>
+                        </float-label>
                     </div>
                 </div>
             </div>
             <div class="has-text-right">
-                <button @click="submit" class="button btn-align info-btn raised">
+                <button @click="submit" class="button info-btn raised">
                     Submit
                 </button>
             </div>
         </vs-popup>
         <!-- Bid for offer task -->
-        <vs-popup class="holamundo" title="Bid for this Task" :active.sync="offerbid">
-            <div class="columns">
-                <div class="column is-three-quarters">
-                    <div class="field">
-                        <label class="label">Short Message</label>
+        <vs-popup class="holamundo" title="Offer" :active.sync="offerbid">
+            <div class="columns is-vcentered">
+                <div class="column is-half">
+                    <div class="field has-addons">
                         <div class="control">
-                            <textarea class="textarea is-primary-focus" rows="5" v-model="form.cover_letter"></textarea>
+                            <float-label label="Amount">
+                                <input type="number" v-model="form.amount" name="amount" class="input is-primary-focus">
+                            </float-label>
+                        </div>
+                        <div class="control">
+                            <span class="select">
+                                <select>
+                                    <option>{{data.currency}}</option>
+                                </select>
+                            </span>
                         </div>
                     </div>
                 </div>
+                <span class="infotext">Put in the amount only if you want to negotiate</span>
             </div>
             <div class="columns">
-                <div class="column is-half">
-                    <div class="field">
-                        <label class="label">Bid Amount</label>
-                        <div class="control">
-                            <input type="number" style="font-weight: 500;" v-model="form.amount" name="amount" class="input is-primary-focus" placeholder="amount">
-                        </div>
-                        <span style="color:rgb(154, 152, 152);font-weight:400">Put bid amount only if you want to negotiate or else leave it blank</span>
+                <div class="column is-three-quarters">
+                    <div class="control">
+                        <float-label label="Short Message (optional)">
+                            <textarea class="textarea is-primary-focus" v-model="form.cover_letter" rows="4"></textarea>
+                        </float-label>
                     </div>
                 </div>
             </div>
             <div class="has-text-center">
-                <button @click="bidsubmit" class="button btn-align info-btn raised">
+                <button @click="bidsubmit" class="button info-btn raised">
                     Submit
                 </button>
             </div>
@@ -315,14 +334,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import * as VueGoogleMaps from 'vue2-google-maps-withscopedautocomp'
-Vue.use(VueGoogleMaps, {
-    load: {
-        key: 'AIzaSyCdu3RozRNnds9nOhMTPs-ETTWLlV1C-EE',
-        libraries: 'places',
-    },
-});
-
+import googleMap from '@/components/global/googleMap'
 import VueSweetalert2 from 'vue-sweetalert2';
 import Swal from 'sweetalert2';
 import moment from 'moment-timezone'
@@ -338,7 +350,8 @@ export default {
         editTask: () => import('@/components/task/EditTask'),
         postedTaskFeedback: () => import('@/components/task/PostedTaskFeedback'),
         StarRating,
-        Loading
+        Loading,
+        googleMap
     },
     props: ['data'],
     data() {
@@ -355,7 +368,6 @@ export default {
             tasked: false,
             bid: false,
             offerbid: false,
-            fb: this.data.facebook,
             task_archive: 1,
             task_undo: 0,
             cover_letter: '',
@@ -365,9 +377,7 @@ export default {
                 cover_letter: '',
                 amount: '',
                 task_id: this.data.id,
-
             }
-
         }
 
     },
@@ -378,6 +388,9 @@ export default {
         task_owner() {
             return this.$store.getters.id == this.data.user_id
         },
+        verified() {
+            return this.$store.getters.user.status == 'verified'
+        }
     },
     created() {
         for (let i = 0; i < this.data.bids.length; i++) {
@@ -471,27 +484,25 @@ export default {
             }
         },
         bidsubmit() {
-            this.$validator.validateAll().then((result) => {
-                if (result) {
-                    this.offerbid = false;
-                    this.isLoading = true
-                    this.$axios.post('bid', this.form)
-                        .then((res) => {
-                            this.canBid = false
-                            setTimeout(() => {
-                                this.$axios.get('/getTask/' + this.slug)
-                                    .then(res => {
-                                        this.isLoading = false
-                                        EventBus.$emit('bidOfferTask', res.data)
-                                    })
-                            }, 0)
-                        })
-                        .catch(error => {
-                            this.isLoading = false
-                            console.log(error.res.data)
-                        })
-                }
-            })
+
+            this.offerbid = false;
+            this.isLoading = true
+            this.$axios.post('bid', this.form)
+                .then((res) => {
+                    this.canBid = false
+                    setTimeout(() => {
+                        this.$axios.get('/getTask/' + this.slug)
+                            .then(res => {
+                                this.isLoading = false
+                                EventBus.$emit('bidOfferTask', res.data)
+                            })
+                    }, 0)
+                })
+                .catch(error => {
+                    this.isLoading = false
+                    console.log(error.res.data)
+                })
+
         },
         deleteTask(slug) {
             Swal.fire({
@@ -567,15 +578,20 @@ a {
 
 .content {
     padding: 20px 0px 0px;
+    margin-bottom: 0rem;
+}
+
+.image.is-32x32 {
+    height: 20px;
+    width: 20px;
+}
+
+.material-icons {
+    font-size: 20px;
 }
 
 a:hover {
     color: #35B9EF;
-}
-
-.fa {
-    margin-top: 4px;
-    font-size: 22px;
 }
 
 .tasktitle {
@@ -603,6 +619,28 @@ a:hover {
     padding-top: 0.3rem;
 }
 
+.verified {
+    font-size: 18px;
+    margin: px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.verified .username {
+    color: black;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.verified .material-icons {
+    font-size: 18px;
+}
+
+.verified .text {
+    font-size: 13px;
+    margin-top: 2px;
+}
+
 .recent-post a {
     margin: 0px;
 }
@@ -611,6 +649,7 @@ a:hover {
 .task-poster-info {
     min-height: 170px;
     margin-top: -20px;
+    margin-left: -5px;
 }
 
 .vs-button {
@@ -628,6 +667,11 @@ a:hover {
     padding-right: 5px;
 }
 
+.content h3 {
+    font-size: 1.3em;
+    margin-bottom: 0.2em;
+}
+
 .right button {
     margin: 0px 5px;
 }
@@ -641,7 +685,8 @@ a:hover {
 }
 
 .task-info {
-    min-height: 185px;
+    min-height: 200px;
+    margin-left: -5px;
 }
 
 .content li+li {

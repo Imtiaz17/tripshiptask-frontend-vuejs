@@ -1,5 +1,9 @@
 <template>
     <section>
+         <vue-headful
+            :title="title"
+            :description="title"
+        />
     <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="true"></loading>
 	<div v-if="trip">
     <show-trip :data=trip>
@@ -16,6 +20,7 @@ export default {
      components: {showTrip: () => import('@/components/trip/ShowTrip'),Loading},
     data() {
         return {
+            title:'',
             isLoading:false,
             trip: '',
             slug: this.$route.params.slug
@@ -31,6 +36,7 @@ export default {
                 .then(res => {
                     this.isLoading=false
                     this.trip = res.data.data
+                    this.title = res.data.data.title
                 })
                 .catch(error => console.log(error.response.data))
         },

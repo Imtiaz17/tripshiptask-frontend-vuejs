@@ -1,12 +1,12 @@
 <template>
-    <section>
-        <table class="table is-accent fixed_header ">
+    <div class="fixed_header">
+        <table class="table is-accent">
             <thead>
                 <tr>
-                    <th width="25%" style="text-align:center">Type</th>
-                    <th width="25%" style="text-align:center">Amount</th>
-                    <th width="45%" style="text-align:center">Date</th>
-                    <th width="35%" style="text-align:center">Status</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -15,23 +15,23 @@
                 </div>
                 <div v-else>
                     <tr v-for="(item,index) in data" :key="index" v-if="item.type=='received'">
-                        <td data-th="Type" width="25%" style="text-align:center">
+                        <td>
                             {{item.type}}
                         </td>
-                        <td data-th="Amount" width="25%" style="text-align:center">
+                        <td>
                             {{item.amount}}
                         </td>
-                        <td data-th="Date" width="45%" style="text-align:center">
+                        <td>
                             {{moment(item.date).format('lll')}}
                         </td>
-                        <td data-th="Status" width="35%" style="text-align:center">
+                        <td>
                             {{item.status}}
                         </td>
                     </tr>
                 </div>
             </tbody>
         </table>
-    </section>
+    </div>
 </template>
 <script>
 import moment from 'moment'

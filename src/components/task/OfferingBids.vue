@@ -1,36 +1,45 @@
 <template>
-    <div class="offeringbids">
-        <div class="vld-parent">
+    <div class="columns">
+        <div class="vld-parent column">
             <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
             <div class="flex-card light-bordered light-raised trip-info" id="element2">
-                <div class="felx-body">
+                <div class="flex-body">
                     <div class="content">
-                        <div>
-                            <h3 style="border-bottom: 1px solid #e0e0e0;padding: 14px; margin-bottom:0em">
-                                Total {{bidsData.bids_count}} Bids</h3>
+                        <div class="offer-content-heading">
+                            <h3>Offers:  {{bidsData.bids_count}}</h3>
                         </div>
-                        <article class="media recent-post" style="margin-top:0" v-if="bidsData.bids_count==0">
+                        <article class="media recent-post" v-if="bidsData.bids_count==0">
                             <div class="media-content">
-                                <div class="post-content" style="padding:25px 0;text-align:center">
-                                    <h5>No Bids Yet</h5>
+                                <div class="post-content no-offers">
+                                    <h5>No offers yet</h5>
                                 </div>
                             </div>
                         </article>
-                        <article class="media recent-post" style="margin-top: 12px;margin-bottom: 12px;" v-for="(bid,index) in bidsData.bids" :key="index">
+                        <article class="media recent-post" v-for="(bid,index) in bidsData.bids" :key="index">
                             <div class="media-content">
                                 <div class="post-content ">
                                     <div class="full-topic">
                                         <div class="post">
                                             <div class="post-meta">
-                                                <div class="post-owner" style="margin-top:-40px">
+                                                <div class="post-owner">
                                                     <img class="avatar" :src="getPhoto(bid.photo)">
+                                                    <a class="contactlink" @click="showContactModal(index,bid.bidder_name)">Contact</a>
                                                 </div>
                                             </div>
-                                            <div class="post-content" style="margin: -39px 20px;">
+                                            <div class="post-content">
                                                 <div class="columns">
-                                                    <div class="column is-4">
-                                                        <a style="color:#1F2836;font-weight:500">{{bid.bidder_name}} </a>
-                                                        <a @click="showContactModal(index,bid.bidder_name)">(See contact info)</a>
+                                                     <div class="column is-4">
+                                                        <div class="basicinfo">
+                                                            <a>{{bid.bidder_name}} </a>
+                                                            <span v-if="bid.bidder_sex=='Male'">M</span>
+                                                            <span v-else-if="bid.bidder_sex=='Female'">F</span>
+                                                            <span v-else>{{bid.bidder_sex}}</span>
+                                                            <span>| {{moment().diff(bid.bidder_dob, 'years') }} </span>
+                                                        </div>
+                                                        <div class="backgroundinfo">
+                                                            <span>{{bid.bidder_education}}</span>
+                                                            <span> | {{bid.bidder_profession}}</span>
+                                                        </div>
                                                     </div>
                                                     <div class="column">
                                                         <span style="color:grey;font-weight:500">{{bid.posted}} task posted (<a @click="postedfeedback(index)">{{bid.feedbackcount}} Reviews</a>)</span>
@@ -53,46 +62,44 @@
                                                 </div>
                                                 <div class="columns" :class="bid.accepted==1?'ab':'cd'">
                                                     <div class="column is-4">
-                                                        <span style="font-weight:500;">Short message: </span>
+                                                        <span style="font-weight:500;">Message: </span>
                                                         <span>{{bid.cover_letter}}</span>
                                                     </div>
                                                     <div class="column is-4" v-if="bid.task_owner==id && bid.co>0">
-                                                        <span style="font-weight:500;">Counter Offer:</span>
-                                                        <span style="margin:0px 5px">{{bid.co}}</span>
+                                                        <label class="label">Counter Offer:</label>
+                                                        <span class="counteramt">{{bid.co}} BDT </span>
                                                         <span>
-                                                            <span class="button is-small" style=" background-color: #00b289; color:#fff" v-if="bid.agree==1">Accepted</span>
-                                                            <span class="button is-small" style=" background-color: #ff7273; color:#fff" v-else-if="bid.agree==2">Declined</span>
-                                                            <span class="button is-small" style=" background-color: #4FC1EA;  color:#fff" v-else>Pending</span>
+                                                            <vs-chip transparent color="success" v-if="bid.agree==1">Accepted</vs-chip>
+                                                            <vs-chip transparent color="danger" v-else-if="bid.agree==2">Declined</vs-chip>
+                                                            <vs-chip transparent color="primary" v-else>Pending</vs-chip>
                                                         </span>
                                                     </div>
-                                                    <div class="column is-4" v-if="bid.task_owner==id &&bid.co==null" style="margin-top:-20px">
-                                                        <div v-if="bid.accepted==0 ">
-                                                            <span style="font-weight:500;">Counter Offer</span>
-                                                            <div class="columns">
-                                                                <div class="column is-4">
-                                                                    <input class="input is-primary-focus" v-model="counter_offer[index]" type="text">
-                                                                </div>
-                                                                <div class="column is-2">
-                                                                    <vs-button color="primary" type="filled" @click='submit(bid.id)'>Submit</vs-button>
-                                                                </div>
+                                                    <div class="column is-4" v-if="bid.task_owner==id &&bid.co==null">
+                                                        <div class="columns" v-if="bid.accepted==0 ">
+                                                            <div class="column is-6">
+                                                                <label class="label">Counter Offer: </label>
+                                                                <input class="input is-primary-focus" v-model="counter_offer[index]" type="text">
+                                                                <a @click="submit(bid.id)" class="button raised info-btn is-small btn-fade" style="margin-top:5px">
+                                                                    Submit
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="column is-4" v-else-if="bid.user_id==id">
                                                         <div v-if="bid.co>0">
-                                                            <span style="font-weight:500;">Counter Offer:</span>
-                                                            <span style="margin-right:2px;font-weight:600">{{bid.co}}</span>
+                                                            <label class="label">Counter Offer:</label>
+                                                            <span class="counteramt">{{bid.co}} BDT</span>
                                                             <span>
-                                                                <span class="button is-small" style=" background-color: #00b289; color:#fff" v-if="bid.agree==1">Agreed</span>
-                                                                <span class="button is-small" style=" background-color: #ff7273; color:#fff" v-if="bid.agree==2">Declined</span>
+                                                                <vs-chip transparent color="success" v-if="bid.agree==1">Agreed</vs-chip>
+                                                                <vs-chip transparent color="success" v-if="bid.agree==2">Declined</vs-chip>
                                                                 <vs-button type="filled" v-if="bid.agree==0" @click="agree(bid.id)">Agree</vs-button>
                                                                 <vs-button color="danger" type="filled" v-if="bid.agree==0" @click="disagree(bid.id)">Decline</vs-button>
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div class="column is-4" style="margin-bottom:10px" v-if="bid.task_owner==id">
-                                                        <a style="float:right;" v-if="bid.accepted==0 && bid.paid==0" @click="accept(bid.id)" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade">Accept</a>
-                                                        <span style="float:right;" v-if="bid.accepted==1 && bid.complete==0" class="ongoing">Bid accepted
+                                                    <div class="column is-4" v-if="bid.task_owner==id">
+                                                        <a style="float:right;" v-if="bid.accepted==0 && bid.paid==0" @click="accept(bid.id)" class="button info-btn btn-dash is-raised rounded ripple  btn-fade">Accept</a>
+                                                        <span style="float:right;" v-if="bid.accepted==1 && bid.complete==0" class="ongoing">Offer accepted
                                                         </span>
                                                         <div v-else-if="bid.complete==1 && bid.paid==0" style="float:right;">
                                                             <p style="color: #296557;font-weight: 600;">Task has been completed,do you want to pay?</p>
@@ -104,7 +111,7 @@
                                                         <div v-else-if="bid.paid==1" style="float:right;">
                                                             <span class="ongoing">Task completed</span>
                                                             <div style="margin-top:12px;margin-left: 26%;" v-if="bid.feedback_got==0">
-                                                                <a @click="taskGiverFeedbackModal(index,bid.bidder_name,bid.payment_method)" class="button btn-dash success-btn btn-dash is-raised rounded ripple  btn-fade">Give a rating</a>
+                                                                <a @click="taskGiverFeedbackModal(index,bid.bidder_name,bid.payment_method)" class="button success-btn btn-dash is-raised rounded ripple  btn-fade">Give a rating</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -428,6 +435,7 @@
 <script>
 import Vue from 'vue'
 import { Rate } from 'element-ui';
+import moment from 'moment-timezone'
 Vue.component(Rate.name, Rate);
 import PostedTaskFeedback from './PostedTaskFeedback'
 import CompletedTaskFeedback from './CompletedTaskFeedback'
@@ -451,6 +459,7 @@ export default {
     props: ['data'],
     data() {
         return {
+            moment: moment,
             title: "",
             popupActive: false,
             paynReview: false,

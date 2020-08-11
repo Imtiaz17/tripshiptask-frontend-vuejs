@@ -1,25 +1,27 @@
 <template>
     <section>
+         <vue-headful title="Forgotten Password | TripShipTask" />
         <div class="hero-body">
             <div class="container">
                 <div class="columns is-centered is-mobile" style="text-align:center;">
                     <div class="column is-12">
                         <router-link to="/">
-                        <img class="featured-drawing" src="../../assets/images/tst/tst-logo.jpg" alt="" width="150px">
+                        <img class="featured-drawing" src="../../assets/images/tst/tstlogo.png" alt="" width="150px">
                     </router-link>
                     </div>
                 </div>
-                <div class="columns is-centered is-desktop">
+                <div class="columns is-centered is-desktop forgotpassword">
                     <div class="column is-5">
-                        <h3 class="title is-spaced is-2" style="text-align:center">Provide email address
+                        <h3 class="title is-spaced is-2" style="text-align:center">Trouble Logging In?
                         </h3>
+                        <h4>Enter your email and we'll send you a link to get back into your account.</h4>
                          
                         <div class="card">
                             <div class="card-content">
                                 <div class="columns">
                                     <div class="column">
                                         <div class="control">
-                                            <float-label label="Email address" fixed>
+                                            <float-label label="Email address">
                                                 <input v-validate="'required|email'" :class="{'input': true, 'is-danger': errors.has('email') }" type="text" class="input is-primary-focus" name="email" v-model="email">
                                             </float-label>
                                              <span v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
@@ -122,5 +124,16 @@ export default {
     height: 3px;
     background: #039be5;
     margin-bottom: 5px;
+}
+.forgotpassword h3
+{
+    margin-bottom: 0.8em !important;
+}
+.forgotpassword h4
+{
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 15px;
+    color: #8e8e8e;
 }
 </style>

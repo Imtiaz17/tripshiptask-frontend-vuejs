@@ -3,30 +3,21 @@
         <div class="columns" style="margin-top:1px">
             <div class="column is-6">
                 <div class="control">
-                    <float-label>
-                        <input type="text" class="input is-primary-focus" id="sendfrom" v-model="pickuppoint" v-validate="'required'" name="pick_up" placeholder="Pick up point">
-                    </float-label>
-                    <!--     <div class="field-wrapper">
-                        <input type="text" id="sendfrom" v-model="pickuppoint" v-validate="'required'" name="pick up point">
-                        <div class="field-placeholder"><span>Pick up point</span></div>
-                    </div> -->
+                    <gmap-autocomplete label="Pick up Point"  :start_point="pickuppoint" @address_res="handleAddr" placeholder="Pick up point" :verified="verified"></gmap-autocomplete>
+                    <input type="hidden" v-model="pickuppoint" v-validate="'required'" name="pick_up">
+                    <!--  <float-label label="Pick up point" fixed>
+                        <input type="text" class="input is-primary-focus" id="sendfrom" v-model="pickuppoint" v-validate="'required'" name="pick_up">
+                    </float-label> -->
                     <a style="float:right;font-size:12px;color:#039BE5;margin-top:1px" v-show="start_Marker" @click="startMarker" type="submit">Set on map
                     </a>
                     <span v-show="errors.has('pick_up')" class="help is-danger">Package pick up point is required</span>
                 </div>
             </div>
-            <!-- <div class="column is-9" style="padding-left: 0px;">
-                <div class="control">
-                    <gmap-autocomplete placeholder="Start point" class="input is-small is-primary-focus" @place_changed="pickUpPoint">
-                    </gmap-autocomplete>
-                    <input type="hidden" v-model="pickuppoint" v-validate="'required'" name="pick up point">
-                    <span v-show="errors.has('pick up point')" class="help is-danger">{{ errors.first('pick up point') }}</span>
-                </div>
-            </div> -->
             <div class="column is-6">
                 <div class="control">
-                    <VueCtkDateTimePicker id="OfferDatePicker" label="What's the Date you plan to mail the item?" :no-label="true" color="#6BA3FF" input-size="sm" v-model="date" format="DD-MM-YYYY" formatted="ll" output-format="YYYY-MM-DD" :no-header="true" :only-date="true" :no-button="true" :auto-close="true" v-validate="'required'" name="date" />
-                    <!--   <flat-pickr class="input is-primary-focus " v-validate="'required'" name="date" :config="config" placeholder="What's the Date you plan to mail the item?" :class="{'input': true, 'is-danger': errors.has('date') }" v-model="date"></flat-pickr> -->
+                    <float-label label="Date you plan to mail the item" fixed>
+                        <date-picker v-model="date" valueType="format" v-validate="'required'" :disabled-date="disabledBeforeToday" name="date"></date-picker>
+                    </float-label>
                     <span v-show="errors.has('date')" class="help is-danger">Preferred mailing date is required</span>
                 </div>
             </div>
@@ -34,13 +25,11 @@
         <div class="columns" style="margin-top: -24px;">
             <div class="column is-6">
                 <div class="control">
-                    <float-label>
-                        <input type="text" class="input is-primary-focus" id="sendto" v-model="dropoffpoint" v-validate="'required'" name="drop_off" placeholder="Drop off point">
-                    </float-label>
-                    <!--   <div class="field-wrapper">
-                        <input type="text" id="sendto" v-model="dropoffpoint" v-validate="'required'" name="drop off point">
-                        <div class="field-placeholder"><span>Drop off point</span></div>
-                    </div> -->
+                    <gmap-autocomplete label="Drop off Point"  :destination="dropoffpoint" @address_res="handleAddr" placeholder="Drop off point" :verified="verified"></gmap-autocomplete>
+                    <input type="hidden" v-model="dropoffpoint" v-validate="'required'" name="drop_off">
+                    <!-- <float-label label="Drop off point" fixed>
+                        <input type="text" class="input is-primary-focus" id="sendto" v-model="dropoffpoint" v-validate="'required'" name="drop_off">
+                    </float-label> -->
                     <a style="float:right;font-size:12px;color:#039BE5;margin-top:1px" v-show="end_Marker" @click="endMarker" type="submit">Set on map
                     </a>
                     <span v-show="errors.has('drop_off')" class="help is-danger">Drop off point is required</span>
@@ -48,18 +37,13 @@
             </div>
             <div class="column is-6">
                 <div class="control">
-                    <float-label :dispatch="false">
-                        <div class="select is-select">
+                    <float-label :dispatch="false" label="Time you plan to mail the item" fixed>
+                        <div class="select">
                             <select name="time" v-model="time" v-validate="'required'">
-                                <option :value="null" disabled selected>What's the Time you plan to mail the item?</option>
                                 <option v-for="(item,index) in timeschedule" :key="index" :value="item">{{item}}</option>
                             </select>
                         </div>
                     </float-label>
-                    <!--   <el-select name="time" size="small" v-model="time" placeholder="What's the Time you plan to mail the item?" v-validate="'required'">
-                        <el-option v-for="item,index in timeschedule" :key="index" :label="item" :value="item">
-                        </el-option>
-                    </el-select> -->
                     <span v-show="errors.has('time')" class="help is-danger">Preferred mailing time is required</span>
                 </div>
             </div>
@@ -67,20 +51,17 @@
         <div class="columns" style="margin-top:-23px">
             <div class="column is-6">
                 <div class="control">
-                    <VueCtkDateTimePicker id="OfferTimePicker" color="#6BA3FF" input-size="sm" v-model="deliverydatetime" label="Preferred delivery date & time" :no-label="true" :no-header="true" format=" YYYY-MM-DD hh:mm a" output-format="YYYY-MM-DD hh:mm" formatted="lll" :v-validate="'required'" name="delivery_dt" />
-                    <!--  <flat-pickr class="input is-primary-focus " v-validate="'required'" name="delivery date & time" :config="config1" placeholder="Preferred delivery date & time" :class="{'input': true, 'is-danger': errors.has('date') }" v-model="deliverydatetime"></flat-pickr> -->
+                    <float-label :dispatch="false" label="Preferred delivery date & time" fixed>
+                        <date-picker format="YYYY-MM-DD hh:mm a" v-model="datetime" type="datetime" :disabled-date="disabledBeforeToday" value-type="format" v-validate="'required'" name="delivery_dt"></date-picker>
+                    </float-label>
                     <span v-show="errors.has('delivery_dt')" class="help is-danger">Approx. delivery date and time is required</span>
                 </div>
             </div>
             <div class="column is-6">
                 <div class="control">
-                    <float-label>
-                        <input type="text" class="input is-primary-focus" name="amount" v-model="amount" v-validate="'required'" placeholder="Willing to pay">
+                    <float-label label="Willing to pay" fixed>
+                        <input type="text" class="input is-primary-focus" name="amount" v-model="amount" v-validate="'required'">
                     </float-label>
-                    <!--  <div class="field-wrapper">
-                        <input type="text" name="amount" v-model="amount" v-validate="'required'">
-                        <div class="field-placeholder"><span>Willing to pay</span></div>
-                    </div> -->
                     <span v-show="errors.has('amount')" class="help is-danger">Amount is required</span>
                 </div>
             </div>
@@ -92,18 +73,17 @@
         <div class="columns" style="margin-top:10px">
             <div class="column is-6">
                 <div class="control">
-                    <float-label>
-                        <input type="text" class="input is-primary-focus" name="goods" v-model="goods" v-validate="'required'" placeholder="What are you sending?">
+                    <float-label label="What are you sending?" fixed>
+                        <input type="text" class="input is-primary-focus" name="goods" v-model="goods" v-validate="'required'">
                     </float-label>
                     <span v-show="errors.has('goods')" class="help is-danger">Details of goods is required</span>
                 </div>
             </div>
             <div class="column is-6">
                 <div class="control">
-                    <float-label :dispatch="false">
-                        <div class="select is-select">
+                    <float-label :dispatch="false" label="Type of goods" fixed>
+                        <div class="select">
                             <select name="goods_type" v-model="goodtype">
-                                <option :value="null" disabled selected>Type of goods</option>
                                 <option v-for="(item,index) in gtype" :key="index" :value="item">{{item}}</option>
                             </select>
                         </div>
@@ -115,18 +95,17 @@
         <div class="columns">
             <div class="column is-6">
                 <div class="control">
-                    <float-label>
-                        <input type="text" class="input is-primary-focus" name="document_worth" v-model="goods_worth" v-validate="'required|numeric'" placeholder="Approx. value of the goods">
+                    <float-label label="Approx. value of the goods" fixed>
+                        <input type="text" class="input is-primary-focus" name="document_worth" v-model="goods_worth" v-validate="'required|numeric'">
                     </float-label>
                     <span v-show="errors.has('document_worth')" class="help is-danger">{{ errors.first('document_worth') }}</span>
                 </div>
             </div>
             <div class="column is-6">
                 <div class="control">
-                    <float-label :dispatch="false">
-                        <div class="select is-select">
+                    <float-label :dispatch="false" label="Packaging type" fixed>
+                        <div class="select">
                             <select name="package_type" v-model="packagetype" v-validate="'required'">
-                                <option :value="null" disabled selected>Packaging type</option>
                                 <option v-for="(item,index) in ptype" :key="index" :value="item">{{item}}</option>
                             </select>
                         </div>
@@ -137,20 +116,20 @@
         </div>
         <div class="columns" v-if="measure">
             <div class="column">
-                <input class="input is-small is-primary-focus" placeholder="length in inches" type="text" v-model="length">
+                <input class="input is-primary-focus" placeholder="length in inches" type="text" v-model="length">
             </div>
             <div class="column">
-                <input class="input is-small is-primary-focus" placeholder="width in inches" type="text" v-model="width">
+                <input class="input is-primary-focus" placeholder="width in inches" type="text" v-model="width">
             </div>
             <div class="column">
-                <input class="input is-small is-primary-focus" placeholder="height in inches" type="text" v-model="height">
+                <input class="input is-primary-focus" placeholder="height in inches" type="text" v-model="height">
             </div>
         </div>
         <div class="columns" style="margin-top:-15px;">
             <div class="column is-6">
                 <div class="control">
-                    <float-label>
-                        <textarea class="textarea is-primary-focus" v-model="details" rows="4" placeholder="Your notes ..."></textarea>
+                    <float-label label="Note" fixed>
+                        <textarea class="textarea is-primary-focus" v-model="details" rows="4"></textarea>
                     </float-label>
                 </div>
             </div>
@@ -162,24 +141,31 @@
     </section>
 </template>
 <script>
-
 import Vue from 'vue';
+import moment from "moment";
 import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate);
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
-import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
-Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
+import gmapAutocomplete from '../global/gmapautocomplete'
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 import * as VueGoogleMaps from 'vue2-google-maps-withscopedautocomp'
 Vue.use(VueGoogleMaps, {
     load: {
-        key: 'AIzaSyBsOMFpPA9V9dYG3noMdG3OEy88-gVjmk0',
+        key: 'AIzaSyCdu3RozRNnds9nOhMTPs-ETTWLlV1C-EE',
         libraries: 'places',
     },
 });
 export default {
+    components: {
+        gmapAutocomplete,
+        DatePicker
+    },
+
     props: ['data'],
     data() {
         return {
+            verified: true,
+            moment: moment,
             pickuppoint: '',
             dropoffpoint: '',
             date: '',
@@ -204,6 +190,7 @@ export default {
             length: '',
             width: '',
             height: '',
+            datetime: '',
             deliverydatetime: '',
             packagesize: '',
             start_Marker: true,
@@ -264,65 +251,10 @@ export default {
         },
     },
     mounted() {
-        // $(function() {
-        //     $(".field-wrapper .field-placeholder").on("click", function() {
-        //         $(this).closest(".field-wrapper").find("input").focus();
-        //     });
-        //     $(".field-wrapper input").on("keyup", function() {
-        //         var value = $.trim($(this).val());
-        //         if (value) {
-        //             $(this).closest(".field-wrapper").addClass("hasValue");
-        //         } else {
-        //             $(this).closest(".field-wrapper").removeClass("hasValue");
-        //         }
-        //     });
-        //     $(".field-wrapper .amount-placeholder").on("click", function() {
-        //         $(this).closest(".field-wrapper").find("input").focus();
-        //     });
-        //     $(".field-wrapper input").on("keyup", function() {
-        //         var value = $.trim($(this).val());
-        //         if (value) {
-        //             $(this).closest(".field-wrapper").addClass("hasValue");
-        //         } else {
-        //             $(this).closest(".field-wrapper").removeClass("hasValue");
-        //         }
-        //     });
-
-
-        // });
-
         this.$refs.xyz.$mapPromise.then(() => {
             this.directionsService = new google.maps.DirectionsService()
             this.directionsDisplay = new google.maps.DirectionsRenderer()
             this.directionsDisplay.setMap(this.$refs.xyz.$mapObject)
-            let input1 = document.getElementById("sendfrom");
-            document.getElementById('sendfrom').placeholder = '';
-            let autocomplete1 = new google.maps.places.Autocomplete(input1);
-            let input2 = document.getElementById("sendto");
-            document.getElementById('sendto').placeholder = '';
-            let autocomplete2 = new google.maps.places.Autocomplete(input2);
-            //after change place of from
-            autocomplete1.addListener('place_changed', () => {
-                var place = autocomplete1.getPlace()
-                if (place.name == place.address_components[0].long_name) {
-                    this.pickuppoint = place.formatted_address
-                } else {
-                    this.pickuppoint = place.name + "," + place.address_components[0].long_name + "," + place.address_components[2].long_name
-                }
-                this.getRoute()
-
-            })
-            //after change place of to 
-            autocomplete2.addListener('place_changed', () => {
-                var place = autocomplete2.getPlace()
-                if (place.name == place.address_components[0].long_name) {
-                    this.dropoffpoint = place.formatted_address
-                } else {
-                    this.dropoffpoint = place.name + "," + place.address_components[0].long_name + "," + place.address_components[2].long_name
-                }
-                this.getRoute()
-
-            });
         })
 
     },
@@ -330,6 +262,26 @@ export default {
 
     },
     methods: {
+        handleAddr(data) {
+            if (data.field == "Pick up point") {
+                this.pickuppoint = data.address
+                this.getRoute();
+            } else if (data.field == "Drop off point") {
+                this.dropoffpoint = data.address
+                this.getRoute();
+            }
+        },
+
+        disabledBeforeToday(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date < today || date > new Date(today.setMonth(today.getMonth() + 3))
+        },
+        disabledBeforeNow(time) {
+            const today = new Date();
+            return time < new Date(today.getTime())
+        },
+
         startMarker() {
             this.start_Marker = false
             this.geocoder = new google.maps.Geocoder()
@@ -377,39 +329,61 @@ export default {
         },
         getRoute() {
             var vm = this
+            var waypts = [];
             vm.directionsService.route({
                 origin: this.pickuppoint,
                 destination: this.dropoffpoint,
-                travelMode: 'DRIVING',
+                travelMode: google.maps.TravelMode.DRIVING,
+                waypoints: waypts
             }, function(response, status) {
 
                 if (status === google.maps.DirectionsStatus.OK) {
-                    var routes = response.routes;
-                    if (response.routes[0].legs.length > 1) {
-                        var metere = response.routes[0].legs[0].distance.value + response.routes[0].legs[1].distance.value;
-                        vm.distance = (metere / 1000).toFixed(1);
-                        var min = response.routes[0].legs[0].duration.value + response.routes[0].legs[1].duration.value;
-                        vm.duration = (Math.round(min / 60));
-                    } else {
-                        var metere = ((response.routes[0].legs[0].distance.value) / 1000).toFixed(1);
-                        vm.distance = metere
-                        var min = (response.routes[0].legs[0].duration.value)
-                        vm.duration = (Math.round(min / 60));
-                    }
+                    let mile = response.routes[0].legs[0].distance.text;
+                    vm.distance = mile;
+                    let duration = response.routes[0].legs[0].duration.text;
+                    vm.duration = duration;
                     vm.directionsDisplay.setDirections(response)
                 } else {
                     console.log('Directions request failed due to ' + status)
                 }
             })
         },
-        pickUpPoint(place) {
-            this.pickuppoint = place.name
-            this.getRoute()
-        },
-        dropOffPoint(place) {
-            this.dropoffpoint = place.name
-            this.getRoute()
-        },
+
+        // getRoute() {
+        //     var vm = this
+        //     vm.directionsService.route({
+        //         origin: this.pickuppoint,
+        //         destination: this.dropoffpoint,
+        //         travelMode: 'DRIVING',
+        //     }, function(response, status) {
+
+        //         if (status === google.maps.DirectionsStatus.OK) {
+        //             var routes = response.routes;
+        //             if (response.routes[0].legs.length > 1) {
+        //                 var metere = response.routes[0].legs[0].distance.value + response.routes[0].legs[1].distance.value;
+        //                 vm.distance = (metere / 1000).toFixed(1);
+        //                 var min = response.routes[0].legs[0].duration.value + response.routes[0].legs[1].duration.value;
+        //                 vm.duration = (Math.round(min / 60));
+        //             } else {
+        //                 var metere = ((response.routes[0].legs[0].distance.value) / 1000).toFixed(1);
+        //                 vm.distance = metere
+        //                 var min = (response.routes[0].legs[0].duration.value)
+        //                 vm.duration = (Math.round(min / 60));
+        //             }
+        //             vm.directionsDisplay.setDirections(response)
+        //         } else {
+        //             console.log('Directions request failed due to ' + status)
+        //         }
+        //     })
+        // },
+        // pickUpPoint(place) {
+        //     this.pickuppoint = place.name
+        //     this.getRoute()
+        // },
+        // dropOffPoint(place) {
+        //     this.dropoffpoint = place.name
+        //     this.getRoute()
+        // },
         bidsubmit() {
 
             this.$validator.validateAll().then((result) => {
@@ -434,7 +408,7 @@ export default {
                         })
                         .then((res) => {
                             setTimeout(() => {
-                                this.$axios.get('getShip/' + this.data.id)
+                                this.$axios.get('getCarryShip/' + this.data.id)
                                     .then(res => {
                                         EventBus.$emit('Carryingbid', res.data.data)
                                     })
@@ -449,6 +423,10 @@ export default {
         }
     },
     watch: {
+        'datetime': function(val) {
+            this.datetime = val
+            this.deliverydatetime = moment(val, "YYYY-MM-DD h:mm A").format("YYYY-MM-DD HH:mm:ss")
+        },
         packagetype: function(val) {
             this.measure = false
             if (this.packagetype == 'Small Envelope' || this.packagetype == 'Large Envelope') {

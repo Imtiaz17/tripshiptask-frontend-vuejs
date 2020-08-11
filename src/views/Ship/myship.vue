@@ -1,21 +1,22 @@
 <template>
     <div class="maincolumns">
+         <vue-headful title="My Shipments" description="my shipments" />
         <div class="columns">
             <div class="column is-10 is-offset-1">
                 <vs-tabs class="multiple">
-                    <vs-tab label="My Send package">
+                    <vs-tab label="Send a Package">
                         <div v-if="isSLoading">
                             <img class="loading" src="../../assets/images/roaling.gif">
                         </div>
                         <div v-else>
-                            <send-package v-if="myships" :data="myships.my_send_package"></send-package>
+                            <send-package v-if="myships" :data="myships.send_packages"></send-package>
                         </div>
                     </vs-tab>
-                    <vs-tab label="My Carry package">
-                        <carry-package v-if="myships" :data="myships.my_carry_package"></carry-package>
+                    <vs-tab label="Carry a Package">
+                        <carry-package v-if="myships" :data="myships.carry_packages"></carry-package>
                     </vs-tab>
-                    <vs-tab label="My completed shipments">
-                        <completed-ship v-if="myships" :data="myships.bids"></completed-ship>
+                    <vs-tab label="Completed Shipments">
+                        <completed-ship v-if="myships" :data="myships.completed_shipments"></completed-ship>
                     </vs-tab>
                 </vs-tabs>
             </div>

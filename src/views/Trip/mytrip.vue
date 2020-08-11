@@ -1,9 +1,10 @@
 <template>
     <div class="maincolumns">
+         <vue-headful title="My Trips" description="my trip" />
         <div class="columns">
             <div class="column is-10 is-offset-1">
                 <vs-tabs class="multiple">
-                    <vs-tab label="Posted Trip">
+                    <vs-tab label="Give a Ride">
                         <div v-if="isLoading">
                             <img class="loading" src="../../assets/images/roaling.gif">
                         </div>
@@ -11,11 +12,11 @@
                             <posted-trip v-if="mytrips" :data="mytrips.posted_trips"></posted-trip>
                         </div>
                     </vs-tab>
-                    <vs-tab label="Seeked Trips">
+                    <vs-tab label="Get a Ride">
                         <seeked-trip v-if="mytrips" :data="mytrips.seeked_trips"></seeked-trip>
                     </vs-tab>
-                    <vs-tab label="Completed Trips">
-                        <completed-trip v-if="mytrips" :data="mytrips.bids"></completed-trip>
+                    <vs-tab label="Completed Rides">
+                        <completed-trip v-if="mytrips" :data="mytrips.completed_trips"></completed-trip>
                     </vs-tab>
                 </vs-tabs>
             </div>

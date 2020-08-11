@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-top:-13px;">
+    <div>
         <div v-if="data && data.length>0">
             <table class="table is-accent " style="width:100%;margin-top:7px;">
                 <thead>

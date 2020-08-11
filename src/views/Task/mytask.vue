@@ -1,9 +1,10 @@
 <template>
     <div class="maincolumns">
+        <vue-headful title="My Task" description="my task" />
         <div class="columns">
             <div class="column is-10 is-offset-1">
                 <vs-tabs class="multiple">
-                    <vs-tab label="Posted Tasks">
+                    <vs-tab label="Offer a Task">
                         <div v-if="isTLoading">
                             <img class="loading" src="../../assets/images/roaling.gif">
                         </div>
@@ -11,11 +12,11 @@
                             <offered-task v-if="mytasks" :data="mytasks.offer_tasks"></offered-task>
                         </div>
                     </vs-tab>
-                    <vs-tab label="Seeked Tasks">
+                    <vs-tab label="Want a Task">
                         <seeked-task v-if="mytasks" :data="mytasks.seeked_tasks"></seeked-task>
                     </vs-tab>
                     <vs-tab label="Completed Tasks">
-                        <completed-task v-if="mytasks" :data="mytasks.bids"></completed-task>
+                        <completed-task v-if="mytasks" :data="mytasks.completed_tasks"></completed-task>
                     </vs-tab>
                 </vs-tabs>
             </div>
@@ -69,16 +70,6 @@ export default {
             this.second = true,
                 this.first = false
         },
-        // onChange() {
-        //     this.isLoading = true
-        //     axios.get(`api/mytask/${this.auth}`)
-        //         .then(res => {
-        //             this.data = res.data.data
-        //             this.isLoading = false
-
-        //         })
-        //         .catch(error => console.log(error.res))
-        // },
     }
 }
 </script>

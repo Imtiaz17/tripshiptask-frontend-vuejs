@@ -1,133 +1,136 @@
 <template>
-    <div class="conbox">
-        <div class="vld-parent dashboard-columns">
+    <div class="columns">
+        <div class="vld-parent column">
             <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="false"></loading>
             <div class="flex-card light-bordered light-raised trip-info" id="element" style="margin-top: 10px;">
-                <div class="felx-body">
+                <div class="flex-body">
                     <div class="content">
-                        <div class="card-heading is-bordered">
-                            <h3 style="border-bottom: 1px solid #e0e0e0;padding: 14px; margin-bottom:0em">
-                                Total {{bidsData.bids_count}} Bids</h3>
+                        <div class="offer-content-heading">
+                            <h3>Offers: {{bidsData.bids_count}}</h3>
                         </div>
                         <article class="media recent-post" style="margin-top:0" v-if="bidsData.bids_count==0">
                             <div class="media-content">
-                                <div class="post-content" style="padding:25px 0;text-align:center">
-                                    <h5>No one bids yet</h5>
+                                <div class="post-content no-offers">
+                                   <h5>No offers yet</h5>
                                 </div>
                             </div>
                         </article>
-                        <article class="media recent-post" style="margin-top: 12px;" v-for="(bid,index) in bidsData.bids" :key="index">
-                            <div class="media-content" style="margin-bottom:8px;">
-                                <div class="post-content ">
-                                    <div class="full-topic">
-                                        <div class="post">
-                                            <div class="post-meta">
-                                                <div class="post-owner" style="margin-top:-40px">
-                                                    <img class="avatar" :src="getProfilePhoto(bid.photo)">
+                        <article class="media recent-post" v-for="(bid,index) in bidsData.bids" :key="index">
+                            <div class="media-content">
+                                <div class="full-topic">
+                                    <div class="post">
+                                        <div class="post-meta">
+                                            <div class="post-owner">
+                                                <img class="avatar" :src="getProfilePhoto(bid.photo)">
+                                                <a v-if="bid.accepted==1" class="contactlink" @click="showModal(index,bid.bidder_name)">Contact</a>
+                                            </div>
+                                        </div>
+                                        <div class="post-content">
+                                            <div class="columns">
+                                                <div class="column is-4">
+                                                    <div class="basicinfo">
+                                                    <a>{{bid.bidder_name}} </a>
+                                                     
+                                                    <span v-if="bid.bidder_sex=='Male'">M</span>
+                                                        <span v-else-if="bid.bidder_sex=='Female'">F</span>
+                                                        <span v-else>{{bid.bidder_sex}}</span>
+                                                        <span>| {{moment().diff(bid.bidder_dob, 'years') }} </span>
+                                                    </div>
+                                                    <div class="backgroundinfo">
+                                                        <span>{{bid.bidder_education}}</span>
+                                                        <span> | {{bid.bidder_profession}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="column">
+                                                    <span style="font-weight:500">{{bid.posted}} trip posted (<a @click="postedFeedbacks(index)">Reviews</a>)</span>
+                                                </div>
+                                                <div class="column">
+                                                    <span style="font-weight:500">{{bid.completed}} trip recieved
+                                                        (<a @click="completedFeedbacks(index)">Reviews</a>)</span>
+                                                </div>
+                                                <div class="column is-2" style="font-size: 16px;font-weight: 500;">
+                                                    <span style="font-weight:500">Amount: </span>
+                                                    <span style="color:#00B289">{{bid.amount}} BDT</span>
                                                 </div>
                                             </div>
-                                            <div class="post-content" style="margin: -39px 20px;">
-                                                <div class="columns">
-                                                    <div class="column is-4">
-                                                        <a style="color:#039be5;font-weight:500;font-size:16px">{{bid.bidder_name}} </a>
-                                                        <a @click="showModal(index,bid.bidder_name)">(See contact
-                                                            info)</a>
-                                                    </div>
-                                                    <div class="column">
-                                                        <span style="font-weight:500">{{bid.posted}} trip posted (<a @click="postedFeedbacks(index)">Reviews</a>)</span>
-                                                    </div>
-                                                    <div class="column">
-                                                        <span style="font-weight:500">{{bid.completed}} trip recieved
-                                                            (<a @click="completedFeedbacks(index)">Reviews</a>)</span>
-                                                    </div>
-                                                    <div class="column is-2" style="font-size: 16px;font-weight: 500;">
-                                                        <span style="font-weight:500">Amount: </span>
-                                                        <span style="color:#00B289">{{bid.amount}} BDT</span>
-                                                    </div>
+                                            <div class="columns ">
+                                                <div class="column is-3">
+                                                    <span style="font-weight:500;">Message: </span>
+                                                    <span>{{bid.cover_letter}}</span>
                                                 </div>
-                                                <div class="columns ">
-                                                    <div class="column">
-                                                        <span style="font-weight:500;">Short message: </span>
-                                                        <span>{{bid.cover_letter}}</span>
-                                                    </div>
-                                                    <div class="column is-2">
-                                                        <span style="font-weight:500;">Vehicle type:</span>
-                                                        <span>{{bid.vehicle_type}}</span>
-                                                        <br>
-                                                        <span style="font-weight:500;">Model:</span>
-                                                        <span v-if="bid.vehicle_name==null">N/A</span>
-                                                        <span v-else>{{bid.vehicle_name}}</span>
-                                                    </div>
-                                                    <!--  <div class="column is-4" v-if="bid.trip_owner==id && bid.co>0">
+                                                <div class="column is-2">
+                                                    <span style="font-weight:500;">Vehicle type:</span>
+                                                    <span>{{bid.vehicle_type}}</span>
+                                                    <br>
+                                                    <span style="font-weight:500;">Model:</span>
+                                                    <span v-if="bid.vehicle_name==null">N/A</span>
+                                                    <span v-else>{{bid.vehicle_name}}</span>
+                                                </div>
+                                                <!--  <div class="column is-4" v-if="bid.trip_owner==id && bid.co>0">
                                                         </div>
  -->
-                                                    <div class="column is-2" v-if="bid.trip_owner==id && bid.co>0">
-                                                        <span style="font-weight:500;">Counter Offer:</span>
-                                                        <span style="margin:0px 10px">{{bid.co}}</span>
-                                                        <span>
-                                                            <span class="button is-small" style=" background-color: #00b289; color:#fff" v-if="bid.agree==1">Accepted</span>
-                                                            <span class="button is-small" style=" background-color: #ff7273; color:#fff" v-else-if="bid.agree==2">Declined</span>
-                                                            <span class="button is-small" style=" background-color: #4FC1EA;  color:#fff" v-else>Pending</span>
+                                                <div class="column is-4" v-if="bid.trip_owner==id && bid.co>0">
+                                                    <label class="label">Counter Offer:</label>
+                                                    <span class="counteramt">{{bid.co}} BDT</span>
+                                                    <span>
+                                                        <vs-chip transparent color="success" v-if="bid.agree==1">Accepted</vs-chip>
+                                                        <vs-chip transparent color="danger" v-else-if="bid.agree==2">Declined</vs-chip>
+                                                        <vs-chip transparent color="primary" v-else>Pending</vs-chip>
+                                                    </span>
+                                                </div>
+                                                <div class="column is-4" v-if="bid.trip_owner==id && bid.co==null">
+                                                    <div class="columns" v-if="bid.accepted==0">
+                                                        <div class="column is-6">
+                                                            <label class="label">Counter Offer: </label>
+                                                            <input class="input is-primary-focus" v-model="counter_offer[index]" type="text">
+                                                            <a @click="submit(bid.id)" class="button raised info-btn is-small btn-fade" style="margin-top:5px">
+                                                                Submit
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="column is-3" v-else-if="bid.user_id==id && bid.co>0">
+                                                    <label class="label">Counter Offer:</label>
+                                                    <span class="counteramt">{{bid.co}} BDT</span>
+                                                    <span>
+                                                        <vs-chip transparent color="success" v-if="bid.agree==1">Agreed</vs-chip>
+                                                        <vs-chip transparent color="success" v-if="bid.agree==2">Declined</vs-chip>
+                                                        <vs-button type="filled" v-if="bid.agree==0" @click="agree(bid.id)">Agree</vs-button>
+                                                        <vs-button color="danger" type="filled" v-if="bid.agree==0" @click="disagree(bid.id)">Decline</vs-button>
+                                                    </span>
+                                                </div>
+                                                <div class="column" v-if="bid.user_id==id  && bid.accepted==1">
+                                                    <div v-if="bid.paid==0 && bid.complete==0" style="float: right;">
+                                                        <p style="color: #737373;font-weight: 600;">After finishing the ride, click on Finish Ride button</p>
+                                                        <a style="float: right;" @click="rideCompleted(bid.id)" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade">Finish Ride</a>
+                                                    </div>
+                                                    <div v-else-if="bid.paid==0 && bid.complete==1" style="float:right">
+                                                        <span class="ongoing">Ride completed,awaiting payment
                                                         </span>
                                                     </div>
-                                                    <div class="column is-4" v-if="bid.trip_owner==id &&bid.co==null">
-                                                        <div class="columns" v-if="bid.accepted==0">
-                                                            <label class="label column is-4">Counter Offer</label>
-                                                            <div class="column is-4">
-                                                                <input class="input is-primary-focus" v-model="counter_offer[index]" type="text">
-                                                            </div>
-                                                            <div class="column is-4">
-                                                                <a @click='submit(bid.id)' class="button btn-dash primary-btn btn-fade ripple" style="margin-top:-5px">
-                                                                    Submit
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="column is-2" v-else-if="bid.user_id==id && bid.co>0">
-                                                        <div>
-                                                            <span style="font-weight:500;">Counter Offer:</span>
-                                                            <span style="margin:0px 10px">{{bid.co}}</span>
-                                                            <span>
-                                                                <span class="button is-small" style=" background-color: #00b289; color:#fff" v-if="bid.agree==1">Agreed</span>
-                                                                <span class="button is-small" style=" background-color: #ff7273; color:#fff" v-if="bid.agree==2">Declined</span>
-                                                                <vs-button type="filled" v-if="bid.agree==0" @click="agree(bid.id)">Agree</vs-button>
-                                                                <vs-button color="danger" type="filled" v-if="bid.agree==0" @click="disagree(bid.id)">Decline</vs-button>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="column" v-if="bid.user_id==id  && bid.accepted==1">
-                                                        <div v-if="bid.paid==0 && bid.complete==0" style="float: right;">
-                                                            <p style="color: #737373;font-weight: 600;">After finishing the ride, click on Finish Ride button</p>
-                                                            <a style="float: right;" @click="rideCompleted(bid.id)" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade">Finish Ride</a>
-                                                        </div>
-                                                        <div v-else-if="bid.paid==0 && bid.complete==1" style="float:right">
-                                                            <span class="ongoing">Ride completed,awaiting payment
-                                                            </span>
-                                                        </div>
-                                                        <div v-else-if=" bid.paid==1" style="float:right">
-                                                            <span class="ongoing">Ride completed
-                                                            </span>
-                                                            <div style="margin-top:12px;" v-if="bid.feedback_given==0">
-                                                                <a @click="tripGiverReviewModal(index,bid.trip_username)" class="button btn-dash success-btn btn-dash is-raised rounded ripple  btn-fade">Give a rating</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="column" v-if="bid.trip_owner==id">
-                                                        <a v-if="bid.accepted==0 " @click="accept(bid.id)" class="button btn-dash info-btn btn-dash is-raised rounded ripple  btn-fade" style="float:right">Accept</a>
-                                                        <span v-if="bid.accepted==1 && bid.complete==0" class="ongoing">Bid accepted
+                                                    <div v-else-if=" bid.paid==1" style="float:right">
+                                                        <span class="ongoing">Ride completed
                                                         </span>
-                                                        <div v-else-if="bid.complete==1 && bid.paid==0" style="float:right;">
-                                                            <p style="color: #296557;font-weight: 600;">Ride has been completed,do you want to pay?</p>
-                                                            <div style="text-align:center">
-                                                                <vs-button type="filled" @click="paymentModal(index,bid.bidder_name)">Yes</vs-button>
-                                                                <vs-button type="filled">No</vs-button>
-                                                            </div>
+                                                        <div style="margin-top:12px;" v-if="bid.feedback_given==0">
+                                                            <a @click="tripGiverReviewModal(index,bid.trip_username)" class="button btn-dash success-btn btn-dash is-raised rounded ripple  btn-fade">Give a rating</a>
                                                         </div>
-                                                        <div v-else-if="bid.paid==1" style="float:right;">
-                                                            <span class="ongoing">Ride completed</span>
-                                                            <div style="margin-top:12px;margin-left:6%;" v-if="bid.feedback_got==0">
-                                                                <a @click="ridetakerFeedbackModal(index,bid.trip_username,bid.payment_method)" class="button btn-dash success-btn btn-dash is-raised rounded ripple  btn-fade">Give a rating</a>
-                                                            </div>
+                                                    </div>
+                                                </div>
+                                                <div class="column" v-if="bid.trip_owner==id">
+                                                    <a v-if="bid.accepted==0 " @click="accept(bid.id)" class="button btn-dash info-btn is-raised rounded btn-fade" style="float:right">Accept</a>
+                                                    <span v-if="bid.accepted==1 && bid.complete==0" class="ongoing">Bid accepted
+                                                    </span>
+                                                    <div v-else-if="bid.complete==1 && bid.paid==0" style="float:right;">
+                                                        <p style="color: #296557;font-weight: 600;">Ride has been completed,do you want to pay?</p>
+                                                        <div style="text-align:center">
+                                                            <vs-button type="filled" @click="paymentModal(index,bid.bidder_name)">Yes</vs-button>
+                                                            <vs-button type="filled">No</vs-button>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else-if="bid.paid==1" style="float:right;">
+                                                        <span class="ongoing">Ride completed</span>
+                                                        <div style="margin-top:12px;margin-left:6%;" v-if="bid.feedback_got==0">
+                                                            <a @click="ridetakerFeedbackModal(index,bid.trip_username,bid.payment_method)" class="button success-btn btn-dash is-raised rounded ripple  btn-fade">Give a rating</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -166,7 +169,7 @@
                     </div>
                     <div class="columns">
                         <div class="column" style="display:inline-flex">
-                            <label class="label">Sex:</label>
+                            <label class="label">Gender:</label>
                             <span class="contactinfo">{{ bidd.bidder_sex}}</span>
                         </div>
                         <div class="column" style="display:inline-flex">
@@ -183,16 +186,7 @@
                             <span class="contactinfo">{{ bidd.bidder_location}}</span>
                         </div>
                     </div>
-                    <div class="columns">
-                        <div class="column" style="display:inline-flex">
-                            <label class="label">Skype:</label>
-                            <span class="contactinfo">{{ bidd.bidder_skype}}</span>
-                        </div>
-                        <div class="column" style="display:inline-flex">
-                            <label class="label">Facebook Id:</label>
-                            <span class="contactinfo">{{ bidd.bidder_fblink}}</span>
-                        </div>
-                    </div>
+                   
                 </div>
             </vs-popup>
         </div>
@@ -315,67 +309,72 @@
                 </div>
             </vs-popup>
         </div>
+
         <!--    ride taker payment system choose -->
-        <vs-sidebar position-right parent="body" default-index="1" color="primary" class="sidebarx" spacer v-model="completedfeedbackShow">
-            <div v-for="(bidsrecord,index) in bidsData.bids" :key="index" v-if="recordContent(index)" style="margin-top:-10px">
-                <div class="header-sidebar" slot="header">
+        <a-drawer :width="720" :visible="completedfeedbackShow" :body-style="{ paddingBottom: '80px' }" @close="onClose">
+            <div v-for="(bidsrecord,index) in bidsData.bids" :key="index" v-if="recordContent(index)">
+                <div class="header">
                     <vs-avatar size="70px" :src="'/images/' + bidsrecord.photo" style="float:left" />
                     <div class="con-colors" style="overflow:hidden">
-                        <ul style="padding-left:10px">
-                            <li style="font-size: 21px;color: rgb(36, 33, 69);font-weight:700">
+                        <ul>
+                            <li >
                                 <h4>
                                     {{bidsrecord.bidder_name}}
                                 </h4>
                             </li>
                             <li>
-                                <h3 style="font-size:17px;color:gray">Trip Completed Rating</h3>
-                                <span class="rating" style="display:inline-flex">
+                            
+                                <div class="rating">
+                                    <a-rate :default-value="bidsrecord.completed_rating" disabled allow-half />
+                                </div>
+
+                                
+                              <!--   <span class="rating" style="display:inline-flex">
                                     <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="bidsrecord.completed_rating" style="float:left"> </star-rating>
-                                    <!-- <el-rate v-model="bidsrecord.completed_rating" disabled></el-rate> -->
+                                   
                                     <small class="rate">{{bidsrecord.completed_rating}}</small>
-                                </span>
-                                <!-- <span class="rating">
-                                    <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="bidsrecord.rating" style="float:left"> </star-rating>
-                                    <small class="rate">{{bidsrecord.rating}}</small>
                                 </span> -->
+                             
                             </li>
-                            <li>
-                            </li>
+                         
                         </ul>
                     </div>
                 </div>
                 <vs-divider />
                 <completed-trip-feedback :data="bidsrecord.trip_completed_feedback"></completed-trip-feedback>
             </div>
-        </vs-sidebar>
-        <vs-sidebar position-right parent="body" default-index="1" color="primary" class="sidebarx" spacer v-model="postedfeedbackShow">
-            <div v-for="(bidsrecord,index) in bidsData.bids" :key="index" v-if="postedRecordContent(index)" style="margin-top:-10px">
-                <div class="header-sidebar" slot="header">
+        </a-drawer>
+         <a-drawer :width="720" :visible="postedfeedbackShow" :body-style="{ paddingBottom: '80px' }" @close="onClose">
+            <div v-for="(bidsrecord,index) in bidsData.bids" :key="index" v-if="postedRecordContent(index)">
+                <div class="header">
                     <vs-avatar size="70px" :src="'/images/' + bidsrecord.photo" style="float:left" />
                     <div class="con-colors" style="overflow:hidden">
-                        <ul style="padding-left:10px">
-                            <li style="font-size: 21px;color: rgb(36, 33, 69);font-weight:700">
+                        <ul>
+                            <li>
                                 <h4>
                                     {{bidsrecord.bidder_name}}
                                 </h4>
                             </li>
                             <li>
-                                <h3 style="font-size:17px;color:gray">Trip Posted Rating</h3>
-                                <span class="rating" style="display:inline-flex">
+                            
+                                <div class="rating">
+                                    <a-rate :default-value="bidsrecord.posted_rating" disabled allow-half />
+                                </div>
+
+                                <!-- <span class="rating" style="display:inline-flex">
                                     <star-rating :show-rating=false :star-size="20" :read-only="true" :increment="0.1" :rating="bidsrecord.posted_rating" style="float:left"> </star-rating>
-                                    <!--  <el-rate v-model="bidsrecord.posted_rating" disabled></el-rate> -->
+                                   
                                     <small class="rate">{{bidsrecord.posted_rating}}</small>
-                                </span>
+                                </span> -->
                             </li>
-                            <li>
-                            </li>
+                           
                         </ul>
                     </div>
                 </div>
                 <vs-divider />
                 <posted-trip-feedback :data="bidsrecord.trip_posted_feedback"></posted-trip-feedback>
             </div>
-        </vs-sidebar>
+         </a-drawer>
     </div>
 </template>
 <script>
@@ -393,9 +392,11 @@ var options = {
 }
 export default {
     components: {
-     postedTripFeedback: () => import('@/components/trip/postedTripFeedback'),
-     completedTripFeedback: () => import('@/components/trip/completedTripFeedback'), 
-    Loading, StarRating },
+        postedTripFeedback: () => import('@/components/trip/postedTripFeedback'),
+        completedTripFeedback: () => import('@/components/trip/completedTripFeedback'),
+        Loading,
+        StarRating
+    },
     props: ['data'],
     data() {
         return {
@@ -521,14 +522,16 @@ export default {
         },
     },
 
-    mounted() {
-        EventBus.$on('newTrip', (data) => {
+     mounted() {
+        EventBus.$on('newBid', (data) => {
             this.bidsData = data.data
-            this.$scrollTo(element, 1000, options)
         })
-
     },
     methods: {
+        onClose(){
+            this.postedfeedbackShow=false
+            this.completedfeedbackShow=false
+        },
         getProfilePhoto(pic) {
             return pic;
         },
@@ -780,15 +783,6 @@ export default {
     display: block;
 }
 
-.header {
-    width: 100%;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    height: 50px;
-    color: #444;
-    box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.04);
-}
-
 .rate {
     color: #fff;
     background-color: #4FC1EA;
@@ -816,8 +810,6 @@ export default {
     padding-left: 5px;
 }
 
-overflow: hidden;
-
 .namenrating {
     float: right;
     margin-right: -15px;
@@ -841,6 +833,7 @@ overflow: hidden;
     color: #00B289;
     border: 1px solid;
     padding: 7px;
+    float: right;
 
 }
 
